@@ -27,6 +27,11 @@ class MovimientosController extends Controller
 
         $partes = PartesModel::get();
         $ubicaciones = UbicacionesModel::get();
+        foreach ($partes as $parte) {
+            $parte->descripcion = str_replace('"', "''", $parte->descripcion);
+            // $parte->otra_propiedad = $parte->descripcion;
+        }
+        // return response(['data' => $partes]);
 
         return view('/movimientos', array('movimiento' => $movimiento, 'partes' => $partes, 'ubicaciones' => $ubicaciones));
     }
@@ -34,12 +39,14 @@ class MovimientosController extends Controller
     public function store(Request $request) {
         $validatedData = $request->validate([
             'tipo' => 'required|in:Entrada,Salida,Ajuste',
-            'ubicacion' => 'required|not_in:Ubicación',
-            'palet' => 'not_in:Palet',
-            'fila' => 'not_in:Fila'
         ]);
 
         for($i = 0; $i < $request->counter; $i++) {
+            $validatedData = $request->validate([
+                'ubicacion'.$i => 'required|not_in:Ubicación',
+                'palet'.$i => 'not_in:Palet'
+            ]);
+            
             $lastIndex = MovimientosModel::select('id')->orderBy('id', 'desc')->first();
 
             $movimiento = new MovimientosModel();
@@ -47,17 +54,17 @@ class MovimientosController extends Controller
             $cantidad = 'cantidad'.$i;
             $comentario = 'comentario'.$i;
             $id_parte = 'id_parte'.$i;
+            $ubicacion = 'ubicacion'.$i;
+            $palet = 'palet'.$i;
 
-            // $movimiento->id = $lastIndex->id+1;
             $movimiento->proyecto = $request->$proyecto; // proyecto 02
             $movimiento->cantidad = $request->$cantidad; // 25
             $movimiento->tipo = $request->tipo; // Entrada
             $movimiento->comentario = $request->$comentario; // 25
             $movimiento->fecha_registro = Carbon::now();
             $movimiento->id_parte = $request->$id_parte; // 258
-            $movimiento->ubicacion = $request->ubicacion;
-            $movimiento->palet = $request->palet;
-            $movimiento->fila = $request->fila;
+            $movimiento->ubicacion = $request->$ubicacion;
+            $movimiento->palet = $request->$palet;
             
             $movimiento->save();
         }

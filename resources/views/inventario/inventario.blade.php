@@ -26,8 +26,8 @@
                                         <th scope="col">Unidad de medida</th>
                                         <th scope="col">Inventario</th>
                                         <th scope="col">Ubicación</th>
-                                        <th scope="col">Palet</th>
-                                        <th scope="col">Fila</th>
+                                        {{-- <th scope="col">Palet</th>
+                                        <th scope="col">Fila</th> --}}
                                         <th scope="col">Imagen</th>
                                     </tr>
                                 </thead>
@@ -40,9 +40,29 @@
                                             <td>{{ $inventario->descripcion }}</td>
                                             <td>{{ $inventario->um }}</td>
                                             <td>{{ $inventario->cantidad }}</td>
-                                            <td>{{ $inventario->ubicacion }}</td>
-                                            <td>{{ $inventario->palet }}</td>
-                                            <td>{{ $inventario->fila }}</td>
+                                            {{-- <td>{{ $inventario->ubicacion }}</td> --}}
+
+                                            {{-- <td>{{ $inventario->ubicaciones[0]->ubicacion ?? 'NA'  }}</td> --}}
+
+                                            <td>
+                                                {{-- <select name="" id="" class="form-select"> --}}
+                                                    @foreach($inventario->ubicaciones as $ubi)
+                                                    <div>
+                                                        {{ $ubi->ubicacion }},{{ $ubi->palet }},{{ $ubi->fila }}
+                                                    </div>
+                                                    @endforeach 
+                                                {{-- </select> --}}
+                                                {{-- @if ($inventario->ubicaciones) --}}
+                                                
+                                                    
+                                                {{-- @endif --}}
+                                            </td>
+                                            
+                                            {{-- <td>{{ ($inventario->ubicaciones) ? 
+                                                $inventario->ubicaciones[count($inventario->ubicaciones)-1]->ubicacion
+                                            : 's' }}</td> --}}
+                                            {{-- <td>{{ $inventario->palet }}</td>
+                                            <td>{{ $inventario->fila }}</td> --}}
                                             <td>
                                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inventarioModal{{ $inventario->id }}">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-image" viewBox="0 0 16 16">

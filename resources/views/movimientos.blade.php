@@ -10,9 +10,11 @@
         function cambioParte(p) {
             const parte = p;
 
+            let cleanedWord = parte.descripcion.replaceAll(`"`, "''");
+
             document.getElementById('id_parte').value=parte.id;
             document.getElementById('proyecto').value=parte.proyecto;
-            document.getElementById('descripcion').value=parte.descripcion;
+            document.getElementById('descripcion').value=cleanedWord;
             document.getElementById('unidad_de_medida').value=parte.um;
 
             const option = document.getElementsByClassName("partOption")
@@ -47,7 +49,6 @@
 
         function addRow() {
             rows++;
-            console.log(rows);
             
             const tbody = document.getElementById("tbody");
             let row = tbody.insertRow(0);
@@ -58,13 +59,14 @@
             let cell4 = row.insertCell(3);
             let cell5 = row.insertCell(4);
             let cell6 = row.insertCell(5);
+            let cell7 = row.insertCell(6);
 
             cell1.innerHTML = `
             <div class="dropdown">
                 <div id="myDropdown" class="dropdown-content">
                     <input class="form-select" type="text" placeholder="# de parte" id="myInput" onkeyup="filterFunction()" autocomplete="off">
                         @foreach ($partes as $p)
-                        <option style="display: none" id="parte" class="partOption" onclick="cambioParte({{$p}})" value="{{ $p }}">{{ $p->numero_de_parte }} {{ $p->ubicacion }}</option>
+                        <option style="display: none" id="parte" class="partOption" onclick="cambioParte({{$p}})" value="{{ $p }}">{{ $p->numero_de_parte }}</option>
                         @endforeach
                 </div>
             </div>
@@ -93,6 +95,34 @@
             cell5.innerHTML = `
             <textarea class="form-control" name="comentario${rows}" wire:model="comentario"></textarea>
                                                     @error('comentario${rows}')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
+            `
+
+            cell6.innerHTML = `
+            <select class="form-select" id="ubicacion" name="ubicacion${rows}" aria-placeholder="Ubicación">
+                                                    <option selected >Ubicación</option>
+                                                    @foreach ($ubicaciones as $ubicacion)
+                                                        <option value="{{$ubicacion->ubicacion}}"> {{ $ubicacion->ubicacion }} </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('ubicacion${rows}')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                @enderror
+            `
+
+            cell7.innerHTML = `
+            <select class="form-select" id="palet" name="palet${rows}">
+                                                        <option selected >Palet</option>
+                                                        <option value="1">1</option>
+                                                        <option value="2">2</option>
+                                                        <option value="3">3</option>
+                                                        <option value="4">4</option>
+                                                        <option value="5">5</option>
+                                                        <option value="6">6</option>
+                                                        <option value="7">7</option>
+                                                    </select>
+                                                    @error('palet${rows}')
                                                         <span class="text-danger">{{ $message }}</span>
                                                     @enderror
             `
@@ -134,7 +164,7 @@
                                 <span>Tipo de movimiento</span>
                             </div>
 
-                            <div class="w-25">
+                            {{-- <div class="w-25">
                                 <select class="form-select" id="fila" name="fila">
                                     <option selected >Fila</option>
                                     <option value="1">1</option>
@@ -154,9 +184,9 @@
                             </div>
                             <div class="p-2">
                                 <span>Fila</span>
-                            </div>
+                            </div> --}}
 
-                            <div class="w-25">
+                            {{-- <div class="w-25">
                                 <select class="form-select" id="palet" name="palet">
                                     <option selected >Palet</option>
                                     <option value="1">1</option>
@@ -170,12 +200,12 @@
                                 @error('palet')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                            </div>
-                            <div class="p-2">
+                            </div> --}}
+                            {{-- <div class="p-2">
                                 <span>Palet</span>
-                            </div>
+                            </div> --}}
 
-                                <div class="w-25">
+                                {{-- <div class="w-25">
                                     <select class="form-select" id="ubicacion" name="ubicacion">
                                         <option selected >Ubicación</option>
                                         @foreach ($ubicaciones as $ubicacion)
@@ -188,7 +218,7 @@
                                 </div>
                                 <div class="p-2">
                                     <span>Ubicación</span>
-                                </div>
+                                </div> --}}
                                 
                             </div>
 
@@ -205,6 +235,9 @@
                                             <th scope="col">Unidad de medida</th>
                                             <th scope="col">Cantidad</th>
                                             <th scope="col">Comentario</th>
+                                            <th scope="col">Ubicación</th>
+                                            {{-- <th scope="col">Fila</th> --}}
+                                            <th scope="col">Palet</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tbody">
@@ -214,12 +247,11 @@
                                                         <div id="myDropdown" class="dropdown-content">
                                                             <input class="form-select" type="text" placeholder="# de parte" id="myInput" onkeyup="filterFunction()" autocomplete="off">
                                                                 @foreach ($partes as $p)
-                                                                <!-- <option style="display: none" id="parte" class="partOption" onclick="cambioParte({{$p}})" value="{{ $p }}">{{ $p->numero_de_parte }} {{ $p->ubicacion }}</option> -->
                                                                 <option style="display: none" id="parte" class="partOption" onclick="cambioParte({{$p}})" value="{{ $p }}">{{ $p->numero_de_parte }}</option>
                                                                 @endforeach
                                                         </div>
                                                     </div>
-                                                    @error('parte')
+                                                    @error('parte0')
                                                         <span class="text-danger">{{ $message }}</span>
                                                     @enderror
                                                 </td>
@@ -244,6 +276,51 @@
                                                         <span class="text-danger">{{ $message }}</span>
                                                     @enderror
                                                 </td>
+                                                <td>
+                                                    <select class="form-select" id="ubicacion" name="ubicacion0" aria-placeholder="Ubicación">
+                                                        <option selected >Ubicación</option>
+                                                        @foreach ($ubicaciones as $ubicacion)
+                                                            <option value="{{$ubicacion->ubicacion}}"> {{ $ubicacion->ubicacion }} </option>
+                                                        @endforeach
+                                                    </select>
+                                                    @error('ubicacion')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
+                                                </td>
+                                                <td>
+                                                    <select class="form-select" id="palet" name="palet0">
+                                                        <option selected >Palet</option>
+                                                        <option value="1">1</option>
+                                                        <option value="2">2</option>
+                                                        <option value="3">3</option>
+                                                        <option value="4">4</option>
+                                                        <option value="5">5</option>
+                                                        <option value="6">6</option>
+                                                        <option value="7">7</option>
+                                                    </select>
+                                                    @error('palet')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
+                                                </td>
+                                                {{-- <td>
+                                                    <select class="form-select" id="fila" name="fila">
+                                                        <option selected >Fila</option>
+                                                        <option value="1">1</option>
+                                                        <option value="2">2</option>
+                                                        <option value="3">3</option>
+                                                        <option value="4">4</option>
+                                                        <option value="5">5</option>
+                                                        <option value="6">6</option>
+                                                        <option value="7">7</option>
+                                                        <option value="8">8</option>
+                                                        <option value="9">9</option>
+                                                        <option value="10">10</option>
+                                                    </select>
+                                                    @error('fila')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
+                                                </td> --}}
+
                                                 {{-- <td> --}}
                                                     {{-- <button type="submit" class="btn btn-success btn-sm">Agregar</button> --}}
                                                     {{-- <button class="btn btn-success btn-sm" onclick="addRow()">Agregar</button> --}}

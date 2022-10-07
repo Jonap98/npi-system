@@ -36,6 +36,16 @@ class InventarioController extends Controller
         $temp_list = array();
         if(count($inventarios) > 0)
         array_push($temp_list, $inventarios[0]);
+        $ubicaciones = DB::table('NPI_movimientos')
+            ->select(
+                'tipo',
+                'ubicacion',
+                'palet',
+                'fila'
+            )
+            ->where('id_parte', $inventarios[0]->id)
+            ->get();
+        $temp_list[0]->ubicaciones = $ubicaciones;
 
         $counter = $inventarios->count(); 
         
@@ -55,10 +65,23 @@ class InventarioController extends Controller
             } else {
                 array_push($temp_list, $inventarios[$i]);
             }
+
+            $ubicaciones = DB::table('NPI_movimientos')
+            ->select(
+                'tipo',
+                'ubicacion',
+                'palet',
+                'fila'
+                )
+                ->where('id_parte', $inventarios[$i]->id)
+                ->get();
             
+            $inventarios[$i]->ubicaciones = $ubicaciones;
         }
 
-        return view('inventario.inventario', array('inventarios' => $temp_list));
+        // return response(['ubicaciones' => $ubicaciones, 'data' => $temp_list]);
+
+        return view('inventario.inventario', array('ubicaciones' => $ubicaciones, 'inventarios' => $temp_list));
     }
     
     public function image($id) {

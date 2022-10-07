@@ -22,7 +22,20 @@ use App\Http\Controllers\MovimientosController;
 
 //     return view('welcome', array('users' => $users));
 // });
-// Route::group(['middleware' => ['auth']], function() {
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+// Route::group([
+//     'middleware' => 'api',
+//     'namespace' => 'App\Http\Controllers',
+//     'prefix' => 'auth'
+// ], function() {
+//     Route::post('login', 'AuthController@login');
+//     Route::post('logout', 'AuthController@logout');
+//     Route::post('refresh', 'AuthController@refresh');
+//     Route::post('me', 'AuthController@me');
+
 
     Route::get('movimientos', 'App\Http\Controllers\MovimientosController@create')->name('movimientos.create');
     Route::post('movimientos/store', 'App\Http\Controllers\MovimientosController@store')->name('store');

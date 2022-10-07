@@ -56,15 +56,11 @@ class PartesController extends Controller
     
     public function store(Request $request) {
         $partes = new PartesModel();
-        // dd($request);
         $validatedData = $request->validate([
             'proyecto' => 'required|max:255',
             'numero_de_parte' => 'required|max:255',
             'descripcion' => 'required|max:255',
             'um' => 'required|max:255|not_in:Unidades',
-            // 'ubicacion' => 'required|not_in:Ubicacion',
-            // 'palet' => 'required|not_in:Palet',
-            // 'fila' => 'required|not_in:Fila',
         ]);
 
         $partes->proyecto = $request->proyecto;
