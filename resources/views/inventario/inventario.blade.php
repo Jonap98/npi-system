@@ -40,23 +40,23 @@
                                             <td>{{ $inventario->descripcion }}</td>
                                             <td>{{ $inventario->um }}</td>
                                             <td>{{ $inventario->cantidad }}</td>
-                                            {{-- <td>{{ $inventario->ubicacion }}</td> --}}
+                                            <td>{{ $inventario->ubicacion }}</td>
 
                                             {{-- <td>{{ $inventario->ubicaciones[0]->ubicacion ?? 'NA'  }}</td> --}}
 
-                                            <td>
+                                            {{-- <td> --}}
                                                 {{-- <select name="" id="" class="form-select"> --}}
-                                                    @foreach($inventario->ubicaciones as $ubi)
+                                                    {{-- @foreach($inventario->ubicaciones as $ubi)
                                                     <div>
                                                         {{ $ubi->ubicacion }},{{ $ubi->palet }},{{ $ubi->fila }}
                                                     </div>
-                                                    @endforeach 
+                                                    @endforeach  --}}
                                                 {{-- </select> --}}
                                                 {{-- @if ($inventario->ubicaciones) --}}
                                                 
                                                     
                                                 {{-- @endif --}}
-                                            </td>
+                                            {{-- </td> --}}
                                             
                                             {{-- <td>{{ ($inventario->ubicaciones) ? 
                                                 $inventario->ubicaciones[count($inventario->ubicaciones)-1]->ubicacion
@@ -72,7 +72,7 @@
                                                 </button>
                                             </td>
                                         </tr>
-                                        @include('inventario.image')
+                                        {{-- @include('inventario.image') --}}
 
                                     @endforeach
                                 </tbody>

@@ -37,15 +37,18 @@ class MovimientosController extends Controller
     }
 
     public function store(Request $request) {
+        // dd($request);
+        
         $validatedData = $request->validate([
             'tipo' => 'required|in:Entrada,Salida,Ajuste',
         ]);
 
         for($i = 0; $i < $request->counter; $i++) {
-            $validatedData = $request->validate([
-                'ubicacion'.$i => 'required|not_in:Ubicación',
-                'palet'.$i => 'not_in:Palet'
-            ]);
+            
+            // $validatedData = $request->validate([
+            //     'ubicacion'.$i => 'required|not_in:Ubicación',
+            //     'palet'.$i => 'not_in:Palet'
+            // ]);
             
             $lastIndex = MovimientosModel::select('id')->orderBy('id', 'desc')->first();
 
@@ -56,6 +59,11 @@ class MovimientosController extends Controller
             $id_parte = 'id_parte'.$i;
             $ubicacion = 'ubicacion'.$i;
             $palet = 'palet'.$i;
+            // return response([
+            //     'data' => $request->$proyecto
+            // ]);
+
+            if($request->$proyecto) {
 
             $movimiento->proyecto = $request->$proyecto; // proyecto 02
             $movimiento->cantidad = $request->$cantidad; // 25
@@ -67,9 +75,10 @@ class MovimientosController extends Controller
             $movimiento->palet = $request->$palet;
             
             $movimiento->save();
+            }
         }
         
-        return redirect('/')->with('success', 'Registro creado exitosamente');
+        return redirect('movimientos')->with('success', 'Registro creado exitosamente');
         
     }
 
