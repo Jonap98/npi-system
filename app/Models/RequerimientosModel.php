@@ -8,17 +8,28 @@ use Illuminate\Database\Eloquent\Model;
 class RequerimientosModel extends Model
 {
     use HasFactory;
-    protected $table = 'requerimientos';
+    protected $table = 'NPI_requerimientos';
     protected $fillable = [
+        'id',
         'folio',
-        'proyecto',
-        'numero_de_parte',
+        'num_parte',
         'descripcion',
-        'um',
-        'cantidad',
+        'cantidad_requerida',
+        'cantidad_ubicacion',
+        'solicitante',
         'comentario',
-        'fecha',
-        'persona_que_reuiere',
         'status',
+        
+
+        // 'folio',
+        // 'proyecto',
+        // 'numero_de_parte',
+        // 'descripcion',
+        // 'um',
+        // 'cantidad',
+        // 'comentario',
+        // 'fecha',
+        // 'persona_que_reuiere',
+        // 'status',
     ];
 }

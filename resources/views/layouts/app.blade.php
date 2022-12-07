@@ -43,6 +43,21 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{{ route('inventario') }}">Inventario</a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('boms') }}" class="nav-link active">BOM</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ route('solicitud.requerimientos') }}">Requerimientos</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ route('requerimientos.manual') }}">Solicitar Requerimientos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ route('requerimientos.modelo') }}">Solicitar Requerimientos por Modelo</a>
+                    </li>
                 </ul>
 
                 {{-- Autenticado --}}

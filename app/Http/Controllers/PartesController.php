@@ -95,7 +95,7 @@ class PartesController extends Controller
 
         $parte->save();
 
-        return redirect('partes')->with('success', 'Registro actualizado existosamente');
+        return redirect()->route('solicitud.requerimientos')->with('success', 'Registro actualizado existosamente');
     }
 
     public function edit($id) {
