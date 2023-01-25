@@ -85,6 +85,7 @@
 
                                                     <input type='text'  class="form-control" hidden  id='proyecto' name="proyecto0" wire:model="proyecto" />
                                                     <input type='text'  class="form-control" hidden id='id_parte' name="id_parte0" />
+                                                    <input type='text'  class="form-control" hidden id='numero_de_parte' name="numero_de_parte0" />
                                                 </td>
                                                 <td>
                                                     <input type='text' class="form-control" disabled id='unidad_de_medida' name="unidad_de_medida0" />
@@ -171,6 +172,7 @@
             let cleanedWord = parte.descripcion.replaceAll(`"`, "''");
 
             document.getElementById('id_parte').value=parte.id;
+            document.getElementById('numero_de_parte').value=parte.numero_de_parte;
             document.getElementById('myInput').value=parte.numero_de_parte;
             document.getElementById('proyecto').value=parte.proyecto;
             document.getElementById('descripcion').value=cleanedWord;
@@ -248,6 +250,7 @@
 
             <input type='text'  class="form-control" hidden  id='proyecto' name="proyecto${rows}" wire:model="proyecto" />
             <input type='text'  class="form-control" hidden id='id_parte' name="id_parte${rows}" />
+            <input type='text'  class="form-control" hidden id='numero_de_parte' name="numero_de_parte${rows}" />
             `
 
             cell3.innerHTML = `

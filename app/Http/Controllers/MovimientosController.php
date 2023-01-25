@@ -29,26 +29,17 @@ class MovimientosController extends Controller
         $ubicaciones = UbicacionesModel::get();
         foreach ($partes as $parte) {
             $parte->descripcion = str_replace('"', "''", $parte->descripcion);
-            // $parte->otra_propiedad = $parte->descripcion;
         }
-        // return response(['data' => $partes]);
 
         return view('/movimientos', array('movimiento' => $movimiento, 'partes' => $partes, 'ubicaciones' => $ubicaciones));
     }
 
     public function store(Request $request) {
-        // dd($request);
-        
         $validatedData = $request->validate([
             'tipo' => 'required|in:Entrada,Salida,Ajuste',
         ]);
 
         for($i = 0; $i < $request->counter; $i++) {
-            
-            // $validatedData = $request->validate([
-            //     'ubicacion'.$i => 'required|not_in:Ubicación',
-            //     'palet'.$i => 'not_in:Palet'
-            // ]);
             
             $lastIndex = MovimientosModel::select('id')->orderBy('id', 'desc')->first();
 
@@ -57,11 +48,9 @@ class MovimientosController extends Controller
             $cantidad = 'cantidad'.$i;
             $comentario = 'comentario'.$i;
             $id_parte = 'id_parte'.$i;
+            $numero_de_parte = 'numero_de_parte'.$i;
             $ubicacion = 'ubicacion'.$i;
             $palet = 'palet'.$i;
-            // return response([
-            //     'data' => $request->$proyecto
-            // ]);
 
             if($request->$proyecto) {
 
@@ -71,6 +60,7 @@ class MovimientosController extends Controller
             $movimiento->comentario = $request->$comentario; // 25
             $movimiento->fecha_registro = Carbon::now();
             $movimiento->id_parte = $request->$id_parte; // 258
+            $movimiento->numero_de_parte = $request->$numero_de_parte; // 258
             $movimiento->ubicacion = $request->$ubicacion;
             $movimiento->palet = $request->$palet;
             

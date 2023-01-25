@@ -32,7 +32,7 @@ class InventarioController extends Controller
             ->orderBy('NPI_movimientos.id_parte', 'desc')
             ->orderBy('NPI_movimientos.tipo', 'asc')
             ->get();
-    
+
         $temp_list = array();
         if(count($inventarios) > 0) {
             array_push($temp_list, $inventarios[0]);
@@ -41,7 +41,6 @@ class InventarioController extends Controller
                     'tipo',
                     'ubicacion',
                     'palet',
-                    'fila'
                 )
                 ->where('id_parte', $inventarios[0]->id)
                 ->get();
@@ -51,14 +50,30 @@ class InventarioController extends Controller
         
         for($i = 1; $i < count($inventarios); $i++) {
             $repetido = false;
+            $locations = [];
             for($j = 0; $j < count($temp_list); $j++) {
-
+                
                 if($inventarios[$i]->numero_de_parte == $temp_list[$j]->numero_de_parte) {
                     if($inventarios[$i]->ubicacion == $temp_list[$j]->ubicacion) {
                         $repetido = true;
+                        if($inventarios[$i]->palet == $temp_list[$j]->palet) {
+                            $ubicaciones = DB::table('NPI_movimientos')
+                                ->select(
+                                    'ubicacion',
+                                    'palet',
+                                )
+                                ->where('id_parte', $inventarios[$i]->id)
+                                ->get();
+
+                                $temp_list[$j]->ubicaciones = $ubicaciones;
+                        }
+
+                        // $temp_list[count($temp_list)-1]->ubicaciones = $ubicaciones;
+
+
                         if(strtoupper($inventarios[$i]->tipo) == 'ENTRADA') {
                             $temp_list[$j]->cantidad += $inventarios[$i]->cantidad;
-                        } 
+                        }
                         if(strtoupper($inventarios[$i]->tipo) == 'SALIDA'){
                             $temp_list[$j]->cantidad -= $inventarios[$i]->cantidad;
         
@@ -66,49 +81,46 @@ class InventarioController extends Controller
                                 $temp_list[$j]->cantidad = 0;
                             }
                         }
-                    }
-                } 
-                else {
-                    // array_push($temp_list, $inventarios[$i]);
-                }
-    
-                // $ubicaciones = DB::table('NPI_movimientos')
-                // ->select(
-                //     'tipo',
-                //     'ubicacion',
-                //     'palet',
-                //     'fila'
-                //     )
-                //     ->where('id_parte', $inventarios[$i]->id)
-                //     ->get();
-                
-                // return response([
-                //     'data' => $ubicaciones
-                // ]);
-    
-                
-                // $ubicacionesRepetidas = [];
-                // array_push($ubicacionesRepetidas, $ubicaciones[0]);
+
                         
-                // foreach ($ubicaciones as $ubicacion) {
-                // for($in = 1; $in < count($ubicaciones); $in++) {
-                //     $rep = false;
-                //     // foreach ($ubicacionesRepetidas as $repetida ) {
-                //     for($jo = 0; $jo < count($ubicacionesRepetidas); $jo++) {
-                //         if($ubicaciones[$in]->ubicacion == $ubicacionesRepetidas[$jo]->ubicacion) {
-                //             $rep = true;
-                //         }
-                //     }
-                //     if(!$rep) {
-                //         array_push($ubicacionesRepetidas, $ubicaciones[$in]);
-                //     }
-                // }
-                // $inventarios[$i]->ubicaciones = $ubicaciones[$in];
-                
+
+                    }
+                }
             }
             if(!$repetido) {
                 array_push($temp_list, $inventarios[$i]);
+                // $temp_list[count($temp_list)-1]->ubicaciones = 'JONA';
+                $ubicaciones = DB::table('NPI_movimientos')
+                ->select(
+                    'ubicacion',
+                    'palet',
+                )
+                ->where('id_parte', $inventarios[$i]->id)
+                ->get();
+
+                $temp_list[count($temp_list)-1]->ubicaciones = $ubicaciones;
             }
+
+            foreach ($temp_list as $temp) {
+                // $ubicaciones = DB::table('NPI_movimientos')
+                //             ->select(
+                //                 // 'tipo',
+                //                 // 'ubicacion',
+                //                 'palet',
+                //             )
+                //             ->where('id_parte', $temp->id)
+                //             ->first();
+
+                        // $temp->ubicaciones = $ubicaciones;
+                        // return response([
+                        //     'num' => $temp->numero_de_parte,
+                        //     'data' => $ubicaciones
+                        // ]);
+            }
+
+            // return response([
+            //     'data' => $temp_list
+            // ]);
                 
         }
 

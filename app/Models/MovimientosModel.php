@@ -16,5 +16,7 @@ class MovimientosModel extends Model
         'comentario',
         'fecha_registro',
         'id_parte',
+        'ubicacion',
+        'numero_de_parte'
     ];
 }

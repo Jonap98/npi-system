@@ -20,7 +20,7 @@ class BomsController extends Controller
             'status',
             'requerido'
         )
-        ->take(100)
+        // ->take(100)
         ->orderBy('id', 'asc')
         ->get();
         // $boms = BomsModel::paginate();

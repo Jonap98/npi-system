@@ -26,8 +26,8 @@
                                         <th scope="col">Unidad de medida</th>
                                         <th scope="col">Inventario</th>
                                         <th scope="col">Ubicación</th>
-                                        {{-- <th scope="col">Palet</th>
-                                        <th scope="col">Fila</th> --}}
+                                        <th scope="col">Palet</th>
+                                        {{-- <th scope="col">Fila</th> --}}
                                         <th scope="col">Imagen</th>
                                     </tr>
                                 </thead>
@@ -41,6 +41,18 @@
                                             <td>{{ $inventario->um }}</td>
                                             <td>{{ $inventario->cantidad }}</td>
                                             <td>{{ $inventario->ubicacion }}</td>
+                                            <td>
+                                                {{-- {{ $inventario->palet }} --}}
+                                                {{-- {{ $inventario->ubicaciones }} --}}
+
+                                                @foreach($inventario->ubicaciones as $ubi)
+                                                    <div>
+                                                        {{ $ubi->palet }}
+                                                    </div>
+                                                @endforeach 
+
+                                                {{-- W11603208 --}}
+                                            </td>
 
                                             {{-- <td>{{ $inventario->ubicaciones[0]->ubicacion ?? 'NA'  }}</td> --}}
 

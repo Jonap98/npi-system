@@ -58,6 +58,10 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('solicitudes/requerimientos/{folio}', [SolicitudRequerimientosController::class, 'details'])->name('solicitud.requerimientos.detalles');
     Route::post('solicitudes/requerimientos/update', [SolicitudRequerimientosController::class, 'update'])->name('solicitud.requerimientos.update');
     Route::post('solicitudes/requerimientos/export', [SolicitudRequerimientosController::class, 'exportPDF'])->name('solicitud.requerimientos.export');
+    
+    Route::post('solicitudes/requerimientos/preparar', [SolicitudRequerimientosController::class, 'preparar'])->name('solicitud.requerimientos.preparar');
+    // Editar cantidad
+    Route::post('solicitudes/requerimientos/edit', [SolicitudRequerimientosController::class, 'updateQty'])->name('solicitud.requerimientos.edit');
 
     // Manual
     Route::get('requerimientos/manual', [RequerimientoManualController::class, 'index'])->name('requerimientos.manual');

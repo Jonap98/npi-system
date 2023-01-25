@@ -162,6 +162,7 @@ class RequerimientosController extends Controller
                 'kit_descripcion',
                 'nivel',
                 'num_parte',
+                'cantidad',
                 'requerido'
             )
             ->where('id', $id)
@@ -178,7 +179,7 @@ class RequerimientosController extends Controller
                 $requerimiento->num_parte = $model->num_parte;
                 // $requerimiento->descripcion = consulta bom
                 $requerimiento->descripcion = $model->kit_descripcion;
-                $requerimiento->cantidad_requerida = $request->cantidad;
+                $requerimiento->cantidad_requerida = ($request->cantidad * $model->cantidad);
                 // $requerimiento->cantidad_ubicacion = consulta inventario
                 $requerimiento->cantidad_ubicacion = 1000;
                 $requerimiento->solicitante = $request->solicitante;
