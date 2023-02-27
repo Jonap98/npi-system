@@ -8,7 +8,11 @@ use App\Models\UbicacionesModel;
 class UbicacionesController extends Controller
 {
     public function index() {
-        $ubicaciones = UbicacionesModel::select('id', 'ubicacion')->get();
+        $ubicaciones = UbicacionesModel::select(
+            'id',
+            'ubicacion',
+            'tipo'
+        )->get();
 
         return view('ubicaciones.index', ['ubicaciones' => $ubicaciones]);
     }
@@ -21,6 +25,7 @@ class UbicacionesController extends Controller
         $ubicacion = new UbicacionesModel();
 
         $ubicacion->ubicacion = $request->ubicacion;
+        $ubicacion->tipo = $request->tipo;
 
         $ubicacion->save();
 

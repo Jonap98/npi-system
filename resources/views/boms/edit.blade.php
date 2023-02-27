@@ -19,11 +19,10 @@
                     <input type="hidden" name="id" value="{{ $bom->id }}">
 
                     <div class="m-2">
-                        <label for="">Cantidad</label>
+                        <label for="">Kit nombre</label>
                         <input type="nombre" name="nombre" class="form-control" value="{{ $bom->kit_nombre }}">
                     </div>
 
-                    {{-- <span>¿Seguro que desea eliminar este registro?</span> --}}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\RequerimientosModel;
-use App\Models\MovimientosModel;
+// use App\Models\MovimientosModel;
+use App\Models\test\MovimientosModel;
 use App\Models\SolicitudesModel;
-use App\Models\PartesModel;
+use App\Models\test\PartesModel;
 use App\Models\CantidadUbicacionesModel;
 use Carbon\Carbon;
 
@@ -25,18 +26,10 @@ class SolicitudRequerimientosController extends Controller
         ->orderBy('id', 'desc')
         ->get();
 
-        // return response([
-        //     'data' => $requerimientos
-        // ]);
-
         return view('requerimientos.solicitudes.index', array('requerimientos' => $requerimientos));
     }
 
     public function filter(Request $request) {
-        // dd($request);
-        // return response([
-        //     'status' => $request->status
-        // ]);
         $requerimientos = SolicitudesModel::select(
             'id',
             'folio',
@@ -58,12 +51,14 @@ class SolicitudRequerimientosController extends Controller
             'id',
             'folio',
             'num_parte',
+            'kit_nombre',
             'descripcion',
             'cantidad_requerida',
             'cantidad_ubicacion',
             'solicitante',
             'comentario',
             'status',
+            'ubicacion'
         )
         ->where('folio', $folio)
         ->get();
@@ -98,7 +93,7 @@ class SolicitudRequerimientosController extends Controller
             for($j = 1; $j < count($solicitadas); $j++) {
                 $repetida = false;
                 for($k = 0; $k < count($ubicaciones_temp); $k++) {
-                    if($solicitadas[$j]->numero_de_parte == $ubicaciones_temp[$k]->numero_de_parte && $solicitadas[$j]->palet == $ubicaciones_temp[$k]->palet) {
+                    if($solicitadas[$j]->numero_de_parte == $ubicaciones_temp[$k]->numero_de_parte && $solicitadas[$j]->ubicacion == $ubicaciones_temp[$k]->ubicacion && $solicitadas[$j]->palet == $ubicaciones_temp[$k]->palet) {
                         $repetida = true;
                         if($solicitadas[$j]->tipo == 'Entrada') {
                             $ubicaciones_temp[$k]->cantidad += $solicitadas[$j]->cantidad;
@@ -148,7 +143,7 @@ class SolicitudRequerimientosController extends Controller
                 for($m = 0; $m < count($solicitudes_list); $m++) {
                     if($solicitudes[$l]->ubicacion == $solicitudes_list[$m]->ubicacion && $solicitudes[$l]->palet == $solicitudes_list[$m]->palet) {
                         $seRepitio = true;
-                        $suma = $solicitudes_list[$m]->cantidad += $solicitudes[$l]->cantidad;
+                        // $suma = $solicitudes_list[$m]->cantidad += $solicitudes[$l]->cantidad;
                     }
                 }
                 if(!$seRepitio) {
@@ -163,34 +158,30 @@ class SolicitudRequerimientosController extends Controller
             foreach ($requerimientos[$i]->ubicaciones as $ubicacion) {
                 foreach ($requerimientos[$i]->solicitudes as $solicitud) {
                     if($ubicacion->ubicacion == $solicitud->ubicacion && $ubicacion->palet == $solicitud->palet) {
-                        $ubicacion->cantidad -= $solicitud->cantidad;
+                        // $ubicacion->cantidad -= $solicitud->cantidad;
                     }
                 }
             }
-
-            // return response([
-            //     'data' => $requerimientos
-            // ]);
-
         }
         
         return view('requerimientos.solicitudes.details', array('requerimientos' => $requerimientos, 'status' => $status->status, 'folio' => $folio));
     }
 
     public function preparar(Request $request) {
-        dd($request);
 
         $requerimientos = $request->all();
         $requerimientosList = [];
-        
+
+        // Elimina del request los datos que no se necesitan
         unset($requerimientos['_token']);
         unset($requerimientos['requerimientos_length']);
         unset($requerimientos['folio']);
-        
+
+        // Agrega los datos a una lista para poder iterarla de manera más sencilla
         foreach ($requerimientos as $requerimiento) {
             array_push($requerimientosList, $requerimiento);
         }
-        
+
         $counter = count($requerimientosList);
 
         for($i = 0; $i < count($requerimientosList); $i ++) {
@@ -205,6 +196,9 @@ class SolicitudRequerimientosController extends Controller
             $proyecto = $part->proyecto ?? '';
             $id = $part->id ?? '';
 
+            // Ingresa el registro de la cantidad que se requiere, a la tabla de Cantidad_ubicaciones
+            // De manera que permite una mejor visualización y uso, ya que esa cantidad se registrará posteriormente 
+            // en la tabla de movimientos como una salida
             $movimiento = new CantidadUbicacionesModel();
 
             $movimiento->folio_solicitud = $request->folio;
@@ -216,30 +210,38 @@ class SolicitudRequerimientosController extends Controller
 
             $movimiento->save();
 
-            $movimiento = new MovimientosModel();
+            // Realiza el descuento de ese material, del inventario, solo si se hay requerimiento de ese material, es decir,
+            // si la cantidad solicitada en esa ubicación es mayor a cero
 
-            $movimiento->proyecto = $proyecto;
-            $movimiento->cantidad = $requerimientosList[$i+3] ?? 0;
-            $movimiento->tipo = 'Salida';
-            $movimiento->comentario = 'Requerimiento de material con folio: '.$request->folio;
-            $movimiento->fecha_registro = Carbon::now();
-            $movimiento->id_parte = $id;
-            $movimiento->numero_de_parte = $requerimientosList[$i];
-            $movimiento->ubicacion = $requerimientosList[$i+1];
-            $movimiento->palet = $requerimientosList[$i+2];
+            // Actualización, crear el movimiento con valor de cero para poder editarlo después en caso de ser necesario
+            // Validar eso
+            if($requerimientosList[$i+3]) {
+                $movimiento = new MovimientosModel();
 
-            $movimiento->save();
+                $movimiento->proyecto = $proyecto;
+                $movimiento->cantidad = $requerimientosList[$i+3] ?? 0;
+                $movimiento->tipo = 'Salida';
+                $movimiento->comentario = 'Requerimiento de material con folio: '.$request->folio;
+                $movimiento->fecha_registro = Carbon::now();
+                $movimiento->id_parte = $id;
+                $movimiento->numero_de_parte = $requerimientosList[$i];
+                $movimiento->ubicacion = $requerimientosList[$i+1];
+                $movimiento->palet = $requerimientosList[$i+2];
 
+                $movimiento->save();
+            }
+
+            // Se itera de 3 en 3 debido a las propiedades del request, de manera que cada 4° valor, es la cantidad
             $i += 3;
 
         }
 
+        // Se actualiza el status en la tabla de solicitudes y su requerimiento correspondiente
         $solicitud = RequerimientosModel::where('folio', $request->folio)->update(['status' => 'PREPARADO']);
         $solicitud = SolicitudesModel::where('folio', $request->folio)->update(['status' => 'PREPARADO']);
 
         return back()->with('success', 'La solicitud fue actualizada exitosamente');
     }
-
 
     // Validar funcionamiento
     public function confirmar(Request $request) {
@@ -291,109 +293,87 @@ class SolicitudRequerimientosController extends Controller
     }
 
     public function updateQty(Request $request) {
-        // dd($request);
-        return response([
-            'data' => $request->all()
-        ]);
-        // $movimientos = MovimientosModel::select(
-        //     'id',
-        //     'numero_de_parte',
-        //     'cantidad',
-        //     'tipo'
-        // )
-        // ->where('numero_de_parte', $request->num_parte)
-        // ->get();
 
+        // 1- Validar cantidad en inventario
+        // 1.1 - Obtiene la cantidad registrada como salida del inventario
+        $cantidadRegistrada = CantidadUbicacionesModel::select(
+            'folio_solicitud',
+            'cantidad'
+        )
+        ->where('id', $request->cantidad_id)
+        ->first();
 
-        // Calculando el inventario para descontar
+        // 1.2 - Obtiene todos los movimientos de ese número de parte, en esa ubicación y palet
+        $cantidadInventario = MovimientosModel::select(
+            'proyecto',
+            'cantidad',
+            'tipo',
+            'id_parte'
+        )
+        ->where('numero_de_parte', $request->num_parte)
+        ->where('ubicacion', $request->ubicacion)
+        ->where('palet', $request->palet)
+        ->get();
 
-        $solicitadas = DB::table('NPI_movimientos')
-            ->join('NPI_partes', 'NPI_partes.id', '=', 'NPI_movimientos.id_parte')
-            ->select(
-                'NPI_movimientos.id',
-                'NPI_movimientos.proyecto',
-                'NPI_movimientos.cantidad',
-                'NPI_movimientos.comentario',
-                'NPI_movimientos.tipo',
-                'NPI_movimientos.fecha_registro',
-                'NPI_movimientos.ubicacion', 
-                'NPI_movimientos.palet', 
-                'NPI_movimientos.fila',
-                'NPI_partes.id',
-                'NPI_partes.numero_de_parte',
-                'NPI_partes.descripcion',
-                'NPI_partes.um',
-            )
-            ->where('NPI_partes.numero_de_parte', $request->num_parte)
-            // ->orderBy('NPI_movimientos.fecha_registro', 'asc')
-            ->orderBy('NPI_movimientos.id_parte', 'desc')
-            ->orderBy('NPI_movimientos.tipo', 'asc')
-            ->get();
-
-
-        // $solicitadas = MovimientosModel::select(
-        //     'id',
-        //     'numero_de_parte',
-        //     'ubicacion',
-        //     'cantidad',
-        //     'tipo',
-        //     'palet',
-        // )
-        // ->where('numero_de_parte', $request->num_parte)
-        // ->get();
-
-        // return response([
-        //     'data' => $solicitadas
-        // ]);
-
-        // Agrupar las cantidades solicitadas
-        $ubicaciones_temp = [];
-        if(count($solicitadas) > 0) {
-            array_push($ubicaciones_temp, $solicitadas[0]);
-        }
-
-        for($j = 1; $j < count($solicitadas); $j++) {
-            $repetida = false;
-            for($k = 0; $k < count($ubicaciones_temp); $k++) {
-                if($solicitadas[$j]->numero_de_parte == $ubicaciones_temp[$k]->numero_de_parte && $solicitadas[$j]->palet == $ubicaciones_temp[$k]->palet) {
-                    $repetida = true;
-                    if($solicitadas[$j]->tipo == 'Entrada') {
-                        $ubicaciones_temp[$k]->cantidad += $solicitadas[$j]->cantidad;
-                    }
-
-                    if($solicitadas[$j]->tipo == 'Salida') {
-                        $ubicaciones_temp[$k]->cantidad -= $solicitadas[$j]->cantidad;
-                    }
-
-                    if($ubicaciones_temp[$k]->cantidad < 0) {
-                        $ubicaciones_temp[$k]->cantidad = 0;
-                    }
-                }
+        // 1.3 - Calcula el inventario existente
+        $enInventario = 0;
+        foreach ($cantidadInventario as $inventario) {
+            if($inventario->tipo == 'Entrada') {
+                $enInventario += $inventario->cantidad;
             }
-            if(!$repetida) {
-                array_push($ubicaciones_temp, $solicitadas[$j]);
+
+            if($inventario->tipo == 'Salida') {
+                $enInventario -= $inventario->cantidad;
             }
         }
 
 
-
-        return response([
-            'cantidad' => $request->cantidad,
-            'ubicaciones_temp' => $ubicaciones_temp,
-            'solicitadas' => $solicitadas
-        ]);
-
-
+        // 2 - Realiza el ajuste de inventario
+        $inventarioResultante = ($enInventario + $cantidadRegistrada->cantidad) - $request->cantidad;
         
-        // dd($request);
-        if(count($movimientos) == 0) {
-            return back()->with('error', 'No hay inventario para ese número de parte');
+        if( $inventarioResultante < 0 ) {
+            return back()->with('error', 'No se puede ajustar la cantidad, no tiene suficiente inventario');
         }
 
-        return response([
-            'num_parte' => $request->num_parte,
-            'data' => $movimientos
-        ]);
+        // 2.1 - Entrada de material con cantidad anterior, solo si se tomó material de esa ubicación
+        // es decir, si la cantidad es mayor a 0
+        if($cantidadRegistrada->cantidad > 0) {
+            $movimiento = new MovimientosModel();
+    
+            $movimiento->proyecto = $cantidadInventario->first->proyecto->proyecto;
+            $movimiento->cantidad = round($cantidadRegistrada->cantidad, 0);
+            $movimiento->tipo = 'Entrada';
+            $movimiento->comentario = 'Ajuste de requerimiento con folio: '.$cantidadRegistrada->folio_solicitud;
+            $movimiento->fecha_registro = Carbon::now();
+            $movimiento->id_parte = $cantidadInventario->first->proyecto->id_parte;
+            $movimiento->numero_de_parte = $request->num_parte;
+            $movimiento->ubicacion = $request->ubicacion;
+            $movimiento->palet = $request->palet;
+    
+            $movimiento->save();
+        }
+
+        // 2.2 - Salida de material con nueva cantidad
+        if($request->cantidad > 0) {
+            $movimiento = new MovimientosModel();
+    
+            $movimiento->proyecto = $cantidadInventario->first->proyecto->proyecto;
+            $movimiento->cantidad = $request->cantidad;
+            $movimiento->tipo = 'Salida';
+            $movimiento->comentario = 'Ajuste de requerimiento con folio: '.$cantidadRegistrada->folio_solicitud;
+            $movimiento->fecha_registro = Carbon::now();
+            $movimiento->id_parte = $cantidadInventario->first->proyecto->id_parte;
+            $movimiento->numero_de_parte = $request->num_parte;
+            $movimiento->ubicacion = $request->ubicacion;
+            $movimiento->palet = $request->palet;
+    
+            $movimiento->save();
+        }
+
+        // 2.3 - Ajuste de cantidad en ubicación
+        CantidadUbicacionesModel::where('id', $request->cantidad_id)->update(['cantidad' => $request->cantidad]);
+
+        return back()->with('success', 'La cantidad fue ajustada exitosamente');
     }
 
     public function update(Request $request) {

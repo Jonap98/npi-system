@@ -5,24 +5,24 @@
 @endsection
 
 @section('content')
+{{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous"> --}}
+
     <div class="container">
         <div class="row justify-contnet-center">
             <div class="col-md-12">
-                <span>Inventario nuevas partes</span>
+                <span> <b>TEST</b> Inventario nuevas partes</span>
                 <hr>
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
                         <button class="btn btn-success" onclick="addRow()">Agregar parte</button>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#storeUbicacion">
-                            Crear ubicación
-                        </button>
+                        
                     </div>
                     @if(session('success'))
                         <div class="alert alert-success mt-2" role="alert">
                             {{ session('success') }}
                         </div>
                     @endif
-                    <form name="movimientos" method="post" action="{{ route('store') }}">
+                    <form name="movimientos" method="post" action="{{ route('test.movimientos.store') }}">
                         @csrf
                         <div class="row mt-2 g-2">
                             <div class="d-flex flex-row-reverse">
@@ -40,11 +40,11 @@
                                 <div class="p-2">
                                     <span>Tipo de movimiento</span>
                                 </div>
-                                
+                                    
                             </div>
 
                             <div class="card col-md-12">
-                                <input type="text" class="form-control" hidden  id="counter" name="counter" />
+                                <input type='text' class="form-control" hidden  id="counter" name="counter" />
                                 <div class="d-flex flex-row-reverse">
                                     <button class="btn btn-primary m-4 col-md-2" onclick="getRowsCount()" id="mybutton">Guardar</button>
                                 </div>
@@ -138,7 +138,6 @@
                             </div>
                         </div>
                     </form>
-                    @include('ubicaciones.store')
 
                 </div>
             </div>

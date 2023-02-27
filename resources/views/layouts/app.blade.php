@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta id="tkn" name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>NPI</title>
 
     <!-- Scripts -->
     {{-- <script src="{{ asset('js/app.js') }}" defer></script> --}}
@@ -22,6 +22,9 @@
     <!-- CSS only -->
     @yield('css')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+
+<link rel="stylesheet" type="text/css" href="{{ asset('/css/app.css') }}">
+
 </head>
 <body>
     <div id="app">
@@ -34,6 +37,9 @@
                     <b>Inventario de nuevas partes</b>
                 </div>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ route('ubicaciones') }}">Ubicaciones</a>
+                    </li>
                     <li class="nav-item">
                       <a class="nav-link active" aria-current="page" href="{{ route('partes') }}">Partes</a>
                     </li>
@@ -52,12 +58,48 @@
                         <a class="nav-link active" aria-current="page" href="{{ route('solicitud.requerimientos') }}">Requerimientos</a>
                     </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('requerimientos.manual') }}">Solicitar Requerimientos</a>
+
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            Solicitar
+                        </a>
+                        <ul class="dropdown-menu dropdown-bar-content" aria-labelledby="navbarDropdown">
+                            <li>
+                                <a href="{{ route('requerimientos.manual') }}" class="nav-link active">Requerimientos por número</a>
+                            </li>
+
+                            <li>
+                                <a href="{{ route('requerimientos.modelo') }}" class="nav-link active">Requerimientos por modelo</a>
+                            </li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('requerimientos.modelo') }}">Solicitar Requerimientos por Modelo</a>
-                    </li>
+
+                    @auth
+                        
+                        @if(Auth::user()->role == 'NPI-admin')
+                        
+                            <li class="nav-item dropdown">
+                                <a href="#" id="navbarDropdow" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Test
+                                </a>
+                                <ul class="dropdown-menu dropdown-bar-content" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a href="{{ route('test.movimientos') }}" class="nav-link active">Movimientos</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('test.inventario') }}" class="nav-link active">Inventario</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('test.partes') }}" class="nav-link active">Partes</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        @endif
+                        
+                    @endauth
+
+
                 </ul>
 
                 {{-- Autenticado --}}

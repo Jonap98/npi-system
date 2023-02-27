@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class UbicacionesModel extends Model
 {
     use HasFactory;
-    protected $table ='NPI_ubicaciones';
+    protected $table = 'NPI_ubicaciones';
     protected $fillable = [
         'id',
         'ubicacion',
+        'tipo'
     ];
 }

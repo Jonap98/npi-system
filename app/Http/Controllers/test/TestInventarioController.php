@@ -1,26 +1,27 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\test;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
 use App\Exports\InventarioExport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\MovimientosModel;
-use App\Models\PartesModel;
+use App\Models\test\MovimientosModel;
+use App\Models\test\PartesModel;
 
-class InventarioController extends Controller
+class TestInventarioController extends Controller
 {
     public function index() {
-        $inventarios = DB::table('NPI_movimientos')
+        $inventarios = DB::table('NPI_movimientos_test')
         ->get()
         ->unique('numero_de_parte');
 
         foreach ($inventarios as $inventario) {
 
             // Proceso para obtener ubicacion y palet sin repetir
-            $ubicaciones = DB::table('NPI_movimientos')
+            $ubicaciones = DB::table('NPI_movimientos_test')
             ->select('ubicacion')
             ->where('numero_de_parte', $inventario->numero_de_parte)
             ->get()
@@ -28,7 +29,7 @@ class InventarioController extends Controller
 
             $ubicaciones_array = array();
             foreach ($ubicaciones as $ubicacion) {
-                $palets = DB::table('NPI_movimientos')
+                $palets = DB::table('NPI_movimientos_test')
                 ->select('palet')
                 ->where('numero_de_parte', $inventario->numero_de_parte)
                 ->where('ubicacion', $ubicacion->ubicacion)
@@ -75,6 +76,7 @@ class InventarioController extends Controller
             $ubicaciones_list = array();
             
             foreach ($cantidades as $cantidad) {
+
                 // Se realiza la sumatoria validando si son entradas o salidas
                 if(strtoupper($cantidad->tipo) == 'ENTRADA') {
                     $cantidad_inventario += $cantidad->cantidad;
@@ -87,13 +89,14 @@ class InventarioController extends Controller
             $inventario->ubicaciones = $ubicaciones_list;
             $inventario->cantidad_inventario = $cantidad_inventario;
             $inventario->cantidades = $cantidades;
+            // END Jala OK
         }
 
-        return view('inventario.inventario', array('inventarios' => $inventarios));
+        return view('test.inventario.inventario', array('inventarios' => $inventarios));
     }
     
     public function image($id) {
-        return view('inventario.image');
+        return view('test.inventario.image');
     }
 
     public function export(){

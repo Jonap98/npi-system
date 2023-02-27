@@ -8,10 +8,8 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <span>Movimientos</span>
-            <a href="{{ route('partes.create') }}" class="btn btn-primary btn-sm ms-5">Crear parte</a>
-            <a href="{{ route('movimientos.create') }}" class="btn btn-primary btn-sm ms-5">Crear movimiento</a>
-            <a href="{{ route('exportar') }}" class="btn btn-success btn-sm ms-5">Exportar excel</a>
+            <span> <b>TEST</b> Movimientos</span>
+            <a href="{{ route('test.movimientos.create') }}" class="btn btn-primary btn-sm ms-5">Crear movimiento</a>
             <hr>
             <div class="container">
                 <div class="row">

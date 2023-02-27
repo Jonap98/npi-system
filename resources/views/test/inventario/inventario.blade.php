@@ -8,7 +8,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <span>Inventario</span>
+            <span> <b>TEST</b> Inventario</span>
             <a href="{{ route('exportar.inventario') }}" class="btn btn-success btn-sm ms-5">Exportar excel</a>
             <hr>
             <div class="container">
@@ -46,6 +46,7 @@
                                                             @foreach ($ubicaciones->palets_registrados as $palets)
                                                                 {{ $palets->palet }},
                                                             @endforeach
+
                                                         </b>
                                                     </div>
                                                 @endforeach 

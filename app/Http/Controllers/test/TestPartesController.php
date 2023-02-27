@@ -1,34 +1,32 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\test;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\PartesModel;
+use App\Models\test\PartesModel;
 use App\Models\UbicacionesModel;
-use App\Http\Controllers\PlainLoginController;
 
-use Illuminate\Support\Facades\Auth;
-
-class PartesController extends Controller
+class TestPartesController extends Controller
 {
     public function index() {
-        $partes = PartesModel::select(
-            'id',
-            'numero_de_parte',
-            'descripcion',
-            'um',
-            'proyecto',
-        )
-        ->where('active', 1)
-        ->orderBy('id', 'desc')
-        ->get();
+            $partes = PartesModel::select(
+                'id',
+                'numero_de_parte',
+                'descripcion',
+                'um',
+                'proyecto',
+            )
+            ->where('active', 1)
+            ->orderBy('id', 'desc')
+            ->get();
     
-        $ubicaciones = UbicacionesModel::select(
-            'ubicacion',
-        )
-        ->get();
+            $ubicaciones = UbicacionesModel::select(
+                'ubicacion',
+            )
+            ->get();
     
-        return view('partes.partes', array('partes' => $partes, 'ubicaciones' => $ubicaciones));
+            return view('test.partes.partes', array('partes' => $partes, 'ubicaciones' => $ubicaciones));
     }
 
     public function create() {
@@ -36,12 +34,11 @@ class PartesController extends Controller
         
         $ubicaciones = UbicacionesModel::get();
 
-        return view('partes.create', array('partes' => $partes, 'ubicaciones' => $ubicaciones));
+        return view('test.partes.create', array('partes' => $partes, 'ubicaciones' => $ubicaciones));
     }
     
     public function store(Request $request) {
         $partes = new PartesModel();
-        
         $validatedData = $request->validate([
             'proyecto' => 'required|max:255',
             'numero_de_parte' => 'required|max:255',
@@ -57,7 +54,7 @@ class PartesController extends Controller
 
         $partes->save();
         
-        return redirect('partes')->with('success', 'Registro creado existosamente');
+        return redirect()->route('test.partes')->with('success', 'Registro creado existosamente');
     }
 
     public function update(Request $request, $id) {
@@ -86,7 +83,7 @@ class PartesController extends Controller
 
         $ubicaciones = UbicacionesModel::get();
 
-        return view('partes.edit', array(
+        return view('test.partes.edit', array(
             'proyecto',
             'numero_parte',
             'descripcion',
@@ -100,6 +97,6 @@ class PartesController extends Controller
     public function destroy($id) {
         \DB::table('NPI_partes')->where('id', $id)->update(['active' => 0 ]); 
 
-        return redirect('partes')->with('success', 'Registro eliminado exitosamente');
+        return redirect('test.partes')->with('success', 'Registro eliminado exitosamente');
     }
 }

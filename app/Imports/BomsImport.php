@@ -18,16 +18,27 @@ class BomsImport implements ToModel
     
     public function model(array $row) {
 
-        return new BomsModel([
-            'kit_nombre' => $row[0],
-            'nivel' => $row[1],
-            'num_parte' => $row[2],
-            'kit_descripcion' => $row[3],
-            'um' => $row[4],
-            'cantidad' => $row[5],
-            'status' => $row[6],
-            'requerido' => $row[7] ?? 0
-        ]);
+        $types = ['PHANTOM', 'BUY REF', 'PDTE'];
+
+
+        if(!in_array($row[6], $types)) {
+            $registro = new BomsModel([
+                'kit_nombre' => $row[0] ?? '', // Validar PTDE
+                'nivel' => $row[1],
+                'num_parte' => $row[2],
+                'kit_descripcion' => $row[3],
+                'um' => $row[4] ?? '',
+                'cantidad' => $row[5],
+                'status' => $row[6] ?? '',
+                'ubicacion' => $row[7] ?? '',
+                'team' => $row[8] ?? '',
+                'requerido' => 1
+            ]);
+
+            $registro->save();
+
+        }
+
 
     }
 }

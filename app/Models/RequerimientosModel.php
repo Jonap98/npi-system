@@ -13,23 +13,13 @@ class RequerimientosModel extends Model
         'id',
         'folio',
         'num_parte',
+        'kit_nombre',
         'descripcion',
         'cantidad_requerida',
         'cantidad_ubicacion',
         'solicitante',
         'comentario',
         'status',
-        
-
-        // 'folio',
-        // 'proyecto',
-        // 'numero_de_parte',
-        // 'descripcion',
-        // 'um',
-        // 'cantidad',
-        // 'comentario',
-        // 'fecha',
-        // 'persona_que_reuiere',
-        // 'status',
+        'ubicacion'
     ];
 }

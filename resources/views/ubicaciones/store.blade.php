@@ -1,4 +1,4 @@
-<!-- Modal editar -->
+<!-- Modal store -->
 <div class="modal fade" id="storeUbicacion" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -16,6 +16,15 @@
                         @error('ubicacion')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
+                    </div>
+
+                    <div class="m-2">
+                        <label>Tipo</label>
+                        <select name="tipo" id="tipo" class="form-select">
+                            <option value="NPI">NPI</option>
+                            <option value="INGENIERIA">Ingeniería</option>
+                            <option value="OTROS">Otros</option>
+                        </select>
                     </div>
 
                 </div>

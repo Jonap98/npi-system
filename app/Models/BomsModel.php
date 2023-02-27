@@ -18,6 +18,8 @@ class BomsModel extends Model
         'um',
         'cantidad',
         'status',
-        'requerido'
+        'requerido',
+        'ubicacion',
+        'team'
     ];
 }

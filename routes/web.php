@@ -11,6 +11,14 @@ use App\Http\Controllers\RequerimientoManualController;
 use App\Http\Controllers\RequerimientosController;
 use App\Http\Controllers\BomsController;
 
+use App\Http\Controllers\requerimientos\ModelosController;
+use App\Http\Controllers\requerimientos\KitsController;
+use App\Http\Controllers\requerimientos\MakeController;
+
+// Test
+use App\Http\Controllers\test\TestMovimientosController;
+use App\Http\Controllers\test\TestInventarioController;
+
 Route::group(['middleware' => ['auth']], function() {
 
     // =======================================================
@@ -69,10 +77,32 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('requerimientos/manual/solicitar', [RequerimientoManualController::class, 'solicitar'])->name('requerimientos.manual.solicitar');
     
     // Por modelo
-    Route::get('requerimientos/modelo', [RequerimientosController::class, 'index'])->name('requerimientos.modelo');
-    Route::get('requerimientos/{kit}/modelo', [RequerimientosController::class, 'kit'])->name('requerimientos.kit.modelo');
     Route::get('requerimientos/{kit}/detalles', [RequerimientosController::class, 'details'])->name('requerimientos.kit.detalles');
-    Route::post('requerimientos/solicitar', [RequerimientosController::class, 'solicitar'])->name('requerimientos.solicitar');
+    // Route::post('requerimientos/solicitar', [RequerimientosController::class, 'store'])->name('requerimientos.solicitar');
+    
+
+    // Modelos
+    Route::get('requerimientos/modelo', [ModelosController::class, 'index'])->name('requerimientos.modelo');
+    
+    // Kits
+    Route::get('requerimientos/{kit}/modelo', [KitsController::class, 'index'])->name('requerimientos.kit.modelo');
+    Route::post('requerimientos/solicitarKits', [KitsController::class, 'store'])->name('requerimientos.kit.solicitarKits');
+    Route::get('requerimientos/{id}/showKits', [KitsController::class, 'show'])->name('requerimientos.kit.showKits');
+
+    // Makes
+    Route::get('requerimientos/{make}/make', [MakeController::class, 'index'])->name('requerimientos.kit.make');
+    Route::post('requerimientos/solicitar', [MakeController::class, 'store'])->name('requerimientos.solicitar');
+
+
+
+
+
+
+
+
+
+
+    
     
     // Boms
     Route::get('boms', [BomsController::class, 'index'])->name('boms');
@@ -82,7 +112,35 @@ Route::group(['middleware' => ['auth']], function() {
     
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+    Route::get('requerimientos/getkit/{kit}/', [RequerimientosController::class, 'getKit'])->name('requerimientos.getkit.detalles');
+
+
+
+
+
+
+    // =======================================================
+    // --------------------- TEST-----------------------------
+    // =======================================================
+    // Movimientos
     
+    // Route::get('test', [TestMovimientosController::class, 'index'])->name('test.movimientos');
+    Route::get('test', 'App\Http\Controllers\test\TestMovimientosController@index' )->name('test.movimientos');
+
+    Route::get('test/movimientos', [TestMovimientosController::class, 'create'])->name('test.movimientos.create');
+    Route::post('test/movimientos/store', [TestMovimientosController::class, 'store'])->name('test.movimientos.store');
+
+    // Inventario
+    Route::get('test/inventario', [TestInventarioController::class, 'index'])->name('test.inventario');
+    Route::get('test/inventario/{id}/image', [TestInventarioController::class, 'image'])->name('test.inventario.image');
+
+    // Partes
+    Route::get('test/partes', 'App\Http\Controllers\test\TestPartesController@index')->name('test.partes');
+    Route::get('test/partes/create', 'App\Http\Controllers\test\TestPartesController@create')->name('test.partes.create');
+    Route::get('test/partes/{id}/edit', 'App\Http\Controllers\test\TestPartesController@edit')->name('test.partes.edit');
+    Route::post('test/partes/{id}/update', 'App\Http\Controllers\test\TestPartesController@update')->name('test.partes.update');
+    Route::post('test/partes/store', 'App\Http\Controllers\test\TestPartesController@store')->name('test.partes.store');
+    Route::get('test/partes/{id}/delete', 'App\Http\Controllers\test\TestPartesController@destroy')->name('test.partes.delete');
     
 });
     

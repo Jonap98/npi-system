@@ -12,6 +12,11 @@
             <span>Partes</span>
             <a href="{{ route('partes.create') }}" class="btn btn-primary btn-sm ms-5">Crear parte</a>
             <hr>
+            @if(session('success'))
+                <div class="alert alert-success mt-2" role="alert">
+                    {{ session('success') }}
+                </div>
+            @endif
             <div class="container">
                 <div class="row">
                     <div class="card col-md-12">
@@ -72,7 +77,6 @@
     {{-- Carga datos modal --}}
     <script>
         function cambioParte(numero_de_parte) {
-            // const parte = JSON.parse(document.getElementById('parte').value);
             const id = id;
             const numero_de_parte = numero_de_parte;
             const descripcion = descripcion;
