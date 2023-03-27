@@ -1,7 +1,7 @@
 <div class="modal fade" id="solicitarKit{{ $kit->id }}" tabindex="-1" aria-labelledby="solicitarKit{{ $kit->id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="makes" action="{{ route('requerimientos.solicitar') }}" method="POST">
+            <form id="makes{{ $kit->id }}" action="{{ route('requerimientos.solicitar') }}" method="POST">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="solicitarKit{{ $kit->id }}">Solicitar MAKE</h5>
@@ -12,7 +12,7 @@
                 <div class="modal-body">
 
                     <div class="m-2">
-                        <h5>{{ $kit->kit_nombre }}</h5>
+                        <h5>{{ $kit->status }}</h5>
                         <span>Contenido:</span>
 
                         <div id="parts{{ $kit->id }}" class="text-center">

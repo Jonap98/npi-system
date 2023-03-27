@@ -18,9 +18,11 @@
         th {
             border: 1px solid;
             text-align: center;
+            /* max-width: 200px; */
         }
         td {
             text-align: center;
+            /* max-width: 200px; */
         }
         .header {
             /* margin: auto;
@@ -58,6 +60,9 @@
             white-space: nowrap;
             padding: 2px;
         }
+        .ubicacion {
+            white-space: normal;
+        }
 
     </style>
     <title>Solicitud de material NPI</title>
@@ -66,13 +71,15 @@
     <div class="header">
         <div class="flx-container">
             <div class="inline">
-                <span class="title">Solicitud de material NPI</span>
+                <span class="title">Solicitud de material NPI: {{ $kit }}</span>
                 {{-- <img src="{{ asset('assets/whirlpool-logo.png') }}" alt="" width="50px"> --}}
                 {{-- <img src="https://m.media-amazon.com/images/I/71H-vvz0PXL._AC_SY879_.jpg" height="200" alt="" class="m-2"> --}}
             </div>
             <div class="block">
                 <div class="col">
-                    <span class="head"><b>Fecha de impresión: </b>{{ Carbon\Carbon::now('America/Monterrey')->format('H:i') }}</span>
+                    <span class="head"><b>Fecha de impresión: </b>{{ Carbon\Carbon::now('America/Monterrey')->format('d-m-y H:i') }}</span>
+                    <span class="head"><b>Folio: </b>{{ $folio }}</span>
+                    <span class="head"><b>Solicitante: </b>{{ $solicitante }}</span>
                     <span class="head"><b>Cantidad total: </b>{{ $count }}</span>
                 </div>
             </div>
@@ -81,28 +88,25 @@
     <div class="py-3 table-responsive">
         <table class="table table-striped" id="produccion">
             <thead>
-                <th>Folio</th>
                 <th>Número de parte</th>
                 <th>Descripción</th>
-                <th>Ubicación</th>
+                <th class="ubicacion">Ubicación</th>
                 <th>Cantidad requerida</th>
-                <th>Cantidad ubicación</th>
-                <th>Solicitante</th>
-                <th>Fecha</th>
+                {{-- <th>Solicitante</th>
+                <th>Fecha</th> --}}
             </thead>
 
             <tbody>
                 @foreach ($requerimientos as $requerimiento)
                     <tr>
-                        <td class=""><span>{{ $requerimiento->folio }}</span></td>
+                        {{-- <td class=""><span>{{ $requerimiento->folio }}</span></td> --}}
                         <td class=""><span>{{ $requerimiento->num_parte }}</span></td>
                         <td class=""><span>{{ $requerimiento->descripcion }}</span></td>
-                        <td class=""><span>Ubicación</span></td>
-                        <td class=""><span>{{ $requerimiento->cantidad_requerida }}</span></td>
-                        <td class=""><span>{{ $requerimiento->cantidad_ubicacion }}</span></td>
-                        <td class=""><span>{{ $requerimiento->solicitante }}</span></td>
+                        <td class="" class="ubicacion"><span>{{ $requerimiento->ubicacion }}</span></td>
+                        <td class=""><span>{{ round($requerimiento->cantidad_requerida, 0) }}</span></td>
+                        {{-- <td class=""><span>{{ $requerimiento->solicitante }}</span></td> --}}
                         {{-- <td class=""><span>{{ $requerimiento->created_at->format('d-m-Y H:i') }}</span></td> --}}
-                        <td class=""><span>{{ substr($requerimiento->created_at, 0, 10) }}</span></td>
+                        {{-- <td class=""><span>{{ substr($requerimiento->created_at, 0, 10) }}</span></td> --}}
                     </tr>
                 @endforeach
             </tbody>

@@ -13,7 +13,8 @@ class ModelosController extends Controller
         $modelos = BomsModel::select(
             'id',
             'kit_nombre',
-            'num_parte'
+            'num_parte',
+            'team'
         )
         ->where('status', 'SKU')
         ->get();

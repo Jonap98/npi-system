@@ -6,6 +6,7 @@ use App\Exports\MovimientosExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\auth\RegistroController;
+use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\SolicitudRequerimientosController;
 use App\Http\Controllers\RequerimientoManualController;
 use App\Http\Controllers\RequerimientosController;
@@ -27,6 +28,10 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('register', [AuthController::class, 'register']);
     Route::get('registro', [RegistroController::class, 'index'])->name('registro');
     Route::post('registro/create', [RegistroController::class, 'store'])->name('registro.create');
+
+    Route::get('usuarios', [UsuariosController::class, 'index'])->name('usuarios');
+    Route::post('usuarios/{id}/update', [UsuariosController::class, 'update'])->name('usuarios.update');
+    Route::get('usuarios/{id}/delete', [UsuariosController::class, 'destroy'])->name('usuarios.delete');
 
     // =======================================================
     // Movimientos
@@ -92,8 +97,6 @@ Route::group(['middleware' => ['auth']], function() {
     // Makes
     Route::get('requerimientos/{make}/make', [MakeController::class, 'index'])->name('requerimientos.kit.make');
     Route::post('requerimientos/solicitar', [MakeController::class, 'store'])->name('requerimientos.solicitar');
-
-
 
 
 

@@ -12,6 +12,7 @@ class KitsController extends Controller
 {
     public function index($kit) {
         $team = BomsModel::select(
+            'status',
             'team'
         )
         ->where('num_parte', $kit)
@@ -27,7 +28,7 @@ class KitsController extends Controller
         ->where('status', 'like', 'KIT%')
         ->get();
 
-        return view('requerimientos.porModelo.kits', array('kits' => $kits));
+        return view('requerimientos.porModelo.kits', array('kits' => $kits, 'modelo' => $team->status.$team->team));
     }
 
     public function show($id) {
@@ -59,7 +60,8 @@ class KitsController extends Controller
         ->where('status', 'BUY')
         ->orWhere('status', 'like', 'MAKE%')
         ->get()
-        ->where('kit_nombre', $team->kit_nombre);
+        ->where('kit_nombre', $team->kit_nombre)
+        ->where('team', $team->team);
 
         $array_kits = [];
         foreach ($kits as $kit) {
@@ -138,39 +140,48 @@ class KitsController extends Controller
         ->where('status', 'BUY')
         ->orWhere('status', 'like', 'MAKE%')
         ->get()
-        ->where('kit_nombre', $team->kit_nombre);
+        ->where('kit_nombre', $team->kit_nombre)
+        ->where('team', $team->team);
+        
 
-        $kit_padre = BomsModel::select(
-            'id',
-            'kit_nombre',
-            'kit_descripcion',
-            'cantidad',
-            'num_parte',
-            'status',
-            'team',
-            'ubicacion'
-        )
-        ->where('id', $request->id)
-        ->first();
+        // $kit_padre = BomsModel::select(
+        //     'id',
+        //     'kit_nombre',
+        //     'kit_descripcion',
+        //     'cantidad',
+        //     'num_parte',
+        //     'status',
+        //     'team',
+        //     'ubicacion'
+        // )
+        // ->where('id', $request->id)
+        // ->first();
 
-        $requerimiento = new RequerimientosModel();
+        // $requerimiento = new RequerimientosModel();
                 
-        $requerimiento->folio = $folio;
-        $requerimiento->num_parte = $request->num_parte;
-        $requerimiento->kit_nombre = $kit_padre->kit_nombre;
-        $requerimiento->descripcion = $kit_padre->kit_descripcion;
-        $requerimiento->cantidad_requerida = ($request->cantidad * $kit_padre->cantidad);
-        // Validar si seguirá siendo necesario este campo en la BD
-        $requerimiento->cantidad_ubicacion = 1000;
-        $requerimiento->solicitante = $request->solicitante;
-        $requerimiento->comentario = '';
-        $requerimiento->status = 'SOLICITADO';
-        $requerimiento->ubicacion = $kit_padre->ubicacion;
+        // $requerimiento->folio = $folio;
+        // $requerimiento->num_parte = $request->num_parte;
+        // $requerimiento->kit_nombre = $kit_padre->kit_nombre;
+        // $requerimiento->descripcion = $kit_padre->kit_descripcion;
+        // $requerimiento->cantidad_requerida = ($request->cantidad * $kit_padre->cantidad);
+        // // Validar si seguirá siendo necesario este campo en la BD
+        // $requerimiento->cantidad_ubicacion = 1000;
+        // $requerimiento->solicitante = $request->solicitante;
+        // $requerimiento->comentario = '';
+        // $requerimiento->status = 'SOLICITADO';
+        // $requerimiento->ubicacion = $kit_padre->ubicacion ?? '';
     
-        $requerimiento->save();
+        // $requerimiento->save();
         
         // Para cada uno de los registros obtenidos, se crea un requerimiento
         foreach ($kits as $kit) {
+            $ubicacion = BomsModel::select(
+                'num_parte',
+                'ubicacion'
+            )
+            ->where('num_parte', $kit->num_parte)
+            ->first();
+
             $requerimiento = new RequerimientosModel();
                 
             $requerimiento->folio = $folio;
@@ -183,8 +194,8 @@ class KitsController extends Controller
             $requerimiento->solicitante = $request->solicitante;
             $requerimiento->comentario = '';
             $requerimiento->status = 'SOLICITADO';
-            $requerimiento->ubicacion = $request->ubicacion;
-    
+            $requerimiento->ubicacion = $ubicacion->ubicacion;
+
             $requerimiento->save();
         }
 

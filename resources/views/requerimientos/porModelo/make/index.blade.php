@@ -33,8 +33,8 @@
                             <div class="col-auto mb-3">
                                 <div class="card" style="width: 18rem;">
                                     <div class="card-body col-xs-1 text-center">
-                                        <img src="https://m.media-amazon.com/images/I/71H-vvz0PXL._AC_SY879_.jpg" height="200" alt="" class="m-2">
-                                        <h5 class="card-title text-card" style="text-decoration: none">{{ $kit->kit_nombre }}</h5>
+                                        <img id="img{{ $kit->id }}" src="" height="200" alt="" class="m-2">
+                                        <h5 class="card-title text-card" style="text-decoration: none">{{ $kit->status }}</h5>
                                         <h6 class="card-subtitle mb-2 text-muted text-card">{{ $kit->num_parte }}</h6>
                                     </div>
                                     <div class="mb-2 col-xs-1 text-center">
@@ -68,18 +68,35 @@
             const createElements = () => {
                 const makesList = {!! json_encode($makes) !!};
 
+                const noPartImage = {!! json_encode( asset('assets/objects.png')) !!};
+
+                console.log(makesList);
                 
-                let index = 0;
-                makesList.forEach(({details, id}) => {
+                makesList.forEach(({num_parte, details, id}) => {
                     const parts = document.getElementById(`parts${id}`);
                     parts.innerHTML = '';
 
-                    const formulario = document.getElementById('makes');
+                    const formulario = document.getElementById(`makes${id}`);
 
-                    details.forEach(({num_parte, id}) => {
+                    console.log(num_parte);
+                    const myRequest = new Request(`http://10.40.129.40:99/tkav/storage/${num_parte}.jpg`);
+
+                    fetch(myRequest).then(({status}) => {
+                        const imagen = document.getElementById(`img${id}`);
+
+                        if(status == 200) {
+                            imagen.src = myRequest.url;
+                            imagen.className = 'mb-2 rounded object-fit-cover w-100';
+                        } else {
+                            imagen.src = noPartImage;
+                        }
+                    });
+
+                    let index = 0;
+                    details.forEach(({kit_descripcion, num_parte, id, cantidad}) => {
 
                         const span = document.createElement('span');
-                        span.innerText = num_parte;
+                        span.innerText = `${kit_descripcion}\n${num_parte}: ${Math.round(cantidad)}`;
                         span.className = 'btn btn-secondary btn-sm m-2';
                         parts.appendChild(span);
 
@@ -93,6 +110,9 @@
                         index++;
                     });
                 });
+
+
+
 
             }
         </script>

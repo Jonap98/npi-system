@@ -18,7 +18,7 @@ class BomsImport implements ToModel
     
     public function model(array $row) {
 
-        $types = ['PHANTOM', 'BUY REF', 'PDTE'];
+        $types = ['PHANTOM', 'BUY REF', 'PDTE', ''];
 
 
         if(!in_array($row[6], $types)) {

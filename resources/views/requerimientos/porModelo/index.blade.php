@@ -34,8 +34,8 @@
                                 <a href="{{ route('requerimientos.kit.modelo', $modelo->num_parte) }}" style="text-decoration: none"> 
                                     <div class="card" style="width: 18rem;">
                                         <div class="card-body col-xs-1 text-center">
-                                            <img src="https://m.media-amazon.com/images/I/71H-vvz0PXL._AC_SY879_.jpg" height="200" alt="" class="m-2">
-                                            <h5 class="card-title">{{ $modelo->kit_nombre }}</h5>
+                                            <img id="img{{ $modelo->id }}" src="" height="200" alt="" class="m-2 rounded">
+                                            <h5 class="card-title">{{ $modelo->kit_nombre }} {{ $modelo->team }}</h5>
                                             <h6 class="card-subtitle mb-2 text-muted">{{ $modelo->num_parte }}</h6>
                                         </div>
                                     </div>
@@ -57,6 +57,28 @@
         <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
         <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+
+        <script>
+
+            const modelosList = {!! json_encode($modelos) !!};
+
+            const noModelImage = {!! json_encode( asset('assets/no-model2.jpg')) !!};
+
+            modelosList.forEach(({num_parte, id}) => {
+
+                const myRequest = new Request(`http://10.40.129.40:99/tkav/storage/${num_parte}.jpg`);
+
+                fetch(myRequest).then(({status}) => {
+                    const imagen = document.getElementById(`img${id}`);
+
+                    if(status == 200) {
+                        imagen.src = myRequest.url;
+                    } else {
+                        imagen.src = noModelImage;
+                    }
+                });
+            });
+        </script>
 
         <script>
             const getKits = (kit, id) => {

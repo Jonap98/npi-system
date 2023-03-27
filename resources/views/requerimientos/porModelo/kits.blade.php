@@ -11,7 +11,7 @@
             <div class="col-md-12">
                 <div class="d-flex justify-content-between">
                     <div class="md-3">
-                        <span>kits</span>
+                        <span>kits - <b>{{ $modelo }}</b> </span>
                     </div>
 
                     <div class="md-3">
@@ -35,7 +35,9 @@
                             <div class="col-auto mb-3">
                                     <div class="card" style="width: 18rem;">
                                         <div class="card-body col-xs-1 text-center">
-                                            <img src="https://m.media-amazon.com/images/I/71H-vvz0PXL._AC_SY879_.jpg" height="200" alt="" class="m-2">
+                                            {{-- <img src="not-found.png" /> --}}
+                                            {{-- <img id="img{{ $kit->id }}" src="/tkav/storage/{{$kit->num_parte}}.jpg" alt="" height="200" class="m-2"> --}}
+                                            <img id="img{{ $kit->id }}" src="" height="200" alt="" class="m-2 rounded">
                                             <h5 class="card-title text-card" style="text-decoration: none">{{ $kit->kit_nombre }}</h5>
                                             <h6 class="card-subtitle mb-2 text-muted text-card">{{ $kit->num_parte }}</h6>
                                         </div>
@@ -67,6 +69,37 @@
         <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
 
         <script>
+
+            const kitsList = {!! json_encode($kits) !!};
+
+            const noPartImage = {!! json_encode( asset('assets/objects.png')) !!};
+
+            kitsList.forEach(({num_parte, id}) => {
+
+
+                const myRequest = new Request(`http://10.40.129.40:99/tkav/storage/${num_parte}.jpg`);
+
+                fetch(myRequest).then(({status}) => {
+                    const imagen = document.getElementById(`img${id}`);
+
+                    if(status == 200) {
+                        imagen.src = myRequest.url;
+                        imagen.className = 'mb-2 rounded object-fit-cover w-100';
+                    } else {
+                        imagen.src = noPartImage;
+                    }
+                    // response.blob().then((myBlob) => {
+
+                    //     // const objectURL = URL.createObjectURL(myBlob);
+                    //     // myImage.src = objectURL;
+                    // });
+                });
+
+            });
+            
+        </script>
+
+        <script>
             const showKits = (id) => {
 
                 $.ajax({
@@ -78,10 +111,10 @@
                         parts.className = 'text-center';
                         parts.innerHTML = '';
 
-                        data.forEach(element => {
+                        data.forEach(({kit_descripcion, num_parte, cantidad}) => {
                             const span = document.createElement('span');
-                            span.innerText = element.num_parte;
-                            span.className = 'btn btn-secondary btn-sm m-1';
+                            span.innerText = `${kit_descripcion}\n${num_parte}: ${Math.round(cantidad)}`;
+                            span.className = 'm-2 btn btn-secondary btn-sm m-1';
                         
                             parts.appendChild(span);
                         });

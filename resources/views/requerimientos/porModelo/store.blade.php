@@ -1,4 +1,4 @@
-<div class="modal fade" id="solicitarKit{{ $kit->id }}" tabindex="-1" aria-labelledby="solicitarKit{{ $kit->id }}" aria-hidden="true">
+<div class="modal modal-xl fade" id="solicitarKit{{ $kit->id }}" tabindex="-1" aria-labelledby="solicitarKit{{ $kit->id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ route('requerimientos.kit.solicitarKits') }}" method="POST">

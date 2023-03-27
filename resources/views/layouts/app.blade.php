@@ -95,6 +95,8 @@
                                 </ul>
                             </li>
 
+                            <a href="{{ route('usuarios') }}" class="nav-link active">Usuarios</a>
+
                         @endif
                         
                     @endauth
@@ -108,12 +110,6 @@
                         @csrf
                         <button type="submit" class="btn">Logout</button>
                     </form>
-                    
-                    @if(Auth::user()->role == 'NPI-admin')
-                        <a href="{{ route('registro') }}" class="btn">
-                            Registrar usuario
-                        </a>
-                    @endif
                 @endauth
                 <a class="btn" href="../">Regresar al portal</a>
 

@@ -23,8 +23,10 @@ class MakeController extends Controller
         $makes = BomsModel::select(
             'id',
             'kit_nombre',
+            'kit_descripcion',
             'num_parte',
-            'status'
+            'status',
+            'team',
         )
         ->where('team', $team->team)
         ->where('kit_nombre', $team->kit_nombre)
@@ -34,20 +36,23 @@ class MakeController extends Controller
         foreach ($makes as $make) {
             
             $detailsMake = BomsModel::select(
-                'id',
-                'kit_nombre',
-                'num_parte',
                 'status'
             )
             ->where('id', $make->id)
             ->first();
+            // return response([
+            //     'data' => $make
+            // ]);
 
             $another = BomsModel::select(
                 'id',
                 'kit_nombre',
                 'num_parte',
+                'kit_descripcion',
+                'cantidad',
                 'status'
             )
+            ->where('team', $make->team)
             ->where('kit_nombre', $detailsMake->status)
             ->get();
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\RequerimientosModel;
+use App\Models\BomsModel;
 // use App\Models\MovimientosModel;
 use App\Models\test\MovimientosModel;
 use App\Models\SolicitudesModel;
@@ -25,6 +26,16 @@ class SolicitudRequerimientosController extends Controller
         ->where('status', '!=', 'RECIBIDO')
         ->orderBy('id', 'desc')
         ->get();
+
+        foreach ($requerimientos as $requerimiento) {
+            $kit = RequerimientosModel::select(
+                'kit_nombre'
+            )
+            ->where('folio', $requerimiento->folio)
+            ->first();
+
+            $requerimiento->kit_nombre = $kit->kit_nombre ?? '';
+        }
 
         return view('requerimientos.solicitudes.index', array('requerimientos' => $requerimientos));
     }
@@ -387,19 +398,28 @@ class SolicitudRequerimientosController extends Controller
     public function exportPDF(Request $request) {
         $requerimientos = RequerimientosModel::select(
             'id',
-            'folio',
             'num_parte',
             'descripcion',
             'cantidad_requerida',
-            'cantidad_ubicacion',
-            'solicitante',
             'comentario',
             'status',
-            'created_at',
+            'ubicacion'
         )
         ->where('folio', $request->folio)
         ->get();
 
+        $solicitante = RequerimientosModel::select(
+            'solicitante',
+        )
+        ->where('folio', $request->folio)
+        ->first();
+
+        $kit_nombre = BomsModel::select(
+            'kit_nombre'
+        )
+        ->where('num_parte', $requerimientos->first->num_parte->num_parte)
+        ->first();
+        
         // Se debe decodificar la respuesta para hacerla compatible con el PDF
         $data = json_decode($requerimientos);
         $count = count($data);
@@ -411,7 +431,7 @@ class SolicitudRequerimientosController extends Controller
         $fileName = "Requerimiento de material.pdf";
         
         // Descargar archivo
-        $pdf = \PDF::loadView('requerimientos.solicitudes.pdf', array('requerimientos' => $data, 'count' => $count));
+        $pdf = \PDF::loadView('requerimientos.solicitudes.pdf', array('requerimientos' => $data, 'count' => $count, 'kit' => $kit_nombre->kit_nombre, 'solicitante' => $solicitante->solicitante, 'folio' => $request->folio));
         
         return $pdf->download($fileName);
     }

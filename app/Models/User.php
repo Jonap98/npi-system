@@ -21,21 +21,6 @@ class User extends Authenticatable
         'password',
         'active'
     ];
-    // protected $table = 'PFEP_users';
-    // protected $fillable = [
-    //     'REG',
-    //     'user_name',
-    //     'password',
-    //     'name',
-    //     'privilegio',
-    // ];
-    // protected $fillable = [
-    //     'name',
-    //     'email',
-    //     'role',
-    //     'active',
-    //     'password',
-    // ];
 
     /**
      * The attributes that should be hidden for serialization.
