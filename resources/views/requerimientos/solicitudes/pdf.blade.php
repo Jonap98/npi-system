@@ -71,7 +71,7 @@
     <div class="header">
         <div class="flx-container">
             <div class="inline">
-                <span class="title">Solicitud de material NPI: {{ $kit }}</span>
+                <span class="title">Solicitud de material NPI: {{ $kit }} - SKU {{ $team }}</span>
                 {{-- <img src="{{ asset('assets/whirlpool-logo.png') }}" alt="" width="50px"> --}}
                 {{-- <img src="https://m.media-amazon.com/images/I/71H-vvz0PXL._AC_SY879_.jpg" height="200" alt="" class="m-2"> --}}
             </div>

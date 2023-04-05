@@ -1,4 +1,4 @@
-<div class="modal fade" id="solicitarKit{{ $kit->id }}" tabindex="-1" aria-labelledby="solicitarKit{{ $kit->id }}" aria-hidden="true">
+<div class="modal modal-lg fade" id="solicitarKit{{ $kit->id }}" tabindex="-1" aria-labelledby="solicitarKit{{ $kit->id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="makes{{ $kit->id }}" action="{{ route('requerimientos.solicitar') }}" method="POST">
@@ -12,7 +12,7 @@
                 <div class="modal-body">
 
                     <div class="m-2">
-                        <h5>{{ $kit->status }}</h5>
+                        <h5>{{ $kit->status }} - {{ $kit->team }}</h5>
                         <span>Contenido:</span>
 
                         <div id="parts{{ $kit->id }}" class="text-center">
@@ -31,6 +31,7 @@
                     </div>
 
                     <input type="hidden" name="id" value="{{ $kit->id }}">
+                    <input type="hidden" name="team" value="{{ $kit->team }}">
 
                 </div>
                 <div class="modal-footer">

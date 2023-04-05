@@ -12,7 +12,7 @@
                 <div class="modal-body">
 
                     <div class="m-2">
-                        <h5>{{ $kit->kit_nombre }}</h5>
+                        <h5>{{ $kit->kit_nombre }} - {{ $kit->team }}</h5>
                         <input type="hidden" name="kit_nombre" value="{{ $kit->kit_nombre }}">
                         <span>Contenido:</span>
 
@@ -32,6 +32,7 @@
                     </div>
 
                     <input type="hidden" name="num_parte" value="{{ $kit->num_parte }}">
+                    <input type="hidden" name="team" value="{{ $kit->team }}">
 
                 </div>
                 <div class="modal-footer">

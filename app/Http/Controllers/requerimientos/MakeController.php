@@ -10,14 +10,14 @@ use App\Models\RequerimientosModel;
 
 class MakeController extends Controller
 {
-    public function index($make) {
+    public function index($id) {
         $team = BomsModel::select(
             'kit_nombre',
             'num_parte',
             'team',
             'status'
         )
-        ->where('num_parte', $make)
+        ->where('id', $id)
         ->first();
         
         $makes = BomsModel::select(
@@ -30,6 +30,7 @@ class MakeController extends Controller
         )
         ->where('team', $team->team)
         ->where('kit_nombre', $team->kit_nombre)
+        ->where('status', 'like', 'MAKE%')
         ->get();
 
         $list = [];
@@ -40,9 +41,6 @@ class MakeController extends Controller
             )
             ->where('id', $make->id)
             ->first();
-            // return response([
-            //     'data' => $make
-            // ]);
 
             $another = BomsModel::select(
                 'id',
@@ -54,6 +52,7 @@ class MakeController extends Controller
             )
             ->where('team', $make->team)
             ->where('kit_nombre', $detailsMake->status)
+            ->orderBy('kit_descripcion', 'asc')
             ->get();
 
             if($another) {
@@ -65,7 +64,7 @@ class MakeController extends Controller
             }
         }
 
-        return view('requerimientos.porModelo.make.index', array('makes' => $list));
+        return view('requerimientos.porModelo.make.index', array('makes' => $list, 'make' => $team->kit_nombre, 'temp' => $team->team));
     }
 
     public function store(Request $request) {
@@ -73,12 +72,14 @@ class MakeController extends Controller
         $solicitante = $request->solicitante;
         $cantidad = $request->cantidad;
         $id = $request->id;
+        $team = $request->team;
 
         unset($request['_token']);
         unset($request['id']);
         unset($request['kit_nombre']);
         unset($request['solicitante']);
         unset($request['cantidad']);
+        unset($request['team']);
 
         $ultimoFolio = SolicitudesModel::select(
             'id',
@@ -128,6 +129,7 @@ class MakeController extends Controller
             $requerimiento->comentario = '';
             $requerimiento->status = 'SOLICITADO';
             $requerimiento->ubicacion = $make->ubicacion;
+            $requerimiento->team = $team;
     
             $requerimiento->save();
         }

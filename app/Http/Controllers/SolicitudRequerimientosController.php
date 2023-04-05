@@ -29,12 +29,14 @@ class SolicitudRequerimientosController extends Controller
 
         foreach ($requerimientos as $requerimiento) {
             $kit = RequerimientosModel::select(
-                'kit_nombre'
+                'kit_nombre',
+                'team'
             )
             ->where('folio', $requerimiento->folio)
             ->first();
 
             $requerimiento->kit_nombre = $kit->kit_nombre ?? '';
+            $requerimiento->team = $kit->team ?? '';
         }
 
         return view('requerimientos.solicitudes.index', array('requerimientos' => $requerimientos));
@@ -408,8 +410,9 @@ class SolicitudRequerimientosController extends Controller
         ->where('folio', $request->folio)
         ->get();
 
-        $solicitante = RequerimientosModel::select(
+        $solicitud = RequerimientosModel::select(
             'solicitante',
+            'team'
         )
         ->where('folio', $request->folio)
         ->first();
@@ -431,7 +434,7 @@ class SolicitudRequerimientosController extends Controller
         $fileName = "Requerimiento de material.pdf";
         
         // Descargar archivo
-        $pdf = \PDF::loadView('requerimientos.solicitudes.pdf', array('requerimientos' => $data, 'count' => $count, 'kit' => $kit_nombre->kit_nombre, 'solicitante' => $solicitante->solicitante, 'folio' => $request->folio));
+        $pdf = \PDF::loadView('requerimientos.solicitudes.pdf', array('requerimientos' => $data, 'count' => $count, 'kit' => $kit_nombre->kit_nombre, 'solicitante' => $solicitud->solicitante, 'team' => $solicitud->team, 'folio' => $request->folio));
         
         return $pdf->download($fileName);
     }

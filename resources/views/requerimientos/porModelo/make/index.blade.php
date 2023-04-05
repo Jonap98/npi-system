@@ -10,7 +10,7 @@
             <div class="col-md-12">
                 <div class="d-flex justify-content-between">
                     <div class="md-3">
-                        <span>Make</span>
+                        <span>Make - <b>{{ $make }} {{ $temp }}</b> </span>
                     </div>
 
                     <div class="md-3">
@@ -76,6 +76,13 @@
                     const parts = document.getElementById(`parts${id}`);
                     parts.innerHTML = '';
 
+                    const table = document.createElement('table');
+                    table.className = 'table table-striped';
+
+                    const tbody = document.createElement('tbody');
+                    table.appendChild(tbody);
+                    parts.appendChild(table);
+
                     const formulario = document.getElementById(`makes${id}`);
 
                     console.log(num_parte);
@@ -95,10 +102,27 @@
                     let index = 0;
                     details.forEach(({kit_descripcion, num_parte, id, cantidad}) => {
 
-                        const span = document.createElement('span');
-                        span.innerText = `${kit_descripcion}\n${num_parte}: ${Math.round(cantidad)}`;
-                        span.className = 'btn btn-secondary btn-sm m-2';
-                        parts.appendChild(span);
+                        const row = document.createElement('tr');
+
+                        const partField = document.createElement('td');
+                        partField.innerText = num_parte;
+
+                        const descField = document.createElement('td');
+                        descField.innerText = kit_descripcion;
+
+                        const countField = document.createElement('td');
+                        countField.innerText = Math.round(cantidad);
+
+                        row.appendChild(partField);
+                        row.appendChild(descField);
+                        row.appendChild(countField);
+
+                        tbody.appendChild(row);
+
+                        // const span = document.createElement('span');
+                        // span.innerText = `${kit_descripcion}\n${num_parte}: ${Math.round(cantidad)}`;
+                        // span.className = 'btn btn-secondary btn-sm m-2';
+                        // parts.appendChild(span);
 
                         const input = document.createElement('input');
                         input.type = 'hidden';

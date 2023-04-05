@@ -22,7 +22,8 @@ class KitsController extends Controller
             'id',
             'kit_nombre',
             'num_parte',
-            'status'
+            'status',
+            'team'
         )
         ->where('team', $team->team)
         ->where('status', 'like', 'KIT%')
@@ -59,6 +60,7 @@ class KitsController extends Controller
         ->where('kit_nombre', $team->kit_nombre)
         ->where('status', 'BUY')
         ->orWhere('status', 'like', 'MAKE%')
+        ->orderBy('kit_descripcion', 'asc')
         ->get()
         ->where('kit_nombre', $team->kit_nombre)
         ->where('team', $team->team);
@@ -195,6 +197,7 @@ class KitsController extends Controller
             $requerimiento->comentario = '';
             $requerimiento->status = 'SOLICITADO';
             $requerimiento->ubicacion = $ubicacion->ubicacion;
+            $requerimiento->team = $request->team;
 
             $requerimiento->save();
         }

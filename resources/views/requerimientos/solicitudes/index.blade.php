@@ -53,6 +53,7 @@
                                         <th scope="col">Folio</th>
                                         <th scope="col">Solicitante</th>
                                         <th scope="col">Kit</th>
+                                        <th scope="col">SKU</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Fecha</th>
                                         <th scope="col">Recibir</th>
@@ -67,6 +68,7 @@
                                             <td>{{ $requerimiento->folio }}</td>
                                             <td>{{ $requerimiento->solicitante }}</td>
                                             <td>{{ $requerimiento->kit_nombre }}</td>
+                                            <td>{{ $requerimiento->team }}</td>
                                             <td>{{ $requerimiento->status }}</td>
                                             <td>{{ $requerimiento->fecha }}</td>
                                             <td>

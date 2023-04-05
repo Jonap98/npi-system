@@ -20,6 +20,7 @@ class RequerimientosModel extends Model
         'solicitante',
         'comentario',
         'status',
-        'ubicacion'
+        'ubicacion',
+        'team'
     ];
 }

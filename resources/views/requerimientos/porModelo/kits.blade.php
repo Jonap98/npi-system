@@ -42,7 +42,7 @@
                                             <h6 class="card-subtitle mb-2 text-muted text-card">{{ $kit->num_parte }}</h6>
                                         </div>
                                         <div class="mb-2 col-xs-1 text-center">
-                                            <a class="btn btn-sm" href="{{ route('requerimientos.kit.make', $kit->num_parte) }}" style="text-decoration: none; background-color: #eb8c34; color: #fff">
+                                            <a class="btn btn-sm" href="{{ route('requerimientos.kit.make', $kit->id) }}" style="text-decoration: none; background-color: #eb8c34; color: #fff">
                                                 Solicitar MAKE
                                             </a>
                                             <button class="btn btn-sm" style="background-color: #347aeb; color: #fff" onclick="showKits('{{ $kit->id }}')" data-bs-toggle="modal" data-bs-target="#solicitarKit{{ $kit->id }}">
@@ -111,12 +111,37 @@
                         parts.className = 'text-center';
                         parts.innerHTML = '';
 
+                        const table = document.createElement('table');
+                        table.className = 'table table-striped';
+
+                        const tbody = document.createElement('tbody');
+                        table.appendChild(tbody);
+                        parts.appendChild(table);
+
                         data.forEach(({kit_descripcion, num_parte, cantidad}) => {
-                            const span = document.createElement('span');
-                            span.innerText = `${kit_descripcion}\n${num_parte}: ${Math.round(cantidad)}`;
-                            span.className = 'm-2 btn btn-secondary btn-sm m-1';
+
+                            const row = document.createElement('tr');
+
+                            const partField = document.createElement('td');
+                            partField.innerText = num_parte;
+
+                            const descField = document.createElement('td');
+                            descField.innerText = kit_descripcion;
+
+                            const countField = document.createElement('td');
+                            countField.innerText = Math.round(cantidad);
+
+                            row.appendChild(partField);
+                            row.appendChild(descField);
+                            row.appendChild(countField);
+
+                            tbody.appendChild(row);
+
+                            // const span = document.createElement('span');
+                            // span.innerText = `${kit_descripcion}\n${num_parte}: ${Math.round(cantidad)}`;
+                            // span.className = 'm-2 btn btn-secondary btn-sm m-1';
                         
-                            parts.appendChild(span);
+                            // parts.appendChild(span);
                         });
                     },
 
