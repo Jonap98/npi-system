@@ -417,11 +417,22 @@ class SolicitudRequerimientosController extends Controller
         ->where('folio', $request->folio)
         ->first();
 
-        $kit_nombre = BomsModel::select(
-            'kit_nombre'
+        $kit_nombre = RequerimientosModel::select(
+            'kit_nombre',
         )
-        ->where('num_parte', $requerimientos->first->num_parte->num_parte)
+        ->where('folio', $request->folio)
         ->first();
+
+        foreach ($requerimientos as $req) {
+            $status = BomsModel::select(
+                'status'
+            )
+            ->where('num_parte', $req->num_parte)
+            ->where('team', $solicitud->team)
+            ->first();
+
+            $req->status_bom = substr($status->status, 0, 8);
+        }
         
         // Se debe decodificar la respuesta para hacerla compatible con el PDF
         $data = json_decode($requerimientos);
@@ -432,7 +443,7 @@ class SolicitudRequerimientosController extends Controller
         
         // $fileName = "Requerimiento de material ".$arr[0]['TIPO']."-".substr($arr[0]['FECHAREAL'], 0, 10).".pdf";
         $fileName = "Requerimiento de material.pdf";
-        
+
         // Descargar archivo
         $pdf = \PDF::loadView('requerimientos.solicitudes.pdf', array('requerimientos' => $data, 'count' => $count, 'kit' => $kit_nombre->kit_nombre, 'solicitante' => $solicitud->solicitante, 'team' => $solicitud->team, 'folio' => $request->folio));
         

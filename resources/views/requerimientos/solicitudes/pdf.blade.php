@@ -88,6 +88,7 @@
     <div class="py-3 table-responsive">
         <table class="table table-striped" id="produccion">
             <thead>
+                <th>Make</th>
                 <th>Número de parte</th>
                 <th>Descripción</th>
                 <th class="ubicacion">Ubicación</th>
@@ -100,6 +101,7 @@
                 @foreach ($requerimientos as $requerimiento)
                     <tr>
                         {{-- <td class=""><span>{{ $requerimiento->folio }}</span></td> --}}
+                        <td class=""><span>{{ $requerimiento->status_bom }}</span></td>
                         <td class=""><span>{{ $requerimiento->num_parte }}</span></td>
                         <td class=""><span>{{ $requerimiento->descripcion }}</span></td>
                         <td class="" class="ubicacion"><span>{{ $requerimiento->ubicacion }}</span></td>

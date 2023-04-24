@@ -73,6 +73,7 @@ class MakeController extends Controller
         $cantidad = $request->cantidad;
         $id = $request->id;
         $team = $request->team;
+        $num_parte = $request->num_parte;
 
         unset($request['_token']);
         unset($request['id']);
@@ -80,6 +81,7 @@ class MakeController extends Controller
         unset($request['solicitante']);
         unset($request['cantidad']);
         unset($request['team']);
+        unset($request['num_parte']);
 
         $ultimoFolio = SolicitudesModel::select(
             'id',
@@ -121,6 +123,7 @@ class MakeController extends Controller
             $requerimiento->folio = $folio;
             $requerimiento->num_parte = $make->num_parte;
             $requerimiento->kit_nombre = $make->kit_nombre;
+            $requerimiento->kit_num_parte = $num_parte;
             $requerimiento->descripcion = $make->kit_descripcion;
             $requerimiento->cantidad_requerida = ($cantidad * $make->cantidad);
             // Validar si seguirá siendo necesario este campo en la BD
