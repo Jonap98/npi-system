@@ -1,18 +1,20 @@
 <!-- Modal editar -->
-<div class="modal fade" id="editModal{{ $parte->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+{{-- <div class="modal fade" id="editModal{{ $parte->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"> --}}
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('partes.update', $parte->id) }}" method="POST">
+            <form action="{{ route('partes.update') }}" method="POST">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Editar parte</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Editar número de parte</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
                     <div class="m-2">
                         <label>Número de parte</label>
-                        <input type="text" class="form-control" name="numero_de_parte" placeholder="# de parte" value="{{ $parte->numero_de_parte }}">
+                        <input type="text" class="form-control" id="num_parte_id" name="numero_de_parte" placeholder="# de parte">
+                        <input type="hidden" class="form-control" id="id_parte" name="id">
                         @error('numero_parte')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -20,13 +22,14 @@
 
                     <div class="m-2">
                         <label>Descripción</label>
-                        <textarea class="form-control" name="descripcion" placeholder="Descripción..."  > {{ $parte->descripcion }} </textarea>
+                        <textarea class="form-control" id="descripcion_id" name="descripcion" placeholder="Descripción..."  ></textarea>
+                        {{-- <textarea class="form-control" name="descripcion" placeholder="Descripción..."  > {{ $parte->descripcion }} </textarea> --}}
                         @error('descripcion')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
 
-                    <div class="m-2">
+                    {{-- <div class="m-2">
                         <label>Unidad de medida</label>
                         <select class="form-select" name="um">
                             <option selected>{{ $parte->um }}</option>
@@ -37,9 +40,9 @@
                           @error('um')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
-                    </div>
+                    </div> --}}
 
-                    <div class="m-2">
+                    {{-- <div class="m-2">
                         <label>Ubicación</label>
                         <select class="form-select" id="ubicacion" name="ubicacion">
                             <option selected >{{ $parte->ubicacion }}</option>
@@ -84,7 +87,7 @@
                           @error('fila')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
-                    </div>
+                    </div> --}}
 
                 </div>
                 <div class="modal-footer">

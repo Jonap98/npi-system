@@ -40,21 +40,23 @@
                                             <td>{{ $parte->descripcion }}</td>
                                             <td>{{ $parte->um }}</td>
                                             <td>
-                                                <button type="button" class="btn btn-success btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#editModal{{ $parte->id }}">
+                                                <button type="button" class="btn btn-success btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#editModal" onclick="editPart('{{ $parte->id }}', '{{ $parte->numero_de_parte }}', '{{ $parte->descripcion }}')">
+                                                {{-- <button type="button" class="btn btn-success btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#editModal{{ $parte->id }}"> --}}
                                                     Editar
                                                 </button>
-                                                <button type="button" class="btn btn-danger btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $parte->id }}">
+                                                <button type="button" class="btn btn-danger btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="deletePart('{{ $parte->id }}')">
+                                                {{-- <button type="button" class="btn btn-danger btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $parte->id }}"> --}}
                                                     Eliminar
                                                 </button>
                                             </td>
                                         </tr>
 
-                                        {{-- Modal editar --}}
-                                        @include('partes.edit')
-                                        {{-- Modal eliminar --}}
-                                        @include('partes.delete')
-
                                     @endforeach
+                                    
+                                    {{-- Modal editar --}}
+                                    @include('partes.edit')
+                                    {{-- Modal eliminar --}}
+                                    @include('partes.delete')
                                 </tbody>
                             </table>
                         </div>
@@ -74,20 +76,6 @@
 
 @section('js')
 
-    {{-- Carga datos modal --}}
-    <script>
-        function cambioParte(numero_de_parte) {
-            const id = id;
-            const numero_de_parte = numero_de_parte;
-            const descripcion = descripcion;
-            const um = um;
-
-            document.getElementById('id').value=id;
-            document.getElementById('numero_de_parte').value=numero_de_parte;
-            document.getElementById('descripcion').value=descripcion;
-            document.getElementById('um').value=um;
-        }
-    </script>
 
     {{-- Datatable --}}
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
@@ -100,6 +88,24 @@
                 order: [0, 'desc']
             });
         });
+    </script>
+
+    <script>
+        const editPart = (id, num_parte, descripcion) => {
+            const inputId = document.getElementById('id_parte');
+            const inputNumParte = document.getElementById('num_parte_id');
+            const inputDescripcion = document.getElementById('descripcion_id');
+            
+            inputId.value = id;
+            inputNumParte.value = num_parte;
+            inputDescripcion.value = descripcion;
+        }
+
+        const deletePart = (id) => {
+            const deleteInputId = document.getElementById('delete_id');
+            
+            deleteInputId.value = id;
+        }
     </script>
 
 @endsection

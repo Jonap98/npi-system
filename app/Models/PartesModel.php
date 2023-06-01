@@ -10,6 +10,7 @@ class PartesModel extends Model
     use HasFactory;
     protected $table = 'NPI_partes';
     protected $fillable = [
+        'id',
         'numero_de_parte',
         'descripcion',
         'um',

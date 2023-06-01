@@ -32,7 +32,7 @@
                         @foreach ($makes as $kit)
                             <div class="col-auto mb-3">
                                 <div class="card" style="width: 18rem;">
-                                    <div class="card-body col-xs-1 text-center">
+                                    <div class="card col-xs-1 text-center">
                                         <img id="img{{ $kit->id }}" src="" height="200" alt="" class="m-2">
                                         <h5 class="card-title text-card" style="text-decoration: none">{{ $kit->status }}</h5>
                                         <h6 class="card-subtitle mb-2 text-muted text-card">{{ $kit->num_parte }}</h6>
@@ -71,7 +71,7 @@
                 const noPartImage = {!! json_encode( asset('assets/objects.png')) !!};
 
                 console.log(makesList);
-                
+
                 makesList.forEach(({num_parte, details, id}) => {
                     const parts = document.getElementById(`parts${id}`);
                     parts.innerHTML = '';

@@ -60,25 +60,14 @@ class PartesController extends Controller
         return redirect('partes')->with('success', 'Registro creado existosamente');
     }
 
-    public function update(Request $request, $id) {
-        $parte = PartesModel::findOrFail($id);
+    public function update(Request $request) {
 
-        $validatedData = $request->validate([
-            'numero_de_parte' => 'required|max:255',
-            'descripcion' => 'required|max:255',
-            'um' => 'required|max:255|not_in:Unidades',
+        PartesModel::where('id', $request->id)->update([
+            'numero_de_parte' => $request->numero_de_parte,
+            'descripcion' => $request->descripcion,
         ]);
-
-        $parte->numero_de_parte = $request->numero_de_parte;
-        $parte->descripcion = $request->descripcion;
-        $parte->um = $request->um;
-        $parte->ubicacion = $request->ubicacion;
-        $parte->palet = $request->palet;
-        $parte->fila = $request->fila;
-
-        $parte->save();
-
-        return redirect()->route('solicitud.requerimientos')->with('success', 'Registro actualizado existosamente');
+        
+        return back()->with('success', 'Registro actualizado exitosamente');
     }
 
     public function edit($id) {
@@ -97,8 +86,8 @@ class PartesController extends Controller
         ));
     }
 
-    public function destroy($id) {
-        \DB::table('NPI_partes')->where('id', $id)->update(['active' => 0 ]); 
+    public function destroy(Request $request) {
+        PartesModel::where('id', $request->id_parte)->update(['active' => 0]);
 
         return redirect('partes')->with('success', 'Registro eliminado exitosamente');
     }

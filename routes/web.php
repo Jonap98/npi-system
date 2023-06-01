@@ -45,9 +45,11 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('partes', 'App\Http\Controllers\PartesController@index')->name('partes');
     Route::get('partes/create', 'App\Http\Controllers\PartesController@create')->name('partes.create');
     Route::get('partes/{id}/edit', 'App\Http\Controllers\PartesController@edit')->name('partes.edit');
-    Route::post('partes/{id}/update', 'App\Http\Controllers\PartesController@update')->name('partes.update');
+    // Route::post('partes/{id}/update', 'App\Http\Controllers\PartesController@update')->name('partes.update');
+    Route::post('partes/update', 'App\Http\Controllers\PartesController@update')->name('partes.update');
     Route::post('partes/store', 'App\Http\Controllers\PartesController@store')->name('partes.store');
-    Route::get('partes/{id}/delete', 'App\Http\Controllers\PartesController@destroy')->name('partes.delete');
+    // Route::get('partes/{id}/delete', 'App\Http\Controllers\PartesController@destroy')->name('partes.delete');
+    Route::post('partes/delete', 'App\Http\Controllers\PartesController@destroy')->name('partes.delete');
     
     // =======================================================
     // Ubicaciones
