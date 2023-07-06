@@ -20,6 +20,7 @@ use App\Http\Controllers\requerimientos\MakeController;
 use App\Http\Controllers\test\TestMovimientosController;
 use App\Http\Controllers\test\TestInventarioController;
 
+use App\Http\Controllers\InventarioExportController;
 
 
 // Externals
@@ -173,7 +174,10 @@ Route::get('inventario', 'App\Http\Controllers\InventarioController@index')->nam
 
 //Excel
 Route::get('/exportar', 'App\Http\Controllers\MovimientosController@export')->name('exportar');
-Route::get('/exportar/inventario', 'App\Http\Controllers\InventarioController@export')->name('exportar.inventario');
+// OLD
+// Route::get('/exportar/inventario', 'App\Http\Controllers\InventarioController@export')->name('exportar.inventario');
+// NEW
+Route::get('/exportar/inventario', [InventarioExportController::class, 'crearExcel'])->name('exportar.inventario');
 
 // Auth
 Auth::routes();
