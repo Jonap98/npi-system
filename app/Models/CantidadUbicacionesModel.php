@@ -17,5 +17,6 @@ class CantidadUbicacionesModel extends Model
         'ubicacion',
         'palet',
         'status',
+        'id_requerimiento',
     ];
 }

@@ -15,7 +15,7 @@ class BomsImport implements ToModel
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    
+
     public function model(array $row) {
 
         $types = ['PHANTOM', 'BUY REF', 'PDTE', ''];
@@ -24,7 +24,7 @@ class BomsImport implements ToModel
         if(!in_array($row[6], $types)) {
             $registro = new BomsModel([
                 'kit_nombre' => $row[0] ?? '', // Validar PTDE
-                'nivel' => $row[1],
+                'nivel' => $row[1] ?? 0,
                 'num_parte' => $row[2],
                 'kit_descripcion' => $row[3],
                 'um' => $row[4] ?? '',
@@ -32,7 +32,8 @@ class BomsImport implements ToModel
                 'status' => $row[6] ?? '',
                 'ubicacion' => $row[7] ?? '',
                 'team' => $row[8] ?? '',
-                'requerido' => 1
+                'requerido' => 1,
+                // 'padre' => $row[9] ?? ''
             ]);
 
             $registro->save();

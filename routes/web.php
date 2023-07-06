@@ -20,6 +20,13 @@ use App\Http\Controllers\requerimientos\MakeController;
 use App\Http\Controllers\test\TestMovimientosController;
 use App\Http\Controllers\test\TestInventarioController;
 
+
+
+// Externals
+// e-kanban
+use App\Http\Controllers\externals\ekanban\RegisterController;
+
+
 Route::group(['middleware' => ['auth']], function() {
 
     // =======================================================
@@ -38,7 +45,7 @@ Route::group(['middleware' => ['auth']], function() {
     // =======================================================
     Route::get('movimientos', 'App\Http\Controllers\MovimientosController@create')->name('movimientos.create');
     Route::post('movimientos/store', 'App\Http\Controllers\MovimientosController@store')->name('store');
-    
+
     // =======================================================
     // Partes
     // =======================================================
@@ -50,7 +57,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('partes/store', 'App\Http\Controllers\PartesController@store')->name('partes.store');
     // Route::get('partes/{id}/delete', 'App\Http\Controllers\PartesController@destroy')->name('partes.delete');
     Route::post('partes/delete', 'App\Http\Controllers\PartesController@destroy')->name('partes.delete');
-    
+
     // =======================================================
     // Ubicaciones
     // =======================================================
@@ -62,7 +69,7 @@ Route::group(['middleware' => ['auth']], function() {
     // Inventario
     // =======================================================
     Route::get('inventario/{id}/image', 'App\Http\Controllers\InventarioController@image')->name('inventario.image');
-    
+
     // =======================================================
     // Requerimientos
     // =======================================================
@@ -73,24 +80,31 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('solicitudes/requerimientos/{folio}', [SolicitudRequerimientosController::class, 'details'])->name('solicitud.requerimientos.detalles');
     Route::post('solicitudes/requerimientos/update', [SolicitudRequerimientosController::class, 'update'])->name('solicitud.requerimientos.update');
     Route::post('solicitudes/requerimientos/export', [SolicitudRequerimientosController::class, 'exportPDF'])->name('solicitud.requerimientos.export');
-    
+    Route::post('solicitudes/requerimientos/update-individual', [SolicitudRequerimientosController::class, 'prepararIndividual'])->name('solicitud.requerimientos.update-individual');
+    Route::post('solicitudes/requerimientos/calcular-acumulado', [SolicitudRequerimientosController::class, 'calcularAcumulado'])->name('solicitud.requerimientos.calcular-acumulado');
+
+
+
     Route::post('solicitudes/requerimientos/preparar', [SolicitudRequerimientosController::class, 'preparar'])->name('solicitud.requerimientos.preparar');
     // Editar cantidad
     Route::post('solicitudes/requerimientos/edit', [SolicitudRequerimientosController::class, 'updateQty'])->name('solicitud.requerimientos.edit');
+    Route::post('solicitudes/requerimientos/dynamic-edit', [SolicitudRequerimientosController::class, 'updateDynamicQty'])->name('solicitud.requerimientos.dynamic-edit');
+    Route::post('solicitudes/requerimientos/update-status', [SolicitudRequerimientosController::class, 'updateStatus'])->name('solicitud.requerimientos.update-status');
+
 
     // Manual
     Route::get('requerimientos/manual', [RequerimientoManualController::class, 'index'])->name('requerimientos.manual');
     Route::get('requerimientos/{kit}/manual', [RequerimientoManualController::class, 'kit'])->name('requerimientos.kit.manual');
     Route::post('requerimientos/manual/solicitar', [RequerimientoManualController::class, 'solicitar'])->name('requerimientos.manual.solicitar');
-    
+
     // Por modelo
     Route::get('requerimientos/{kit}/detalles', [RequerimientosController::class, 'details'])->name('requerimientos.kit.detalles');
     // Route::post('requerimientos/solicitar', [RequerimientosController::class, 'store'])->name('requerimientos.solicitar');
-    
+
 
     // Modelos
     Route::get('requerimientos/modelo', [ModelosController::class, 'index'])->name('requerimientos.modelo');
-    
+
     // Kits
     Route::get('requerimientos/{kit}/modelo', [KitsController::class, 'index'])->name('requerimientos.kit.modelo');
     Route::post('requerimientos/solicitarKits', [KitsController::class, 'store'])->name('requerimientos.kit.solicitarKits');
@@ -101,20 +115,23 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('requerimientos/solicitar', [MakeController::class, 'store'])->name('requerimientos.solicitar');
 
 
+    Route::post('requerimientos/getInfo', [MakeController::class, 'getInfo'])->name('requerimientos.getInfo');
 
 
 
 
 
 
-    
-    
+
+
+
+
     // Boms
     Route::get('boms', [BomsController::class, 'index'])->name('boms');
     Route::post('boms/import', [BomsController::class, 'import'])->name('boms.import');
     Route::post('boms/update', [BomsController::class, 'update'])->name('boms.update');
     Route::post('boms/edit', [BomsController::class, 'editName'])->name('boms.edit.name');
-    
+
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
     Route::get('requerimientos/getkit/{kit}/', [RequerimientosController::class, 'getKit'])->name('requerimientos.getkit.detalles');
@@ -128,7 +145,7 @@ Route::group(['middleware' => ['auth']], function() {
     // --------------------- TEST-----------------------------
     // =======================================================
     // Movimientos
-    
+
     // Route::get('test', [TestMovimientosController::class, 'index'])->name('test.movimientos');
     Route::get('test', 'App\Http\Controllers\test\TestMovimientosController@index' )->name('test.movimientos');
 
@@ -146,9 +163,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('test/partes/{id}/update', 'App\Http\Controllers\test\TestPartesController@update')->name('test.partes.update');
     Route::post('test/partes/store', 'App\Http\Controllers\test\TestPartesController@store')->name('test.partes.store');
     Route::get('test/partes/{id}/delete', 'App\Http\Controllers\test\TestPartesController@destroy')->name('test.partes.delete');
-    
+
 });
-    
+
 Route::get('/', 'App\Http\Controllers\MovimientosController@index')->name('movimientos');
 
 // Inventario
@@ -162,3 +179,12 @@ Route::get('/exportar/inventario', 'App\Http\Controllers\InventarioController@ex
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+
+// =========================================================================
+// Externals
+// =========================================================================
+// e-kanban
+Route::get('/e-kanban/register', [RegisterController::class, 'index'])->name('e-kanban.register');
+Route::post('/e-kanban/register/register', [RegisterController::class, 'store'])->name('e-kanban.register.register');

@@ -27,7 +27,7 @@
                         <div class="">
                             <label for="">Cargar BOM</label>
                             <input type="file" name="import" class="form-control mt-2 mb-2" id="import" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" >
-                            <button class="btn btn-success" type="submit">Cargar</button> 
+                            <button class="btn btn-success" type="submit">Cargar</button>
                         </div>
                     </form>
 
@@ -61,9 +61,6 @@
                                             <th scope="col">Nivel</th>
                                             {{-- <th scope="col">Requerido</th> --}}
                                             <th scope="col">Cantidad</th>
-                                            @if (Auth::user()->role == 'NPI-admin')
-                                                <th scope="col">Editar</th>
-                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -74,13 +71,13 @@
                                                 <td>{{ $bom->kit_nombre }}</td>
                                                 <td>{{ $bom->kit_descripcion }}</td>
                                                 <td>{{ $bom->nivel }}</td>
-                                                {{-- <td style="background-color: {{ ($bom->requerido == 1) ? '#50bf47' : '#fff'  }}; color: #fff"> 
+                                                {{-- <td style="background-color: {{ ($bom->requerido == 1) ? '#50bf47' : '#fff'  }}; color: #fff">
 
                                                     @if (Auth::user()->role == 'NPI-admin')
-                                                        <input 
-                                                            type="checkbox" 
-                                                            class="checkbox-lg" 
-                                                            style="top: 1.2rem; scale: 1.7; margin-right: 0.8rem;" 
+                                                        <input
+                                                            type="checkbox"
+                                                            class="checkbox-lg"
+                                                            style="top: 1.2rem; scale: 1.7; margin-right: 0.8rem;"
                                                             name="requerido" id="requerido" value="{{ $bom->id }}"
                                                             onchange="agregarParte('{{ $bom->id }}')"
                                                         >
@@ -89,22 +86,11 @@
                                                     {{ ($bom->requerido == 1) ? 'Requerido' : '' }}
                                                 </td> --}}
                                                 <td>{{ round($bom->cantidad, 0) }}</td>
-                                                @if (Auth::user()->role == 'NPI-admin')
-                                                    <td>
-                                                        <button type="button" class="btn btn-warning align-self-center" style="color: #fff" data-bs-toggle="modal" data-bs-target="#edit{{ $bom->id }}">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                                                            </svg>
-                                                        </button>
-                                                    </td>
-                                                @endif
                                             </tr>
-                                            @include('boms.edit')
                                         @endforeach
                                     </tbody>
                                 </table>
-                                
+
                             </div>
                         </div>
                     @include('boms.modal')
@@ -144,7 +130,7 @@
 
                 let part = '';
 
-                
+
                 if(list.includes(parte)) {
                     list.splice(list.indexOf(parte), 1);
 

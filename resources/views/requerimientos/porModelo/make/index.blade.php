@@ -20,6 +20,7 @@
                 </div>
 
                 <hr>
+                <div hidden class="alert alert-success mt-2" id="confirmation-message" role="alert"></div>
                 @if(session('success'))
                     <div class="alert alert-success mt-2" role="alert">
                         {{ session('success') }}
@@ -38,17 +39,25 @@
                                         <h6 class="card-subtitle mb-2 text-muted text-card">{{ $kit->num_parte }}</h6>
                                     </div>
                                     <div class="mb-2 col-xs-1 text-center">
-                                        <button class="btn btn-sm" style="background-color: #347aeb; color: #fff" data-bs-toggle="modal" data-bs-target="#solicitarKit{{ $kit->id }}">
+                                        {{-- OLD --}}
+                                        {{-- <button class="btn btn-sm" style="background-color: #347aeb; color: #fff" data-bs-toggle="modal" data-bs-target="#solicitarKit{{ $kit->id }}" onclick="getInfoTest({{ $kit }}, {{ $padre_id }})">
                                             Solicitar Make
+                                        </button> --}}
+
+                                        {{-- NEW --}}
+                                        <button class="btn btn-sm" style="background-color: #347aeb; color: #fff" data-bs-toggle="modal" data-bs-target="#solicitarKit" onclick="getInfoTest({{ $kit }}, {{ $padre_id }})">
+                                            Solicitar Make NEW
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
 
-                            @include('requerimientos.porModelo.make.store')
+                            {{-- OLD --}}
+                            {{-- @include('requerimientos.porModelo.make.store') --}}
                         @endforeach
-
+                        {{-- NEW --}}
+                        @include('requerimientos.porModelo.make.store2')
                     </div>
                 </div>
 
@@ -70,10 +79,9 @@
 
                 const noPartImage = {!! json_encode( asset('assets/objects.png')) !!};
 
-                console.log(makesList);
-
                 makesList.forEach(({num_parte, details, id}) => {
-                    const parts = document.getElementById(`parts${id}`);
+                    // const parts = document.getElementById(`parts${id}`);
+                    const parts = document.getElementById(`parts`);
                     parts.innerHTML = '';
 
                     const table = document.createElement('table');
@@ -83,9 +91,8 @@
                     table.appendChild(tbody);
                     parts.appendChild(table);
 
-                    const formulario = document.getElementById(`makes${id}`);
+                    // const formulario = document.getElementById(`makes${id}`);
 
-                    console.log(num_parte);
                     const myRequest = new Request(`http://10.40.129.40:99/tkav/storage/${num_parte}.jpg`);
 
                     fetch(myRequest).then(({status}) => {
@@ -129,7 +136,7 @@
                         input.name = `num_parte${index}`;
                         input.value = num_parte;
 
-                        formulario.appendChild(input);
+                        // formulario.appendChild(input);
 
                         index++;
                     });
@@ -138,6 +145,117 @@
 
 
 
+            }
+        </script>
+
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+
+        <script>
+            let valores = [];
+
+            function getInfoTest(kit, padre_id) {
+                $.ajax({
+                    type: 'POST',
+                    // url: `/requerimientos/${padre_id}/getInfo`,
+                    url: `/requerimientos/getInfo`,
+                    headers: {
+                        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    data: {
+                        "kit_nombre": kit.kit_nombre,
+                        "kit_status": kit.status,
+                        "padre_id": padre_id,
+                    },
+                    success: function(data) {
+                        const parts = document.getElementById(`parts`);
+                        parts.innerHTML = '';
+
+                        const table = document.createElement('table');
+                        table.className = 'table table-striped';
+
+                        const tbody = document.createElement('tbody');
+                        table.appendChild(tbody);
+                        parts.appendChild(table);
+
+                        // const formulario = document.getElementById(`makes`);
+                        // const formulario = document.getElementById('formulario-dinamico');
+
+                        data.data.forEach(element => {
+                            console.log('Element');
+                            console.log(element)
+                            const row = document.createElement('tr');
+
+                            const partField = document.createElement('td');
+                            partField.innerText = element.num_parte;
+
+                            const descField = document.createElement('td');
+                            descField.innerText = element.kit_descripcion;
+
+                            const countField = document.createElement('td');
+                            countField.innerText = Math.round(element.cantidad);
+
+                            row.appendChild(partField);
+                            row.appendChild(descField);
+                            row.appendChild(countField);
+
+                            const obj = {
+                                "num_part": element.num_parte,
+                                "descripcion": element.kit_descripcion,
+                                "cantidad": element.cantidad,
+                                "ubicacion": element.ubicacion,
+                                "kit_nombre": element.kit_nombre,
+                                "team": element.team
+                            };
+
+                            valores.push(obj);
+
+                            tbody.appendChild(row);
+
+                            // const span = document.createElement('span');
+                            // span.innerText = `${kit_descripcion}\n${num_parte}: ${Math.round(cantidad)}`;
+                            // span.className = 'btn btn-secondary btn-sm m-2';
+                            // parts.appendChild(span);
+
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            // input.name = `num_parte${index}`;
+                            // input.value = num_parte;
+
+                            // formulario.appendChild(input);
+                        });
+
+
+
+
+
+                    }
+                });
+            }
+
+            function solicitarRequerimiento() {
+                let cantidad = document.getElementById('cantidad-registrada').value;
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/requerimientos/solicitar',
+                    headers: {
+                        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    data: {
+                        "cantidad": cantidad,
+                        "valores": valores
+                    },
+                    success: function({msg}) {
+                        valores = [];
+                        cantidad = 0;
+                        const inputCantidad = document.getElementById('cantidad-registrada')
+                        inputCantidad.value = '';
+                        const alerta = document.getElementById('confirmation-message');
+                        alerta.removeAttribute('hidden');
+                        alerta.innerText = msg;
+                    }
+                });
             }
         </script>
     @endsection

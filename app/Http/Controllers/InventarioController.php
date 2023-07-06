@@ -73,7 +73,7 @@ class InventarioController extends Controller
             // Calculo de inventario
             $cantidad_inventario = 0;
             $ubicaciones_list = array();
-            
+
             foreach ($cantidades as $cantidad) {
                 // Se realiza la sumatoria validando si son entradas o salidas
                 if(strtoupper($cantidad->tipo) == 'ENTRADA') {
@@ -91,7 +91,7 @@ class InventarioController extends Controller
 
         return view('inventario.inventario', array('inventarios' => $inventarios));
     }
-    
+
     public function image($id) {
         return view('inventario.image');
     }

@@ -16,7 +16,7 @@
             <div class="container">
                 <div class="row">
                     <div class="card col-md-12">
-                        
+
                         <div class="mt-2 table-responsive">
                             <table id="consulta" class="table table-striped">
                                 <thead>
@@ -32,6 +32,7 @@
                                         <th scope="col">Fecha de registro</th>
                                         <th scope="col">Ubicación</th>
                                         <th scope="col">Palet</th>
+                                        <th scope="col">Número de guía</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -48,13 +49,14 @@
                                             <td>{{ $movimiento->fecha_registro }}</td>
                                             <td>{{ $movimiento->ubicacion }}</td>
                                             <td>{{ $movimiento->palet }}</td>
+                                            <td>{{ $movimiento->numero_guia }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <div class="container">
                         </div>

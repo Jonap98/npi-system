@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('css')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
+    {{-- <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css"> --}}
 @endsection
 
 
@@ -48,13 +48,13 @@
                                         @include('ubicaciones.store')
                                         {{-- Modal eliminar --}}
                                         @include('ubicaciones.delete')
-                                        
+
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <div class="container">
                         </div>

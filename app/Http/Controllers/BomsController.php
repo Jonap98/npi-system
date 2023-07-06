@@ -26,13 +26,14 @@ class BomsController extends Controller
 
         return view('boms.index', array('boms' => $boms));
     }
-    
+
     public function import(Request $request) {
+        set_time_limit(4800);
         $file = $request->file('import');
 
         if($file) {
             $bomList = BomsModel::select('id')->get();
-    
+
             foreach ($bomList as $bom) {
                 $bom->delete();
             }

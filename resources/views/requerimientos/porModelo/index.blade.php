@@ -31,7 +31,7 @@
                     <div class="row">
                         @foreach ($modelos as $modelo)
                             <div class="col-auto mb-3">
-                                <a href="{{ route('requerimientos.kit.modelo', $modelo->num_parte) }}" style="text-decoration: none"> 
+                                <a href="{{ route('requerimientos.kit.modelo', $modelo->num_parte) }}" style="text-decoration: none">
                                     <div class="card" style="width: 18rem;">
                                         <div class="card-body col-xs-1 text-center">
                                             <img id="img{{ $modelo->id }}" src="" height="200" alt="" class="m-2 rounded">

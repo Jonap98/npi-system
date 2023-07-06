@@ -95,6 +95,7 @@ class SolicitudRequerimientosController extends Controller
                 'palet',
             )
             ->where('numero_de_parte', $requerimientos[$i]->num_parte)
+            ->orderBy('ubicacion', 'asc')
             ->get();
 
             // Agrupar las cantidades solicitadas
@@ -141,10 +142,11 @@ class SolicitudRequerimientosController extends Controller
             )
             ->where('folio_solicitud', $requerimientos[$i]->folio)
             ->where('num_parte', $requerimientos[$i]->num_parte)
+            ->where('id_requerimiento', $requerimientos[$i]->id)
             ->get();
 
-            
-            
+
+
             $solicitudes_list = [];
             if(count($solicitudes) > 0) {
                 array_push($solicitudes_list, $solicitudes[0]);
@@ -176,8 +178,68 @@ class SolicitudRequerimientosController extends Controller
                 }
             }
         }
-        
+
         return view('requerimientos.solicitudes.details', array('requerimientos' => $requerimientos, 'status' => $status->status, 'folio' => $folio));
+    }
+
+    public function updateStatus(Request $request) {
+        $solicitud = RequerimientosModel::where('folio', $request->folio)->update(['status' => 'PREPARADO']);
+        $solicitud = SolicitudesModel::where('folio', $request->folio)->update(['status' => 'PREPARADO']);
+
+        return response([
+            'msg' => 'Status actualizado exitosamente'
+        ]);
+    }
+
+    public function prepararIndividual(Request $request) {
+        $proyecto = PartesModel::select(
+            'proyecto'
+        )
+        ->where('numero_de_parte', $request->num_parte)
+        ->first();
+
+        // PTE ubicación, nombre, validar de dónde se tomará, es decir, de qué ubicación
+        // $bomInfo = BomsModel::select(
+
+        // )
+
+        $cantidad_ubicacion = new CantidadUbicacionesModel();
+
+        $cantidad_ubicacion->folio_solicitud = $request->folio;
+        $cantidad_ubicacion->num_parte = $request->num_parte;
+        $cantidad_ubicacion->cantidad = $request->cantidad;
+        $cantidad_ubicacion->ubicacion = $request->ubicacion;
+        $cantidad_ubicacion->palet = $request->palet;
+        $cantidad_ubicacion->status = 'PREPARADO';
+        $cantidad_ubicacion->id_requerimiento = $request->id_requerimiento;
+
+        $cantidad_ubicacion->save();
+
+        $movimiento = new MovimientosModel();
+
+        $movimiento->proyecto = $proyecto->proyecto;
+        $movimiento->cantidad = $request->cantidad;
+        $movimiento->tipo = 'Salida';
+        $movimiento->comentario = 'Requerimiento de material con folio: '.$request->folio;
+        $movimiento->fecha_registro = Carbon::now();
+        $movimiento->id_parte = '0';
+        $movimiento->numero_de_parte = $request->num_parte;
+        $movimiento->ubicacion = $request->ubicacion;
+        $movimiento->palet = $request->palet;
+
+        $movimiento->save();
+
+        if(!$cantidad_ubicacion) {
+            return response([
+                'msg' => 'No se pudo registrar la cantidad',
+            ]);
+        }
+        return response([
+            'msg' => 'Cantidad registrada exitosamente',
+            'data' => $cantidad_ubicacion,
+            'movimiento' => $movimiento->id
+        ]);
+
     }
 
     public function preparar(Request $request) {
@@ -189,6 +251,24 @@ class SolicitudRequerimientosController extends Controller
         unset($requerimientos['_token']);
         unset($requerimientos['requerimientos_length']);
         unset($requerimientos['folio']);
+
+        $inputs = array();
+        foreach ($requerimientos as $req) {
+            return response([
+                'data' => $req
+            ]);
+            if(str_starts_with($req, 'cantidad')) {
+                array_push($inputs, $req);
+            }
+        }
+
+        return response([
+            'data' => $inputs
+        ]);
+
+        return response([
+            'data' => 'wait'
+        ]);
 
         // Agrega los datos a una lista para poder iterarla de manera más sencilla
         foreach ($requerimientos as $requerimiento) {
@@ -210,7 +290,7 @@ class SolicitudRequerimientosController extends Controller
             $id = $part->id ?? '';
 
             // Ingresa el registro de la cantidad que se requiere, a la tabla de Cantidad_ubicaciones
-            // De manera que permite una mejor visualización y uso, ya que esa cantidad se registrará posteriormente 
+            // De manera que permite una mejor visualización y uso, ya que esa cantidad se registrará posteriormente
             // en la tabla de movimientos como una salida
             $movimiento = new CantidadUbicacionesModel();
 
@@ -220,6 +300,7 @@ class SolicitudRequerimientosController extends Controller
             $movimiento->ubicacion = $requerimientosList[$i+1];
             $movimiento->palet = $requerimientosList[$i+2];
             $movimiento->status = 'PREPARADO';
+            $movimiento->id_requerimiento = $requerimientosList[$i+4];
 
             $movimiento->save();
 
@@ -245,7 +326,7 @@ class SolicitudRequerimientosController extends Controller
             }
 
             // Se itera de 3 en 3 debido a las propiedades del request, de manera que cada 4° valor, es la cantidad
-            $i += 3;
+            $i += 4;
 
         }
 
@@ -258,18 +339,18 @@ class SolicitudRequerimientosController extends Controller
 
     // Validar funcionamiento
     public function confirmar(Request $request) {
-        
+
         $requerimientos = $request->all();
         $requerimientosList = [];
-        
+
         unset($requerimientos['_token']);
         unset($requerimientos['requerimientos_length']);
         unset($requerimientos['id_solicitud']);
-        
+
         foreach ($requerimientos as $requerimiento) {
             array_push($requerimientosList, $requerimiento);
         }
-        
+
         $counter = count($requerimientosList);
 
         for($i = 0; $i < $counter; $i ++) {
@@ -305,7 +386,73 @@ class SolicitudRequerimientosController extends Controller
         return back()->with('success', 'La solicitud fue actualizada exitosamente');
     }
 
+    public function updateDynamicQty(Request $request) {
+
+
+        CantidadUbicacionesModel::where(
+            'id', $request->cantidad_id
+        )
+        ->update([
+            'cantidad' => $request->cantidad
+        ]);
+
+        $cantidad_ubicacion = CantidadUbicacionesModel::select(
+            'folio_solicitud',
+            'num_parte',
+            'cantidad',
+            'ubicacion',
+            'palet',
+            'status' ,
+            'id_requerimiento',
+        )
+        ->where('id', $request->cantidad_id)
+        ->first();
+
+        MovimientosModel::where(
+            'id', $request->movimiento_id
+        )
+        ->update([
+            'cantidad' => $request->cantidad
+        ]);
+
+        return response([
+            'msg' => 'Cantidad actualizada exitosamente',
+            'data' => $cantidad_ubicacion,
+            'movimiento' => $request->movimiento_id
+        ]);
+
+
+    }
+
+    public function calcularAcumulado(Request $request) {
+        // return response([
+        //     'data' => $request->all()
+        // ]);
+        $cantidades = CantidadUbicacionesModel::select(
+            'cantidad'
+        )
+        ->where('folio_solicitud', $request->folio)
+        ->where('num_parte', $request->num_parte)
+        ->where('ubicacion', $request->ubicacion)
+        ->where('palet', $request->palet)
+        ->get();
+
+        $acumulado = 0;
+        foreach ($cantidades as $cantidad) {
+            $acumulado += $cantidad->cantidad;
+        }
+
+        return response([
+            // 'data' => $cantidades,
+            'acumulado' => $acumulado
+        ]);
+
+    }
+
     public function updateQty(Request $request) {
+        // return response([
+        //     'data' => $request->all()
+        // ]);
 
         // 1- Validar cantidad en inventario
         // 1.1 - Obtiene la cantidad registrada como salida del inventario
@@ -343,7 +490,7 @@ class SolicitudRequerimientosController extends Controller
 
         // 2 - Realiza el ajuste de inventario
         $inventarioResultante = ($enInventario + $cantidadRegistrada->cantidad) - $request->cantidad;
-        
+
         if( $inventarioResultante < 0 ) {
             return back()->with('error', 'No se puede ajustar la cantidad, no tiene suficiente inventario');
         }
@@ -352,7 +499,7 @@ class SolicitudRequerimientosController extends Controller
         // es decir, si la cantidad es mayor a 0
         if($cantidadRegistrada->cantidad > 0) {
             $movimiento = new MovimientosModel();
-    
+
             $movimiento->proyecto = $cantidadInventario->first->proyecto->proyecto;
             $movimiento->cantidad = round($cantidadRegistrada->cantidad, 0);
             $movimiento->tipo = 'Entrada';
@@ -362,14 +509,14 @@ class SolicitudRequerimientosController extends Controller
             $movimiento->numero_de_parte = $request->num_parte;
             $movimiento->ubicacion = $request->ubicacion;
             $movimiento->palet = $request->palet;
-    
+
             $movimiento->save();
         }
 
         // 2.2 - Salida de material con nueva cantidad
         if($request->cantidad > 0) {
             $movimiento = new MovimientosModel();
-    
+
             $movimiento->proyecto = $cantidadInventario->first->proyecto->proyecto;
             $movimiento->cantidad = $request->cantidad;
             $movimiento->tipo = 'Salida';
@@ -379,7 +526,7 @@ class SolicitudRequerimientosController extends Controller
             $movimiento->numero_de_parte = $request->num_parte;
             $movimiento->ubicacion = $request->ubicacion;
             $movimiento->palet = $request->palet;
-    
+
             $movimiento->save();
         }
 
@@ -433,20 +580,20 @@ class SolicitudRequerimientosController extends Controller
 
             $req->status_bom = substr($status->status, 0, 8);
         }
-        
+
         // Se debe decodificar la respuesta para hacerla compatible con el PDF
         $data = json_decode($requerimientos);
         $count = count($data);
-        
+
         // Se vuelve a codificar para acceder a ella como arreglo
         $arr = json_decode(json_encode($data), true);
-        
+
         // $fileName = "Requerimiento de material ".$arr[0]['TIPO']."-".substr($arr[0]['FECHAREAL'], 0, 10).".pdf";
         $fileName = "Requerimiento de material.pdf";
 
         // Descargar archivo
         $pdf = \PDF::loadView('requerimientos.solicitudes.pdf', array('requerimientos' => $data, 'count' => $count, 'kit' => $kit_nombre->kit_nombre, 'solicitante' => $solicitud->solicitante, 'team' => $solicitud->team, 'folio' => $request->folio));
-        
+
         return $pdf->download($fileName);
     }
 }

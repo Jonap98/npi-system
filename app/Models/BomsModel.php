@@ -20,6 +20,7 @@ class BomsModel extends Model
         'status',
         'requerido',
         'ubicacion',
-        'team'
+        'team',
+        'padre'
     ];
 }

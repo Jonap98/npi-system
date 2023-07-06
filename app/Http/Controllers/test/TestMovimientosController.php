@@ -15,9 +15,20 @@ use Maatwebsite\Excel\Facades\Excel;
 class TestMovimientosController extends Controller
 {
     public function index() {
-        $movimientos = DB::table('NPI_movimientos_test as a')
-            ->join('NPI_partes_test', 'NPI_partes_test.id', '=', 'a.id_parte')
-            ->select('a.id', 'a.proyecto', 'NPI_partes_test.numero_de_parte as numero_parte', 'NPI_partes_test.descripcion', 'a.ubicacion', 'a.palet', 'NPI_partes_test.um as unidad_de_medida', 'a.tipo', 'a.cantidad', 'a.comentario',  'a.fecha_registro',
+        $movimientos = DB::table('NPI_movimientos_test as movimiento')
+            ->join('NPI_partes_test as parte', 'parte.numero_de_parte', '=', 'movimiento.numero_de_parte')
+            ->select(
+                'movimiento.id',
+                'movimiento.proyecto',
+                'parte.numero_de_parte as numero_parte',
+                'parte.descripcion',
+                'movimiento.ubicacion',
+                'movimiento.palet',
+                'parte.um as unidad_de_medida',
+                'movimiento.tipo',
+                'movimiento.cantidad',
+                'movimiento.comentario',
+                'movimiento.fecha_registro',
             )->get();
 
         return view('test/consulta', array('movimientos' => $movimientos));
@@ -28,7 +39,7 @@ class TestMovimientosController extends Controller
 
         $partes = PartesModel::get();
         $ubicaciones = UbicacionesModel::where('tipo', 'NPI')->get();
-        
+
         foreach ($partes as $parte) {
             $parte->descripcion = str_replace('"', "''", $parte->descripcion);
         }
@@ -44,7 +55,7 @@ class TestMovimientosController extends Controller
         ]);
 
         for($i = 0; $i < $request->counter; $i++) {
-            
+
             $lastIndex = MovimientosModel::select('id')->orderBy('id', 'desc')->first();
 
             $movimiento = new MovimientosModel();
@@ -67,13 +78,13 @@ class TestMovimientosController extends Controller
             $movimiento->numero_de_parte = $request->$numero_de_parte;
             $movimiento->ubicacion = $request->$ubicacion;
             $movimiento->palet = $request->$palet;
-            
+
             $movimiento->save();
             }
         }
-        
+
         return redirect('test/movimientos')->with('success', 'Registro creado exitosamente');
-        
+
     }
 
     public function export(){
@@ -82,16 +93,16 @@ class TestMovimientosController extends Controller
 
     // Función de prueba para query con raw
     public function indextestGroupBy() {
-        
+
         $movimientos = DB::table('NPI_movimientos_test as a')
             ->join('NPI_partes_test', 'NPI_partes_test.id', '=', 'a.id_parte')
             ->select('a.id', 'a.proyecto', 'a.comentario', 'NPI_partes_test.numero_de_parte as numero_parte', 'NPI_partes_test.descripcion', 'NPI_partes_test.um as unidad_de_medida',
                 DB::raw('(select sum(e.cantidad) from NPI_movimientos_test e WHERE e.tipo="ENTRADA" and a.id_parte=e.id_parte GROUP BY id_parte)entrada'),
-                DB::raw('(select sum(NPI_movimientos_test.cantidad) from NPI_movimientos_test WHERE NPI_movimientos_test.tipo="SALIDA" and a.id_parte=NPI_movimientos_test.id_parte GROUP BY id_parte) as salida'),  
+                DB::raw('(select sum(NPI_movimientos_test.cantidad) from NPI_movimientos_test WHERE NPI_movimientos_test.tipo="SALIDA" and a.id_parte=NPI_movimientos_test.id_parte GROUP BY id_parte) as salida'),
                 DB::raw('(SELECT TOP 1 c.fecha_registro FROM NPI_movimientos_test as c WHERE a.id_parte=c.id_parte ) as fecha_registro'),
                 DB::raw('(SELECT TOP 1 c.id_parte FROM NPI_movimientos_test as c WHERE a.id_parte=c.id_parte ) as id_parte'),
-                
+
             )->get();
-            
+
     }
 }

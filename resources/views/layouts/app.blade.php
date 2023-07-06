@@ -75,9 +75,9 @@
                     </li>
 
                     @auth
-                        
+
                         @if(Auth::user()->role == 'NPI-admin')
-                        
+
                             <li class="nav-item dropdown">
                                 <a href="#" id="navbarDropdow" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                     Test
@@ -98,7 +98,7 @@
                             <a href="{{ route('usuarios') }}" class="nav-link active">Usuarios</a>
 
                         @endif
-                        
+
                     @endauth
 
 
@@ -115,12 +115,12 @@
 
                 {{-- No autenticado --}}
                 @guest
-                    
+
                 @endguest
-                
+
             </div>
             <div class=""></div>
-            
+
         </nav>
 
         <main class="py-4">

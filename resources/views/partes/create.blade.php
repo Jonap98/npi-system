@@ -41,6 +41,7 @@
                                     <option value="Piezas">Piezas</option>
                                     <option value="IN">IN</option>
                                     <option value="KG">KG</option>
+                                    <option value="M">M</option>
                                   </select>
                                   @error('um')
                                     <span class="text-danger">{{ $message }}</span>
@@ -93,7 +94,7 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div> -->
-                            
+
                             <button type="submit" class="btn btn-primary btn-sm m-2">Guardar</button>
 
                         </tr>
@@ -102,5 +103,5 @@
             </div>
         </div>
     </div>
-    
+
 @endsection

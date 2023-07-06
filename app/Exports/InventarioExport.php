@@ -5,6 +5,10 @@ namespace App\Exports;
 use DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Illuminate\Support\Arr;
+use App\Exports\InventarioExport;
+use App\Models\MovimientosModel;
+use App\Models\PartesModel;
 
 class InventarioExport implements FromCollection, WithHeadings
 {
@@ -32,127 +36,85 @@ class InventarioExport implements FromCollection, WithHeadings
     public function collection()
     {
         $inventarios = DB::table('NPI_movimientos')
-            ->join('NPI_partes', 'NPI_partes.id', '=', 'NPI_movimientos.id_parte')
-            ->select(
-                'NPI_movimientos.id',
-                'NPI_movimientos.proyecto',
-                'NPI_movimientos.cantidad',
-                'NPI_movimientos.comentario',
-                'NPI_movimientos.tipo',
-                'NPI_movimientos.fecha_registro',
-                'NPI_movimientos.ubicacion', 
-                'NPI_movimientos.palet', 
-                'NPI_movimientos.fila',
-                'NPI_partes.id',
-                'NPI_partes.numero_de_parte',
-                'NPI_partes.descripcion',
-                'NPI_partes.um',
-            )
-            // ->orderBy('NPI_movimientos.fecha_registro', 'asc')
-            ->orderBy('NPI_movimientos.id_parte', 'desc')
-            ->orderBy('NPI_movimientos.tipo', 'asc')
-            ->get();
-    
-        $temp_list = array();
-        if(count($inventarios) > 0) {
-            array_push($temp_list, $inventarios[0]);
+        ->get()
+        ->unique('numero_de_parte');
+
+        foreach ($inventarios as $inventario) {
+
+            // Proceso para obtener ubicacion y palet sin repetir
             $ubicaciones = DB::table('NPI_movimientos')
-                ->select(
-                    'tipo',
-                    'ubicacion',
-                    'palet',
-                    'fila'
-                )
-                ->where('id_parte', $inventarios[0]->id)
-                ->get();
-            $temp_list[0]->ubicaciones = $ubicaciones;
-        }
+            ->select('ubicacion')
+            ->where('numero_de_parte', $inventario->numero_de_parte)
+            ->get()
+            ->unique('ubicacion');
 
-        
-        for($i = 1; $i < count($inventarios); $i++) {
-            $repetido = false;
-            for($j = 0; $j < count($temp_list); $j++) {
+            $ubicaciones_array = array();
+            foreach ($ubicaciones as $ubicacion) {
+                $palets = DB::table('NPI_movimientos')
+                ->select('palet')
+                ->where('numero_de_parte', $inventario->numero_de_parte)
+                ->where('ubicacion', $ubicacion->ubicacion)
+                ->get()
+                ->unique('palet');
 
-                if($inventarios[$i]->numero_de_parte == $temp_list[$j]->numero_de_parte) {
-                    if($inventarios[$i]->ubicacion == $temp_list[$j]->ubicacion) {
-                        $repetido = true;
-                        if(strtoupper($inventarios[$i]->tipo) == 'ENTRADA') {
-                            $temp_list[$j]->cantidad += $inventarios[$i]->cantidad;
-                        } 
-                        if(strtoupper($inventarios[$i]->tipo) == 'SALIDA'){
-                            $temp_list[$j]->cantidad -= $inventarios[$i]->cantidad;
-        
-                            if($temp_list[$j]->cantidad < 0) {
-                                $temp_list[$j]->cantidad = 0;
-                            }
-                        }
-                    }
-                } 
-                else {
-                    // array_push($temp_list, $inventarios[$i]);
+
+                $palets_array = array();
+                foreach ($palets as $palet) {
+                    array_push($palets_array, $palet);
                 }
-    
-                // $ubicaciones = DB::table('NPI_movimientos')
-                // ->select(
-                //     'tipo',
-                //     'ubicacion',
-                //     'palet',
-                //     'fila'
-                //     )
-                //     ->where('id_parte', $inventarios[$i]->id)
-                //     ->get();
-                
-                // return response([
-                //     'data' => $ubicaciones
-                // ]);
-    
-                
-                // $ubicacionesRepetidas = [];
-                // array_push($ubicacionesRepetidas, $ubicaciones[0]);
-                        
-                // foreach ($ubicaciones as $ubicacion) {
-                // for($in = 1; $in < count($ubicaciones); $in++) {
-                //     $rep = false;
-                //     // foreach ($ubicacionesRepetidas as $repetida ) {
-                //     for($jo = 0; $jo < count($ubicacionesRepetidas); $jo++) {
-                //         if($ubicaciones[$in]->ubicacion == $ubicacionesRepetidas[$jo]->ubicacion) {
-                //             $rep = true;
-                //         }
-                //     }
-                //     if(!$rep) {
-                //         array_push($ubicacionesRepetidas, $ubicaciones[$in]);
-                //     }
-                // }
-                // $inventarios[$i]->ubicaciones = $ubicaciones[$in];
-                
+                $ubicacion->palets_registrados = $palets_array;
+
+                array_push($ubicaciones_array, $ubicacion);
+
             }
-            if(!$repetido) {
-                array_push($temp_list, $inventarios[$i]);
-            }
-                
+            $inventario->ubicaciones_registradas = $ubicaciones_array;
         }
 
+        foreach ($inventarios as $inventario) {
+            // Para este número de parte se obtienen todos sus movimientos
+            $cantidades = MovimientosModel::select(
+                'numero_de_parte',
+                'cantidad',
+                'tipo',
+                'ubicacion',
+                'palet'
+            )
+            ->where('numero_de_parte', $inventario->numero_de_parte)
+            ->get();
 
-        
-        $final = array();
+            $datos = PartesModel::select(
+                'descripcion',
+                'um'
+            )
+            ->where('numero_de_parte', $inventario->numero_de_parte)
+            ->first();
 
-        for($i = 0; $i < count($temp_list); $i++) {
-            array_push($final, 
-                array(
-                    'id' => $temp_list[$i]->id,
-                    'proyecto' => $temp_list[$i]->proyecto,
-                    'numero_de_parte' => $temp_list[$i]->numero_de_parte,
-                    'descripcion' => $temp_list[$i]->descripcion,
-                    'um' => $temp_list[$i]->um,
-                    'cantidad' => $temp_list[$i]->cantidad,
-                    'ubicacion' => $temp_list[$i]->ubicacion,
-                    'palet' => $temp_list[$i]->palet,
-                    // 'fila' => $temp_list[$i]->fila,
-                )
-            );
-            
+            $inventario->descripcion = $datos->descripcion;
+            $inventario->um = $datos->um;
+
+            // Calculo de inventario
+            $cantidad_inventario = 0;
+            $ubicaciones_list = array();
+
+            foreach ($cantidades as $cantidad) {
+                // Se realiza la sumatoria validando si son entradas o salidas
+                if(strtoupper($cantidad->tipo) == 'ENTRADA') {
+                    $cantidad_inventario += $cantidad->cantidad;
+                }
+                if(strtoupper($cantidad->tipo) == 'SALIDA'){
+                    $cantidad_inventario -= $cantidad->cantidad;
+                }
+            }
+
+            $inventario->ubicaciones = $ubicaciones_list;
+            $inventario->cantidad_inventario = $cantidad_inventario;
+            $inventario->cantidades = $cantidades;
         }
 
-        return collect($final);
+        // return response([
+        //     'data' => $inventarios
+        // ]);
+
+        return collect($inventarios);
     }
 }
