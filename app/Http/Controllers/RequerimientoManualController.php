@@ -8,6 +8,7 @@ use App\Models\BomsModel;
 use App\Models\RequerimientosModel;
 use App\Models\PartesModel;
 use App\Models\SolicitudesModel;
+use Carbon\Carbon;
 
 class RequerimientoManualController extends Controller
 {
@@ -96,6 +97,9 @@ class RequerimientoManualController extends Controller
         $solicitud->folio = $folio;
         $solicitud->solicitante = $request->solicitante;
         $solicitud->status = 'SOLICITADO';
+        $solicitud->created_at = Carbon::now()->subHours(1);
+        $solicitud->updated_at = Carbon::now()->subHours(1);
+
 
         $solicitud->save();
 
@@ -132,10 +136,8 @@ class RequerimientoManualController extends Controller
                 $requerimiento->solicitante = $request->solicitante;
                 $requerimiento->comentario = '';
                 $requerimiento->status = 'SOLICITADO';
-
-                // return response([
-                //     'data' => $requerimiento
-                // ]);
+                $requerimiento->created_at = Carbon::now()->subHours(1);
+                $requerimiento->updated_at = Carbon::now()->subHours(1);
 
                 $requerimiento->save();
             }

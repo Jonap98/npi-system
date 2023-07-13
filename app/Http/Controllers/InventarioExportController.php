@@ -64,8 +64,8 @@ class InventarioExportController extends Controller
             ->where('numero_de_parte', $inventario->numero_de_parte)
             ->first();
 
-            $inventario->descripcion = $datos->descripcion;
-            $inventario->um = $datos->um;
+            $inventario->descripcion = $datos->descripcion ?? '';
+            $inventario->um = $datos->um ?? '';
 
             // Calculo de inventario
             $cantidad_inventario = 0;

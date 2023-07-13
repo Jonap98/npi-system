@@ -21,6 +21,8 @@ class RequerimientosModel extends Model
         'comentario',
         'status',
         'ubicacion',
-        'team'
+        'team',
+        'created_at',
+        'updated_at',
     ];
 }

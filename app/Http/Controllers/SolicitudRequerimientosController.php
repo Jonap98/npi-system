@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\RequerimientosModel;
 use App\Models\BomsModel;
-// use App\Models\MovimientosModel;
-use App\Models\test\MovimientosModel;
+use App\Models\MovimientosModel;
+// use App\Models\test\MovimientosModel;
 use App\Models\SolicitudesModel;
 use App\Models\test\PartesModel;
 use App\Models\CantidadUbicacionesModel;
@@ -183,8 +183,8 @@ class SolicitudRequerimientosController extends Controller
     }
 
     public function updateStatus(Request $request) {
-        $solicitud = RequerimientosModel::where('folio', $request->folio)->update(['status' => 'PREPARADO']);
-        $solicitud = SolicitudesModel::where('folio', $request->folio)->update(['status' => 'PREPARADO']);
+        $solicitud = RequerimientosModel::where('folio', $request->folio)->update(['status' => 'PREPARADO', 'updated_at' => Carbon::now()->subHours(1)]);
+        $solicitud = SolicitudesModel::where('folio', $request->folio)->update(['status' => 'PREPARADO', 'updated_at' => Carbon::now()->subHours(1)]);
 
         return response([
             'msg' => 'Status actualizado exitosamente'
@@ -212,6 +212,9 @@ class SolicitudRequerimientosController extends Controller
         $cantidad_ubicacion->palet = $request->palet;
         $cantidad_ubicacion->status = 'PREPARADO';
         $cantidad_ubicacion->id_requerimiento = $request->id_requerimiento;
+        $cantidad_ubicacion->created_at = Carbon::now()->subHours(1);
+        $cantidad_ubicacion->updated_at = Carbon::now()->subHours(1);
+
 
         $cantidad_ubicacion->save();
 
@@ -221,11 +224,13 @@ class SolicitudRequerimientosController extends Controller
         $movimiento->cantidad = $request->cantidad;
         $movimiento->tipo = 'Salida';
         $movimiento->comentario = 'Requerimiento de material con folio: '.$request->folio;
-        $movimiento->fecha_registro = Carbon::now();
+        $movimiento->fecha_registro = Carbon::now()->subHours(1);
         $movimiento->id_parte = '0';
         $movimiento->numero_de_parte = $request->num_parte;
         $movimiento->ubicacion = $request->ubicacion;
         $movimiento->palet = $request->palet;
+        $movimiento->created_at = Carbon::now()->subHours(1);
+        $movimiento->updated_at = Carbon::now()->subHours(1);
 
         $movimiento->save();
 
@@ -301,6 +306,9 @@ class SolicitudRequerimientosController extends Controller
             $movimiento->palet = $requerimientosList[$i+2];
             $movimiento->status = 'PREPARADO';
             $movimiento->id_requerimiento = $requerimientosList[$i+4];
+            $movimiento->created_at = Carbon::now()->subHours(1);
+            $movimiento->updated_at = Carbon::now()->subHours(1);
+
 
             $movimiento->save();
 
@@ -316,11 +324,13 @@ class SolicitudRequerimientosController extends Controller
                 $movimiento->cantidad = $requerimientosList[$i+3] ?? 0;
                 $movimiento->tipo = 'Salida';
                 $movimiento->comentario = 'Requerimiento de material con folio: '.$request->folio;
-                $movimiento->fecha_registro = Carbon::now();
+                $movimiento->fecha_registro = Carbon::now()->subHours(1);
                 $movimiento->id_parte = $id;
                 $movimiento->numero_de_parte = $requerimientosList[$i];
                 $movimiento->ubicacion = $requerimientosList[$i+1];
                 $movimiento->palet = $requerimientosList[$i+2];
+                $movimiento->created_at = Carbon::now()->subHours(1);
+                $movimiento->updated_at = Carbon::now()->subHours(1);
 
                 $movimiento->save();
             }
@@ -331,8 +341,8 @@ class SolicitudRequerimientosController extends Controller
         }
 
         // Se actualiza el status en la tabla de solicitudes y su requerimiento correspondiente
-        $solicitud = RequerimientosModel::where('folio', $request->folio)->update(['status' => 'PREPARADO']);
-        $solicitud = SolicitudesModel::where('folio', $request->folio)->update(['status' => 'PREPARADO']);
+        $solicitud = RequerimientosModel::where('folio', $request->folio)->update(['status' => 'PREPARADO', 'updated_at' => Carbon::now()->subHours(1)]);
+        $solicitud = SolicitudesModel::where('folio', $request->folio)->update(['status' => 'PREPARADO', 'updated_at' => Carbon::now()->subHours(1)]);
 
         return back()->with('success', 'La solicitud fue actualizada exitosamente');
     }
@@ -370,18 +380,21 @@ class SolicitudRequerimientosController extends Controller
             $movimiento->cantidad = $requerimientosList[$i+1] ?? 0;
             $movimiento->tipo = 'Salida';
             $movimiento->comentario = '';
-            $movimiento->fecha_registro = Carbon::now();
+            $movimiento->fecha_registro = Carbon::now()->subHours(1);
             $movimiento->id_parte = $part->id;
             $movimiento->numero_de_parte = $requerimientosList[$i];
             $movimiento->ubicacion = $requerimientosList[$i+2];
             $movimiento->palet = $requerimientosList[$i+3];
+            $movimiento->created_at = Carbon::now()->subHours(1);
+            $movimiento->updated_at = Carbon::now()->subHours(1);
+
 
             $movimiento->save();
 
             $i+4;
         }
 
-        $solicitud = SolicitudesModel::where('id', $request->id_solicitud)->update(['status' => 'PREPARADO']);
+        $solicitud = SolicitudesModel::where('id', $request->id_solicitud)->update(['status' => 'PREPARADO', 'updated_at' => Carbon::now()->subHours(1)]);
 
         return back()->with('success', 'La solicitud fue actualizada exitosamente');
     }
@@ -504,11 +517,13 @@ class SolicitudRequerimientosController extends Controller
             $movimiento->cantidad = round($cantidadRegistrada->cantidad, 0);
             $movimiento->tipo = 'Entrada';
             $movimiento->comentario = 'Ajuste de requerimiento con folio: '.$cantidadRegistrada->folio_solicitud;
-            $movimiento->fecha_registro = Carbon::now();
+            $movimiento->fecha_registro = Carbon::now()->subHours(1);
             $movimiento->id_parte = $cantidadInventario->first->proyecto->id_parte;
             $movimiento->numero_de_parte = $request->num_parte;
             $movimiento->ubicacion = $request->ubicacion;
             $movimiento->palet = $request->palet;
+            $movimiento->created_at = Carbon::now()->subHours(1);
+            $movimiento->updated_at = Carbon::now()->subHours(1);
 
             $movimiento->save();
         }
@@ -521,17 +536,19 @@ class SolicitudRequerimientosController extends Controller
             $movimiento->cantidad = $request->cantidad;
             $movimiento->tipo = 'Salida';
             $movimiento->comentario = 'Ajuste de requerimiento con folio: '.$cantidadRegistrada->folio_solicitud;
-            $movimiento->fecha_registro = Carbon::now();
+            $movimiento->fecha_registro = Carbon::now()->subHours(1);
             $movimiento->id_parte = $cantidadInventario->first->proyecto->id_parte;
             $movimiento->numero_de_parte = $request->num_parte;
             $movimiento->ubicacion = $request->ubicacion;
             $movimiento->palet = $request->palet;
+            $movimiento->created_at = Carbon::now()->subHours(1);
+            $movimiento->updated_at = Carbon::now()->subHours(1);
 
             $movimiento->save();
         }
 
         // 2.3 - Ajuste de cantidad en ubicación
-        CantidadUbicacionesModel::where('id', $request->cantidad_id)->update(['cantidad' => $request->cantidad]);
+        CantidadUbicacionesModel::where('id', $request->cantidad_id)->update(['cantidad' => $request->cantidad, 'updated_at' => Carbon::now()->subHours(1)]);
 
         return back()->with('success', 'La cantidad fue ajustada exitosamente');
     }
@@ -539,7 +556,7 @@ class SolicitudRequerimientosController extends Controller
     public function update(Request $request) {
         $status = ($request->action == '1') ? 'PREPARADO' : 'RECIBIDO';
 
-        $solicitud = SolicitudesModel::where('id', $request->id)->update(['status' => $status]);
+        $solicitud = SolicitudesModel::where('id', $request->id)->update(['status' => $status, 'updated_at' => Carbon::now()->subHours(1)]);
 
         return back()->with('success', 'La solicitud fue actualizada exitosamente');
     }

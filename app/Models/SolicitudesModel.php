@@ -13,5 +13,7 @@ class SolicitudesModel extends Model
         'folio',
         'solicitante',
         'status',
+        'created_at',
+        'updated_at',
     ];
 }

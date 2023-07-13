@@ -17,6 +17,8 @@ class MovimientosModel extends Model
         'fecha_registro',
         'id_parte',
         'ubicacion',
-        'numero_de_parte'
+        'numero_de_parte',
+        'created_at',
+        'updated_at',
     ];
 }
