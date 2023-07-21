@@ -31,14 +31,14 @@
                         </div>
                     </form>
 
-                    @if (Auth::user()->role == 'NPI-admin')
+                    {{-- @if (Auth::user()->role == 'NPI-admin')
                         <div class="mt-2 mb-2">
                             <button type="button" class="btn btn-primary mx-auto mb-4" data-bs-toggle="modal" data-bs-target="#modal">
                                 Seleccionar números
                             </button>
                             @include('boms.modal')
                         </div>
-                    @endif
+                    @endif --}}
 
                 </div>
 
@@ -59,8 +59,12 @@
                                             <th scope="col">Nombre</th>
                                             <th scope="col">Descripción</th>
                                             <th scope="col">Nivel</th>
+                                            <th scope="col">Status</th>
                                             {{-- <th scope="col">Requerido</th> --}}
                                             <th scope="col">Cantidad</th>
+                                            <th scope="col">Ubicación</th>
+                                            <th scope="col">Temp</th>
+                                            <th scope="col">Editar</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -71,21 +75,27 @@
                                                 <td>{{ $bom->kit_nombre }}</td>
                                                 <td>{{ $bom->kit_descripcion }}</td>
                                                 <td>{{ $bom->nivel }}</td>
-                                                {{-- <td style="background-color: {{ ($bom->requerido == 1) ? '#50bf47' : '#fff'  }}; color: #fff">
-
-                                                    @if (Auth::user()->role == 'NPI-admin')
-                                                        <input
-                                                            type="checkbox"
-                                                            class="checkbox-lg"
-                                                            style="top: 1.2rem; scale: 1.7; margin-right: 0.8rem;"
-                                                            name="requerido" id="requerido" value="{{ $bom->id }}"
-                                                            onchange="agregarParte('{{ $bom->id }}')"
-                                                        >
-                                                    @endif
-
-                                                    {{ ($bom->requerido == 1) ? 'Requerido' : '' }}
-                                                </td> --}}
+                                                <td>{{ $bom->status }}</td>
                                                 <td>{{ round($bom->cantidad, 0) }}</td>
+                                                <td>{{ $bom->ubicacion }}</td>
+                                                <td>{{ $bom->team }}</td>
+                                                <td>
+                                                    <button
+                                                        class="btn btn-primary"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#edit"
+                                                        onclick="loadData(
+                                                            {{ $bom->id }},
+                                                            '{{ $bom->num_parte }}',
+                                                            '{{ $bom->kit_nombre }}',
+                                                            '{{ $bom->kit_descripcion }}',
+                                                            '{{ $bom->status }}',
+                                                            '{{ $bom->ubicacion }}',
+                                                            '{{ $bom->team }}',
+                                                        )">
+                                                        Editar
+                                                    </button>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -93,7 +103,8 @@
 
                             </div>
                         </div>
-                    @include('boms.modal')
+                    {{-- @include('boms.modal') --}}
+                    @include('boms.edit')
                 </div>
             </div>
         </div>
@@ -161,6 +172,38 @@
                     modal.append(counter);
 
                 container.innerHTML = `${list.length} registros agregados`;
+            }
+
+            function loadData(
+                id,
+                num_parte,
+                kit_nombre,
+                descripcion,
+                status,
+                ubicacion,
+                team,
+            ) {
+                const idInput = document.getElementById('id');
+                idInput.value = id;
+
+                const num_parteInput = document.getElementById('num_parte');
+                num_parteInput.value = num_parte;
+
+                const kit_nombreInput = document.getElementById('kit_nombre');
+                kit_nombreInput.value = kit_nombre;
+
+                const descripcionInput = document.getElementById('kit_descripcion');
+                descripcionInput.value = descripcion;
+
+                const statusInput = document.getElementById('status');
+                statusInput.value = status;
+
+                const ubicacionInput = document.getElementById('ubicacion');
+                ubicacionInput.value = ubicacion;
+
+                const teamInput = document.getElementById('team');
+                teamInput.value = team;
+
             }
         </script>
 

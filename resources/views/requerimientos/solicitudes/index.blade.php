@@ -33,7 +33,7 @@
                                 </button>
                             </form>
                         </div>
-    
+
                         <div class="mb-4 align-self-end">
                             <a href="{{ route('solicitud.requerimientos') }}" class="btn" style="background-color: #dc6534; color: #fff">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" class="bi bi-funnel-fill" viewBox="0 0 16 16">
@@ -50,6 +50,7 @@
                             <table id="requerimientos" class="table table-striped">
                                 <thead>
                                     <tr>
+                                        <th scope="col">Eliminar</th>
                                         <th scope="col">Folio</th>
                                         <th scope="col">Solicitante</th>
                                         <th scope="col">Kit</th>
@@ -59,12 +60,20 @@
                                         <th scope="col">Recibir</th>
                                         <th scope="col">Ver detalles</th>
                                         <th scope="col">Imprimir</th>
-                                        
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($requerimientos as $requerimiento)
                                         <tr>
+                                            <td>
+                                                @if ($requerimiento->status == 'SOLICITADO')
+                                                    <button class="btn" style="background-color: #ba3636; color: #fff" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="addFolioToDelete({{ $requerimiento->folio }})">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                                                        </svg>
+                                                    </button>
+                                                @endif
+                                            </td>
                                             <td>{{ $requerimiento->folio }}</td>
                                             <td>{{ $requerimiento->solicitante }}</td>
                                             <td>{{ $requerimiento->kit_nombre }}</td>
@@ -72,7 +81,7 @@
                                             <td>{{ $requerimiento->status }}</td>
                                             <td>{{ $requerimiento->fecha }}</td>
                                             <td>
-                                                <button {{ ($requerimiento->status != 'PREPARADO') ? 'disabled' : '' }} class="btn" style="background-color: #4aba36; color: #fff" onclick="sendAction({{ $requerimiento->id }}, '2')" data-bs-toggle="modal" data-bs-target="#update{{ $requerimiento->id }}">
+                                                <button {{ ($requerimiento->status != 'PREPARADO') ? 'disabled' : '' }} class="btn" style="background-color: #4aba36; color: #fff" onclick="sendAction({{ $requerimiento->id }}, '2', {{ $requerimiento->folio }})" data-bs-toggle="modal" data-bs-target="#update{{ $requerimiento->id }}">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-arrow-down-fill" viewBox="0 0 16 16">
                                                         <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM8 5a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 9.293V5.5A.5.5 0 0 1 8 5z"/>
                                                     </svg>
@@ -102,11 +111,12 @@
                                         </tr>
                                         @include('requerimientos.solicitudes.update')
                                     @endforeach
+                                    @include('requerimientos.solicitudes.delete')
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <div class="container">
                         </div>
@@ -132,14 +142,44 @@
     </script>
 
     <script>
-        function sendAction(id, action) {
+        function sendAction(id, action, folio) {
             const title = document.getElementById(`title${id}`);
             const accion = document.getElementById(`action${id}`);
+            const folioInput = document.getElementById(`folio${id}`);
             const confirmationMessage = document.getElementById(`confirmationMessage${id}`);
 
             title.innerText = (action == '1') ? 'Preparar solicitud' : 'Recibir solicitud';
             accion.value = action;
+            folioInput.value = folio;
             confirmationMessage.innerText = (action == '1') ? '¿Desea preparar la solicitud?' : '¿Desea recibir la solicitud?';
+        }
+
+        function addFolioToDelete( folio ) {
+            const folioInput = document.getElementById('folio-delete');
+            folioInput.value = folio;
+
+            const folioSpan = document.getElementById('folio-span');
+            folioSpan.innerText = folio;
+
+        }
+
+        function deleteFolio() {
+            const folioInput = document.getElementById('folio-delete');
+
+
+            $.ajax({
+                type: 'POST',
+                url: `/solicitudes/requerimientos/delete`,
+                headers: {
+                    "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+                },
+                data: {
+                    "folio": folioInput.value
+                },
+                success: function(data) {
+                    window.location.reload();
+                }
+            });
         }
     </script>
 

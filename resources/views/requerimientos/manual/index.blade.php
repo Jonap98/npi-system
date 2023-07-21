@@ -14,25 +14,21 @@
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
                         <button class="btn btn-success" onclick="addRow()">Agregar parte</button>
+                        <button class="btn btn-primary m-4 col-md-2" data-bs-toggle="modal" data-bs-target="#confirm">Guardar</button>
                     </div>
                     @if(session('success'))
                         <div class="alert alert-success mt-2" role="alert">
                             {{ session('success') }}
                         </div>
                     @endif
-                    <form name="movimientos" method="POST" action="{{ route('requerimientos.manual.solicitar') }}">
+                    <form id="requerimientos-form" method="POST" action="{{ route('requerimientos.manual.solicitar') }}">
                         @csrf
                         <div class="row mt-2 g-2">
-                            
+
 
                             <div class="card col-md-12">
-                                <input type='text' class="form-control" hidden  id="counter" name="counter" />
-                                <div class="d-flex flex-row-reverse justify-content-between">
-                                    <button class="btn btn-primary m-4 col-md-2" onclick="getRowsCount()" id="mybutton">Guardar</button>
-                                    <div class="m-2 col-md-3">
-                                        <label>Solicitante</label>
-                                        <input type="text" class="form-control" name="solicitante">
-                                    </div>
+                                <input type="text" class="form-control" hidden  id="counter" name="counter" />
+                                <div class="d-flex justify-content-between">
                                 </div>
                                 <table class="table table-striped m-2">
                                     <thead>
@@ -51,7 +47,7 @@
                                                         <div id="myDropdown" class="dropdown-content">
                                                             <input class="form-select" type="text" placeholder="# de parte" id="myInput" name="num_parte0" onkeyup="filterFunction()" autocomplete="off">
                                                                 @foreach ($partes as $p)
-                                                                    <option style="display: none" id="parte" class="partOption" onclick="cambioParte({{$p}})" value="{{ $p }}">{{ $p->num_parte }}</option>
+                                                                    <option style="display: none" id="parte" class="partOption" onclick="cambioParte({{ $p->id }}, '{{ $p->kit_nombre }}', '{{ $p->num_parte }}', '{{ $p->kit_descripcion }}', {{ $p->nivel }}, '{{ $p->um }}' )" value="{{ $p }}">{{ $p->num_parte }}</option>
                                                                 @endforeach
                                                         </div>
                                                     </div>
@@ -89,14 +85,14 @@
                             </div>
                         </div>
                     </form>
-                    @include('ubicaciones.store')
+                    @include('requerimientos.manual.confirm')
 
                 </div>
             </div>
         </div>
     </div>
 
-    
+
 @endsection
 
 @section('js')
@@ -112,15 +108,15 @@
 
     {{-- Selección dropdown --}}
     <script>
-        function cambioParte(p) {
-            const parte = p;
+        // function cambioParte(p) {
+        function cambioParte(id, kit_nombre, num_parte, kit_descripcion, nivel, um) {
 
-            let cleanedWord = parte.kit_descripcion.replaceAll(`"`, "''");
+            let cleanedWord = kit_descripcion.replaceAll(`"`, "''");
 
-            document.getElementById('id_parte').value=parte.id;
-            document.getElementById('myInput').value=parte.num_parte;
+            document.getElementById('id_parte').value=id;
+            document.getElementById('myInput').value=num_parte;
             document.getElementById('descripcion').value=cleanedWord;
-            document.getElementById('unidad_de_medida').value=parte.um;
+            document.getElementById('unidad_de_medida').value=um;
 
             const option = document.getElementsByClassName("partOption")
             for (i = 0; i < option.length; i++) {
@@ -134,7 +130,7 @@
             filter = input.value.toUpperCase();
             div = document.getElementById("myDropdown");
             option = div.getElementsByTagName("option");
-            
+
             for (i = 0; i < option.length; i++) {
                 txtValue = option[i].textContent || option[i].innerText;
                 if (txtValue.toUpperCase().indexOf(filter) > -1 ) {
@@ -159,16 +155,16 @@
 
         function addRow() {
             rows++;
-            
+
             const tbody = document.getElementById("tbody");
             let row = tbody.insertRow(0);
-            
+
             let cell1 = row.insertCell(0);
             let cell2 = row.insertCell(1);
             let cell3 = row.insertCell(2);
             let cell4 = row.insertCell(3);
             let cell5 = row.insertCell(4);
-            
+
             row.setAttribute('id', `row${rows}`);
 
             cell1.innerHTML = `
@@ -176,7 +172,7 @@
                 <div id="myDropdown" class="dropdown-content">
                     <input class="form-select" type="text" placeholder="# de parte" id="myInput" name="num_parte${rows}" onkeyup="filterFunction()" autocomplete="off">
                         @foreach ($partes as $p)
-                        <option style="display: none" id="parte" class="partOption" onclick="cambioParte({{$p}})" value="{{ $p }}">{{ $p->num_parte }}</option>
+                        <option style="display: none" id="parte" class="partOption" onclick="cambioParte({{ $p->id }}, '{{ $p->kit_nombre }}', '{{ $p->num_parte }}', '{{ $p->kit_descripcion }}', {{ $p->nivel }}, '{{ $p->um }}' )" value="{{ $p }}">{{ $p->num_parte }}</option>
                         @endforeach
                 </div>
             </div>
@@ -210,11 +206,13 @@
                                                     </button>
                                                 </td>
             `
-            
+
         }
 
-        function getRowsCount() {
+        function confirm() {
             document.getElementById("counter").value = rows + 1;
+
+            const formulario = document.getElementById('requerimientos-form').submit();
         }
 
     </script>

@@ -106,6 +106,45 @@ class MakeController extends Controller
 
     }
 
+    public function exportPDF(Request $request) {
+
+        $team = BomsModel::select(
+            'kit_nombre',
+            'num_parte',
+            'team',
+            'status'
+        )
+        ->where('id', $request->padre_id)
+        ->first();
+
+        $makes = BomsModel::select(
+            'id',
+            'kit_nombre',
+            'kit_descripcion',
+            'num_parte',
+            'status',
+            'team',
+            'ubicacion',
+            'cantidad'
+        )
+        ->where('team', 72)
+        ->where('kit_nombre', $request->kit_status)
+        ->where('status', 'like', 'MAKE%')
+        ->where('ubicacion', 'like', '%'.$team->kit_nombre.'%')
+        // ->where('ubicacion', 'like', '%PANTRY%')
+        ->get();
+
+        $data = json_decode($makes);
+        $count = count($data);
+
+        $arr = json_decode(json_encode($data), true);
+
+        $fileName = "Vista previa de material.pdf";
+
+        // $pdf = \PDF::loadView('', aray())
+
+    }
+
     public function store(Request $request) {
         $ultimoFolio = SolicitudesModel::select(
             'id',

@@ -8,6 +8,7 @@ use App\Models\test\MovimientosModel;
 use App\Models\test\PartesModel;
 use App\Models\UbicacionesModel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Exports\MovimientosExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -29,9 +30,11 @@ class TestMovimientosController extends Controller
                 'movimiento.cantidad',
                 'movimiento.comentario',
                 'movimiento.fecha_registro',
+                'movimiento.numero_guia',
+                'movimiento.usuario'
             )->get();
 
-        return view('test/consulta', array('movimientos' => $movimientos));
+        return view('test.movimientos.consulta', array('movimientos' => $movimientos));
     }
 
     public function create() {
@@ -44,7 +47,7 @@ class TestMovimientosController extends Controller
             $parte->descripcion = str_replace('"', "''", $parte->descripcion);
         }
 
-        return view('/test/movimientos', array('movimiento' => $movimiento, 'partes' => $partes, 'ubicaciones' => $ubicaciones));
+        return view('test.movimientos.movimientos', array('movimiento' => $movimiento, 'partes' => $partes, 'ubicaciones' => $ubicaciones));
     }
 
     public function store(Request $request) {
@@ -53,6 +56,8 @@ class TestMovimientosController extends Controller
         $validatedData = $request->validate([
             'tipo' => 'required|in:Entrada,Salida,Ajuste',
         ]);
+
+        $currentUser = Auth::user()->username;
 
         for($i = 0; $i < $request->counter; $i++) {
 
@@ -69,17 +74,18 @@ class TestMovimientosController extends Controller
 
             if($request->$proyecto) {
 
-            $movimiento->proyecto = $request->$proyecto;
-            $movimiento->cantidad = $request->$cantidad;
-            $movimiento->tipo = $request->tipo;
-            $movimiento->comentario = $request->$comentario;
-            $movimiento->fecha_registro = Carbon::now();
-            $movimiento->id_parte = $request->$id_parte;
-            $movimiento->numero_de_parte = $request->$numero_de_parte;
-            $movimiento->ubicacion = $request->$ubicacion;
-            $movimiento->palet = $request->$palet;
+                $movimiento->proyecto = $request->$proyecto;
+                $movimiento->cantidad = $request->$cantidad;
+                $movimiento->tipo = $request->tipo;
+                $movimiento->comentario = $request->$comentario;
+                $movimiento->fecha_registro = Carbon::now();
+                $movimiento->id_parte = $request->$id_parte;
+                $movimiento->numero_de_parte = $request->$numero_de_parte;
+                $movimiento->ubicacion = $request->$ubicacion;
+                $movimiento->palet = $request->$palet;
+                $movimiento->usuario = $currentUser;
 
-            $movimiento->save();
+                $movimiento->save();
             }
         }
 

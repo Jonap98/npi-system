@@ -8,13 +8,15 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
-            <span> <b>TEST</b> Movimientos</span>
-            <a href="{{ route('test.movimientos.create') }}" class="btn btn-primary btn-sm ms-5">Crear movimiento</a>
+            <span>Movimientos</span>
+            <a href="{{ route('partes.create') }}" class="btn btn-primary btn-sm ms-5">Crear parte</a>
+            <a href="{{ route('movimientos.create') }}" class="btn btn-primary btn-sm ms-5">Crear movimiento</a>
+            <a href="{{ route('exportar') }}" class="btn btn-success btn-sm ms-5">Exportar excel</a>
             <hr>
             <div class="container">
                 <div class="row">
                     <div class="card col-md-12">
-                        
+
                         <div class="mt-2 table-responsive">
                             <table id="consulta" class="table table-striped">
                                 <thead>
@@ -30,6 +32,8 @@
                                         <th scope="col">Fecha de registro</th>
                                         <th scope="col">Ubicación</th>
                                         <th scope="col">Palet</th>
+                                        <th scope="col">Número de guía</th>
+                                        <th scope="col">Usuario</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -46,13 +50,15 @@
                                             <td>{{ $movimiento->fecha_registro }}</td>
                                             <td>{{ $movimiento->ubicacion }}</td>
                                             <td>{{ $movimiento->palet }}</td>
+                                            <td>{{ $movimiento->numero_guia }}</td>
+                                            <td>{{ $movimiento->usuario }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <div class="container">
                         </div>

@@ -1,7 +1,7 @@
 <div class="modal modal-xl fade" id="solicitarKit{{ $kit->id }}" tabindex="-1" aria-labelledby="solicitarKit{{ $kit->id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('requerimientos.kit.solicitarKits') }}" method="POST">
+            <form id="solicitud{{ $kit->id }}" action="{{ route('requerimientos.kit.solicitarKits') }}" method="POST">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="solicitarKit{{ $kit->id }}">Solicitar Kit</h5>
@@ -37,9 +37,10 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Solicitar</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="confirmar({{ $kit->id }})">Solicitar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+

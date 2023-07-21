@@ -48,6 +48,7 @@ class InventarioController extends Controller
             $inventario->ubicaciones_registradas = $ubicaciones_array;
         }
 
+        $inventarioFinal = [];
         foreach ($inventarios as $inventario) {
             // Para este número de parte se obtienen todos sus movimientos
             $cantidades = MovimientosModel::select(
@@ -87,9 +88,12 @@ class InventarioController extends Controller
             $inventario->ubicaciones = $ubicaciones_list;
             $inventario->cantidad_inventario = $cantidad_inventario;
             $inventario->cantidades = $cantidades;
+
+            if( $cantidad_inventario > 0 )
+                array_push($inventarioFinal, $inventario);
         }
 
-        return view('inventario.inventario', array('inventarios' => $inventarios));
+        return view('inventario.inventario', array('inventarios' => $inventarioFinal));
     }
 
     public function image($id) {

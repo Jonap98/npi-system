@@ -53,7 +53,6 @@
                             </div>
                             @include('requerimientos.porModelo.store')
                         @endforeach
-
                     </div>
                 </div>
 
@@ -96,7 +95,7 @@
                 });
 
             });
-            
+
         </script>
 
         <script>
@@ -140,12 +139,20 @@
                             // const span = document.createElement('span');
                             // span.innerText = `${kit_descripcion}\n${num_parte}: ${Math.round(cantidad)}`;
                             // span.className = 'm-2 btn btn-secondary btn-sm m-1';
-                        
+
                             // parts.appendChild(span);
                         });
                     },
 
                 });
+            }
+
+            const confirmar = (id) => {
+                if(window.confirm('Seguro que desea crear esta solicitud?')) {
+                    const form = document.getElementById(`solicitud${id}`);
+
+                    form.submit();
+                }
             }
         </script>
 

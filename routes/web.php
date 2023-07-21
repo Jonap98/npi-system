@@ -92,6 +92,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('solicitudes/requerimientos/dynamic-edit', [SolicitudRequerimientosController::class, 'updateDynamicQty'])->name('solicitud.requerimientos.dynamic-edit');
     Route::post('solicitudes/requerimientos/update-status', [SolicitudRequerimientosController::class, 'updateStatus'])->name('solicitud.requerimientos.update-status');
 
+    Route::post('solicitudes/requerimientos/delete', [SolicitudRequerimientosController::class, 'delete'])->name('solicitud.requerimientos.delete');
+
 
     // Manual
     Route::get('requerimientos/manual', [RequerimientoManualController::class, 'index'])->name('requerimientos.manual');
@@ -131,7 +133,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('boms', [BomsController::class, 'index'])->name('boms');
     Route::post('boms/import', [BomsController::class, 'import'])->name('boms.import');
     Route::post('boms/update', [BomsController::class, 'update'])->name('boms.update');
-    Route::post('boms/edit', [BomsController::class, 'editName'])->name('boms.edit.name');
+    Route::post('boms', [BomsController::class, 'edit'])->name('boms.edit');
 
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 

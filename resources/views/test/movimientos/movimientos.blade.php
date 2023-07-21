@@ -5,49 +5,49 @@
 @endsection
 
 @section('content')
+{{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous"> --}}
+
     <div class="container">
-        <div class="row justify-content-center">
+        <div class="row justify-contnet-center">
             <div class="col-md-12">
-                <span>Inventario nuevas partes</span>
+                <span> <b>TEST</b> Inventario nuevas partes</span>
                 <hr>
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
                         <button class="btn btn-success" onclick="addRow()">Agregar parte</button>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#storeUbicacion">
-                            Crear ubicación
-                        </button>
+
                     </div>
                     @if(session('success'))
                         <div class="alert alert-success mt-2" role="alert">
                             {{ session('success') }}
                         </div>
                     @endif
-                    <form name="movimientos" method="post" action="{{ route('store') }}">
+                    <div class="d-flex flex-row-reverse">
+                        <button class="btn btn-primary m-4 col-md-2" data-bs-toggle="modal" data-bs-target="#confirm">Guardar</button>
+                    </div>
+                    <form id="movimientos-form" name="movimientos" method="post" action="{{ route('test.movimientos.store') }}">
                         @csrf
                         <div class="row mt-2 g-2">
-                            <div class="d-flex flex-row-reverse">
-
-                                <div class="w-25">
-                                    <select class="form-select" name="tipo">
-                                        <option value="Entrada" selected>Tipo</option>
-                                        <option value="Entrada" class="btn btn-success">Entrada</option>
-                                        <option value="Salida" class="btn btn-danger">Salida</option>
-                                    </select>
-                                    @error('tipo')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <div class="p-2">
-                                    <span>Tipo de movimiento</span>
-                                </div>
-
-                            </div>
 
                             <div class="card col-md-12">
-                                <input type="text" class="form-control" hidden  id="counter" name="counter" />
-                                <div class="d-flex flex-row-reverse">
-                                    <button class="btn btn-primary m-4 col-md-2" onclick="getRowsCount()" id="mybutton">Guardar</button>
+                                <div class="mt-2 d-flex flex-row-reverse">
+
+                                    <div class="w-25">
+                                        <select class="form-select" name="tipo">
+                                            <option value="Entrada" selected>Tipo</option>
+                                            <option value="Entrada" class="btn btn-success">Entrada</option>
+                                            <option value="Salida" class="btn btn-danger">Salida</option>
+                                        </select>
+                                        @error('tipo')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                    <div class="p-2">
+                                        <span>Tipo de movimiento</span>
+                                    </div>
+
                                 </div>
+                                <input type='text' class="form-control" hidden  id="counter" name="counter" />
                                 <table class="table table-striped m-2">
                                     <thead>
                                         <tr>
@@ -58,7 +58,6 @@
                                             <th scope="col">Comentario</th>
                                             <th scope="col">Ubicación</th>
                                             <th scope="col">Palet</th>
-                                            <th scope="col">Número de guía</th>
                                             <th scope="col">Acción</th>
                                         </tr>
                                     </thead>
@@ -101,7 +100,6 @@
                                                 </td>
                                                 <td>
                                                     <select class="form-select" id="ubicacion" name="ubicacion0" aria-placeholder="Ubicación">
-                                                        <option selected >Ubicación</option>
                                                         @foreach ($ubicaciones as $ubicacion)
                                                             <option value="{{$ubicacion->ubicacion}}"> {{ $ubicacion->ubicacion }} </option>
                                                         @endforeach
@@ -112,8 +110,7 @@
                                                 </td>
                                                 <td>
                                                     <select class="form-select" id="palet" name="palet0">
-                                                        <option selected >Palet</option>
-                                                        <option value="1">1</option>
+                                                        <option value="1" selected>1</option>
                                                         <option value="2">2</option>
                                                         <option value="3">3</option>
                                                         <option value="4">4</option>
@@ -126,12 +123,6 @@
                                                     @enderror
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" id="numero_guia" name="numero_guia0" placeholder="Número de guía...">
-                                                    @error('numero_guia')
-                                                        <span class="text-danger">{{ $message }}</span>
-                                                    @enderror
-                                                </td>
-                                                <td>
                                                     <button type="button" class="btn btn-danger" onclick="deleteRow('0')">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
                                                             <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
@@ -140,12 +131,12 @@
                                                 </td>
                                             </tr>
                                         </form>
+                                        @include('test.movimientos.confirm')
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </form>
-                    @include('ubicaciones.store')
 
                 </div>
             </div>
@@ -230,7 +221,6 @@
             let cell6 = row.insertCell(5);
             let cell7 = row.insertCell(6);
             let cell8 = row.insertCell(7);
-            let cell9 = row.insertCell(8);
 
             row.setAttribute('id', `row${rows}`);
 
@@ -275,7 +265,6 @@
 
             cell6.innerHTML = `
             <select class="form-select" id="ubicacion" name="ubicacion${rows}" aria-placeholder="Ubicación">
-                                                    <option selected >Ubicación</option>
                                                     @foreach ($ubicaciones as $ubicacion)
                                                         <option value="{{$ubicacion->ubicacion}}"> {{ $ubicacion->ubicacion }} </option>
                                                     @endforeach
@@ -287,8 +276,7 @@
 
             cell7.innerHTML = `
             <select class="form-select" id="palet" name="palet${rows}">
-                                                        <option selected >Palet</option>
-                                                        <option value="1">1</option>
+                                                        <option value="1" selected>1</option>
                                                         <option value="2">2</option>
                                                         <option value="3">3</option>
                                                         <option value="4">4</option>
@@ -303,15 +291,6 @@
 
             cell8.innerHTML = `
             <td>
-                                                    <input type="text" class="form-control" id="numero_guia" name="numero_guia${rows}" placeholder="Número de guía...">
-                                                    @error('numero_guia${rows}')
-                                                        <span class="text-danger">{{ $message }}</span>
-                                                    @enderror
-                                                </td>
-            `
-
-            cell9.innerHTML = `
-            <td>
                                                     <button type="button" class="btn btn-danger" onclick="deleteRow('${rows}')">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
                                                             <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
@@ -320,6 +299,12 @@
                                                 </td>
             `
 
+        }
+
+        function confirmar() {
+            getRowsCount();
+
+            document.getElementById('movimientos-form').submit();
         }
 
         function getRowsCount() {

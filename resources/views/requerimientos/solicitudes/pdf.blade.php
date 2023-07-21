@@ -37,6 +37,9 @@
         span {
             font-size: 10px;
         }
+        b {
+            font-size: 10px;
+        }
         span.head {
             font-size: 12px;
         }
@@ -93,6 +96,7 @@
                 <th>Descripción</th>
                 <th class="ubicacion">Ubicación</th>
                 <th>Cantidad requerida</th>
+                <th>Ubicación almacén</th>
                 {{-- <th>Solicitante</th>
                 <th>Fecha</th> --}}
             </thead>
@@ -106,6 +110,20 @@
                         <td class=""><span>{{ $requerimiento->descripcion }}</span></td>
                         <td class="" class="ubicacion"><span>{{ $requerimiento->ubicacion }}</span></td>
                         <td class=""><span>{{ round($requerimiento->cantidad_requerida, 0) }}</span></td>
+                        <td class="">
+                            @foreach ($requerimiento->ubicaciones_registradas as $ubicaciones)
+                                <div>
+                                    <span>
+                                        {{ $ubicaciones->ubicacion }}:
+                                    </span>
+                                    <b>
+                                        @foreach ($ubicaciones->palets_registrados as $palets)
+                                            {{ $palets->palet }},
+                                        @endforeach
+                                    </b>
+                                </div>
+                            @endforeach
+                        </td>
                         {{-- <td class=""><span>{{ $requerimiento->solicitante }}</span></td> --}}
                         {{-- <td class=""><span>{{ $requerimiento->created_at->format('d-m-Y H:i') }}</span></td> --}}
                         {{-- <td class=""><span>{{ substr($requerimiento->created_at, 0, 10) }}</span></td> --}}

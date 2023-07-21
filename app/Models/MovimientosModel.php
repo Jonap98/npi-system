@@ -9,16 +9,19 @@ class MovimientosModel extends Model
 {
     use HasFactory;
     protected $table = 'NPI_movimientos';
-    protected $fillable = [ // Folio es el id
+    protected $fillable = [
         'proyecto',
         'cantidad',
         'tipo',
         'comentario',
         'fecha_registro',
         'id_parte',
-        'ubicacion',
-        'numero_de_parte',
         'created_at',
         'updated_at',
+        'ubicacion',
+        'palet',
+        'numero_de_parte',
+        'numero_guia',
+        'usuario',
     ];
 }

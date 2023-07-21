@@ -18,13 +18,17 @@
                     <div class="d-flex justify-content-end">
                         @if ($status == 'SOLICITADO')
                             @if (Auth::user()->role == 'NPI-admin')
-                                <button type="submit" class="btn btn-primary" onclick="saveInfo()">
+                                {{-- <button type="submit" class="btn btn-primary" onclick="saveInfo()"> --}}
+                                <button type="submit" class="btn btn-primary" onclick="guardarInfo()">
                                     Guardar
                                 </button>
                             @endif
                         @endif
                     </div>
+
                     <div class="row">
+                        <div id="snackbar" class="alert alert-success mt-2" hidden></div>
+                        <div id="error-alert" class="alert alert-danger mt-2" hidden></div>
                         @if(session('success'))
                             <div class="alert alert-success mt-2" role="alert">
                                 {{ session('success') }}
@@ -51,6 +55,7 @@
                                                 <th scope="col">Solicitante</th>
                                                 <th scope="col">Ubicación</th>
                                                 <th scope="col">Status</th>
+                                                <th scope="col">Quien surte</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -96,7 +101,8 @@
                                                                             type="number"
                                                                             class="form-control"
                                                                             name="cantidad"
-                                                                            onblur="registrarCantidad(
+                                                                            onblur="addQty( {{ $ubicacion->cantidad }}, {{ $ubicacion->element_index }}, value)">
+                                                                            {{-- onblur="addQty(
                                                                                 '{{ $requerimiento->num_parte }}',
                                                                                 '{{ $requerimiento->folio }}',
                                                                                 '{{ $ubicacion->ubicacion }}',
@@ -105,7 +111,17 @@
                                                                                 value,
                                                                                 '{{ $ubicacion->id }}',
                                                                                 {{ $ubicacion->cantidad }}
-                                                                            )">
+                                                                            )" --}}
+                                                                            {{-- onblur="registrarCantidad(
+                                                                                '{{ $requerimiento->num_parte }}',
+                                                                                '{{ $requerimiento->folio }}',
+                                                                                '{{ $ubicacion->ubicacion }}',
+                                                                                '{{ $ubicacion->palet }}',
+                                                                                '{{ $requerimiento->id }}',
+                                                                                value,
+                                                                                '{{ $ubicacion->id }}',
+                                                                                {{ $ubicacion->cantidad }}
+                                                                            )"> --}}
                                                                     @endif
                                                                 @endif
                                                             </div>
@@ -137,6 +153,7 @@
                                                     <td>{{ $requerimiento->solicitante }}</td>
                                                     <td>{{ $requerimiento->ubicacion }}</td>
                                                     <td>{{ $requerimiento->status }}</td>
+                                                    <td>{{ $requerimiento->usuario ?? '' }}</td>
                                                 </tr>
 
                                             @endforeach
@@ -163,9 +180,86 @@
     <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
 
     <script>
+        let ubicacionesList = [];
+        let inputList = [];
+
         $(document).ready(function () {
             $('#requerimientos').DataTable();
+
+            // Se crea una lista para asignar índices a los input, si no hay input, no aumenta el índice
+            ubicacionesList = @json($requerimientos);
+
+            let index = 0;
+            ubicacionesList.forEach(requerimiento => {
+                if(requerimiento.ubicaciones.length > 0) {
+
+                    // se asigna cada una de las propiedades
+                    requerimiento.ubicaciones.forEach(ubicacion => {
+                        inputList.push({
+                            index: index,
+                            folio: requerimiento.folio,
+                            num_parte: requerimiento.num_parte,
+                            id: ubicacion.id,
+                            ubicacion: ubicacion.ubicacion,
+                            palet: ubicacion.palet,
+                            cantidad: 0,
+                            id_requerimiento: requerimiento.id
+                        });
+                        index++;
+                    });
+                }
+            });
+
         });
+
+        const addQty = (disponible, index, value) => {
+
+            if( value > disponible ) {
+                value = 0;
+
+                alert('No tienes inventario suficiente');
+            }
+
+            // Agrega cantidad a la lista de inputs
+            inputList[index].cantidad = value;
+        }
+
+        const guardarInfo = () => {
+
+            $.ajax({
+                type: "POST",
+                url: '/solicitudes/requerimientos/preparar',
+                headers: {
+                    "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+                },
+                data: {
+                    "cantidades": inputList,
+                },
+                dataType: "json",
+                success: function({folio, msg, data}) {
+
+                    const snack = document.getElementById('snackbar');
+                    snack.innerText = msg;
+                    snack.removeAttribute('hidden');
+
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 2000);
+
+                },
+                error: function(error) {
+                    const snack = document.getElementById('error-alert');
+                    snack.innerText = 'No se pudo surtir el requerimiento, intente de nuevo';
+                    snack.removeAttribute('hidden');
+
+                    // setTimeout(() => {
+                    //     window.location.reload()
+                    // }, 2000);
+                }
+            });
+        }
+
+
     </script>
 
     <script>
@@ -221,6 +315,7 @@
             return cantidadSolicitada;
         }
 
+        // Ya no se usará esta lógica
         const registrarCantidad = (num_parte, folio, ubicacion, palet, id_requerimiento, cantidad, id_ubicacion, cantidad_actual) => {
             $.ajax({
                 type: "POST",
@@ -337,27 +432,6 @@
 
         }
 
-        const saveInfo = () => {
-            const folio = @json( $requerimientos->first()->folio );
-
-            $.ajax({
-                type: "POST",
-                url: '/solicitudes/requerimientos/update-status',
-                headers: {
-                    "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
-                },
-                data: {
-                    "folio": folio
-                },
-                dataType: "json",
-                success: function({msg, data}) {
-                    window.location.reload();
-                },
-                error: function(error) {
-                    // console.log({error})
-                }
-            });
-        }
     </script>
 
 @endsection

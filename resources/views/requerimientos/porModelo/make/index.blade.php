@@ -39,25 +39,22 @@
                                         <h6 class="card-subtitle mb-2 text-muted text-card">{{ $kit->num_parte }}</h6>
                                     </div>
                                     <div class="mb-2 col-xs-1 text-center">
-                                        {{-- OLD --}}
-                                        {{-- <button class="btn btn-sm" style="background-color: #347aeb; color: #fff" data-bs-toggle="modal" data-bs-target="#solicitarKit{{ $kit->id }}" onclick="getInfoTest({{ $kit }}, {{ $padre_id }})">
-                                            Solicitar Make
-                                        </button> --}}
-
-                                        {{-- NEW --}}
                                         <button class="btn btn-sm" style="background-color: #347aeb; color: #fff" data-bs-toggle="modal" data-bs-target="#solicitarKit" onclick="getInfoTest({{ $kit }}, {{ $padre_id }})">
-                                            Solicitar Make NEW
+                                            Solicitar Make
+                                        </button>
+
+                                        <button type="submit" class="btn btn-primary" onclick="generatePDF({{ $kit }})">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                                                <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                                                <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                                              </svg>
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
-
-                            {{-- OLD --}}
-                            {{-- @include('requerimientos.porModelo.make.store') --}}
                         @endforeach
-                        {{-- NEW --}}
-                        @include('requerimientos.porModelo.make.store2')
+                        @include('requerimientos.porModelo.make.store')
                     </div>
                 </div>
 
@@ -182,8 +179,6 @@
                         // const formulario = document.getElementById('formulario-dinamico');
 
                         data.data.forEach(element => {
-                            console.log('Element');
-                            console.log(element)
                             const row = document.createElement('tr');
 
                             const partField = document.createElement('td');
@@ -236,24 +231,47 @@
             function solicitarRequerimiento() {
                 let cantidad = document.getElementById('cantidad-registrada').value;
 
+                if(window.confirm('Seguro que desea crear esta solicitud?')) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/requerimientos/solicitar',
+                        headers: {
+                            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        data: {
+                            "cantidad": cantidad,
+                            "valores": valores
+                        },
+                        success: function({msg}) {
+                            valores = [];
+                            cantidad = 0;
+                            const inputCantidad = document.getElementById('cantidad-registrada')
+                            inputCantidad.value = '';
+                            const alerta = document.getElementById('confirmation-message');
+                            alerta.removeAttribute('hidden');
+                            alerta.innerText = msg;
+                        }
+                    });
+                }
+
+            }
+
+            function generatePDF(kit) {
+                console.log('Generate PDF');
+                console.log(kit);
                 $.ajax({
                     type: 'POST',
-                    url: '/requerimientos/solicitar',
+                    url: `/requerimientos/getInfo`,
                     headers: {
                         "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
                     },
                     data: {
-                        "cantidad": cantidad,
-                        "valores": valores
+                        "kit_nombre": kit.kit_nombre,
+                        "kit_status": kit.status,
+                        "padre_id": padre_id,
                     },
-                    success: function({msg}) {
-                        valores = [];
-                        cantidad = 0;
-                        const inputCantidad = document.getElementById('cantidad-registrada')
-                        inputCantidad.value = '';
-                        const alerta = document.getElementById('confirmation-message');
-                        alerta.removeAttribute('hidden');
-                        alerta.innerText = msg;
+                    success: function(data) {
+
                     }
                 });
             }

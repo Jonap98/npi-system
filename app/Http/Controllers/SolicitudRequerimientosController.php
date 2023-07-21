@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\RequerimientosModel;
 use App\Models\BomsModel;
 use App\Models\MovimientosModel;
@@ -24,6 +25,7 @@ class SolicitudRequerimientosController extends Controller
             'created_at as fecha'
         )
         ->where('status', '!=', 'RECIBIDO')
+        ->where('status', '!=', 'ELIMINADO')
         ->orderBy('id', 'desc')
         ->get();
 
@@ -77,6 +79,8 @@ class SolicitudRequerimientosController extends Controller
         ->get();
 
         $status = SolicitudesModel::select('status')->where('folio', $folio)->first();
+
+        $indice = 0;
 
         // Iterar en cada requerimiento para obtener los detalles
         for($i = 0; $i < count($requerimientos); $i++) {
@@ -171,6 +175,9 @@ class SolicitudRequerimientosController extends Controller
 
 
             foreach ($requerimientos[$i]->ubicaciones as $ubicacion) {
+                $ubicacion->element_index = $indice;
+                $indice++;
+
                 foreach ($requerimientos[$i]->solicitudes as $solicitud) {
                     if($ubicacion->ubicacion == $solicitud->ubicacion && $ubicacion->palet == $solicitud->palet) {
                         // $ubicacion->cantidad -= $solicitud->cantidad;
@@ -191,6 +198,7 @@ class SolicitudRequerimientosController extends Controller
         ]);
     }
 
+    // Ya no se utilizará
     public function prepararIndividual(Request $request) {
         $proyecto = PartesModel::select(
             'proyecto'
@@ -248,6 +256,71 @@ class SolicitudRequerimientosController extends Controller
     }
 
     public function preparar(Request $request) {
+
+        // $ubicacionesTst = [];
+        // $movimientosTst = [];
+        $currentUser = Auth::user()->username;
+        foreach ($request->cantidades as $cantidad) {
+            if( $cantidad['cantidad'] > 0 ) {
+                $proyecto = PartesModel::select(
+                    'proyecto'
+                )
+                ->where('numero_de_parte', $cantidad['num_parte'])
+                ->first();
+
+                $cantidad_ubicacion = new CantidadUbicacionesModel();
+
+                $cantidad_ubicacion->folio_solicitud = $cantidad['folio'];
+                $cantidad_ubicacion->num_parte = $cantidad['num_parte'];
+                $cantidad_ubicacion->cantidad = $cantidad['cantidad'];
+                $cantidad_ubicacion->ubicacion = $cantidad['ubicacion'];
+                $cantidad_ubicacion->palet = $cantidad['palet'];
+                $cantidad_ubicacion->status = 'PREPARADO';
+                $cantidad_ubicacion->id_requerimiento = $cantidad['id_requerimiento'];
+                $cantidad_ubicacion->created_at = Carbon::now()->subHours(1);
+                $cantidad_ubicacion->updated_at = Carbon::now()->subHours(1);
+
+                // array_push($ubicacionesTst, $cantidad_ubicacion);
+
+                $cantidad_ubicacion->save();
+
+                $movimiento = new MovimientosModel();
+
+                $movimiento->proyecto = $proyecto->proyecto;
+                $movimiento->cantidad = $cantidad['cantidad'];
+                $movimiento->tipo = 'Salida';
+                $movimiento->comentario = 'Requerimiento de material con folio: '.$cantidad['folio'];
+                $movimiento->fecha_registro = Carbon::now()->subHours(1);
+                $movimiento->id_parte = '0';
+                $movimiento->numero_de_parte = $cantidad['num_parte'];
+                $movimiento->ubicacion = $cantidad['ubicacion'];
+                $movimiento->palet = $cantidad['palet'];
+                $movimiento->created_at = Carbon::now()->subHours(1);
+                $movimiento->updated_at = Carbon::now()->subHours(1);
+                $movimiento->usuario = $currentUser;
+
+                // array_push($movimientosTst, $movimiento);
+
+                $movimiento->save();
+            }
+
+        }
+
+        // Se actualiza el status en la tabla de solicitudes y su requerimiento correspondiente
+        $solicitud = RequerimientosModel::where('folio', $request->cantidades[0]['folio'])->update(['status' => 'PREPARADO', 'updated_at' => Carbon::now()->subHours(1)]);
+        $solicitud = SolicitudesModel::where('folio', $request->cantidades[0]['folio'])->update(['status' => 'PREPARADO', 'updated_at' => Carbon::now()->subHours(1)]);
+
+        return response([
+            'msg' => 'Requerimiento surtido exitosamente',
+        ]);
+
+        return response([
+            'msg' => 'Wait'
+        ]);
+    }
+
+    // Se utilizará, cambio de lógica
+    public function prepararOLD(Request $request) {
 
         $requerimientos = $request->all();
         $requerimientosList = [];
@@ -399,6 +472,7 @@ class SolicitudRequerimientosController extends Controller
         return back()->with('success', 'La solicitud fue actualizada exitosamente');
     }
 
+    // Tal vez ya no se utilizará
     public function updateDynamicQty(Request $request) {
 
 
@@ -437,6 +511,7 @@ class SolicitudRequerimientosController extends Controller
 
     }
 
+    // Tal vez ya no se utilizará
     public function calcularAcumulado(Request $request) {
         // return response([
         //     'data' => $request->all()
@@ -463,9 +538,7 @@ class SolicitudRequerimientosController extends Controller
     }
 
     public function updateQty(Request $request) {
-        // return response([
-        //     'data' => $request->all()
-        // ]);
+        $currentUser = Auth::user()->username;
 
         // 1- Validar cantidad en inventario
         // 1.1 - Obtiene la cantidad registrada como salida del inventario
@@ -524,6 +597,7 @@ class SolicitudRequerimientosController extends Controller
             $movimiento->palet = $request->palet;
             $movimiento->created_at = Carbon::now()->subHours(1);
             $movimiento->updated_at = Carbon::now()->subHours(1);
+            $movimiento->usuario = $currentUser;
 
             $movimiento->save();
         }
@@ -543,6 +617,7 @@ class SolicitudRequerimientosController extends Controller
             $movimiento->palet = $request->palet;
             $movimiento->created_at = Carbon::now()->subHours(1);
             $movimiento->updated_at = Carbon::now()->subHours(1);
+            $movimiento->usuario = $currentUser;
 
             $movimiento->save();
         }
@@ -556,7 +631,8 @@ class SolicitudRequerimientosController extends Controller
     public function update(Request $request) {
         $status = ($request->action == '1') ? 'PREPARADO' : 'RECIBIDO';
 
-        $solicitud = SolicitudesModel::where('id', $request->id)->update(['status' => $status, 'updated_at' => Carbon::now()->subHours(1)]);
+        SolicitudesModel::where('id', $request->id)->update(['status' => $status, 'updated_at' => Carbon::now()->subHours(1)]);
+        RequerimientosModel::where('folio', $request->folio)->update(['status' => $status, 'updated_at' => Carbon::now()->subHours(1)]);
 
         return back()->with('success', 'La solicitud fue actualizada exitosamente');
     }
@@ -595,7 +671,35 @@ class SolicitudRequerimientosController extends Controller
             ->where('team', $solicitud->team)
             ->first();
 
-            $req->status_bom = substr($status->status, 0, 8);
+            $req->status_bom = substr($status->status ?? '', 0, 8);
+
+            // Proceso para obtener ubicacion y palet sin repetir
+            $ubicaciones = DB::table('NPI_movimientos')
+            ->select('ubicacion')
+            ->where('numero_de_parte', $req->num_parte)
+            ->get()
+            ->unique('ubicacion');
+
+            $ubicaciones_array = array();
+            foreach ($ubicaciones as $ubicacion) {
+                $palets = DB::table('NPI_movimientos')
+                ->select('palet')
+                ->where('numero_de_parte', $req->num_parte)
+                ->where('ubicacion', $ubicacion->ubicacion)
+                ->get()
+                ->unique('palet');
+
+
+                $palets_array = array();
+                foreach ($palets as $palet) {
+                    array_push($palets_array, $palet);
+                }
+                $ubicacion->palets_registrados = $palets_array;
+
+                array_push($ubicaciones_array, $ubicacion);
+
+            }
+            $req->ubicaciones_registradas = $ubicaciones_array;
         }
 
         // Se debe decodificar la respuesta para hacerla compatible con el PDF
@@ -612,5 +716,14 @@ class SolicitudRequerimientosController extends Controller
         $pdf = \PDF::loadView('requerimientos.solicitudes.pdf', array('requerimientos' => $data, 'count' => $count, 'kit' => $kit_nombre->kit_nombre, 'solicitante' => $solicitud->solicitante, 'team' => $solicitud->team, 'folio' => $request->folio));
 
         return $pdf->download($fileName);
+    }
+
+    public function delete(Request $request) {
+        SolicitudesModel::where( 'folio', $request->folio )->delete();
+        RequerimientosModel::where( 'folio', $request->folio )->delete();
+
+        return response([
+            'msg' => 'La solicitud ha sido eliminada exitosamente'
+        ]);
     }
 }

@@ -19,7 +19,9 @@ class BomsController extends Controller
             'um',
             'status',
             'requerido',
-            'cantidad'
+            'cantidad',
+            'ubicacion',
+            'team'
         )
         ->orderBy('id', 'asc')
         ->get();
@@ -46,8 +48,18 @@ class BomsController extends Controller
         return back()->with('success', 'La BOM fue cargada exitosamente');
     }
 
-    public function editName(Request $request) {
-        BomsModel::where('id', $request->id)->update(['kit_nombre' => $request->nombre]);
+    public function edit(Request $request) {
+        BomsModel::where(
+            'id', $request->id
+        )
+        ->update([
+            'num_parte' => $request->num_parte,
+            'kit_nombre' => $request->kit_nombre,
+            'kit_descripcion' => $request->kit_descripcion,
+            'status' => $request->status,
+            'ubicacion' => $request->ubicacion,
+            'team' => $request->team,
+        ]);
 
         return back()->with('success', 'El nombre del número de parte fue editado correctamente');
     }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLobbyAreasTable extends Migration
+class CreateSeccionesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class CreateLobbyAreasTable extends Migration
      */
     public function up()
     {
-        Schema::create('LOBBY_areas', function (Blueprint $table) {
+        Schema::create('Manifests_secciones', function (Blueprint $table) {
             $table->id();
-            $table->string('area');
+            $table->integer('seccion')->nullable();
+            $table->string('brazo', 1);
+            $table->string('nombre');
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ class CreateLobbyAreasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('lobby_areas');
+        Schema::dropIfExists('secciones');
     }
 }

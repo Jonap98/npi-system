@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\BomsModel;
 use App\Models\RequerimientosModel;
 use App\Models\PartesModel;
@@ -95,17 +96,15 @@ class RequerimientoManualController extends Controller
         $solicitud = new SolicitudesModel();
 
         $solicitud->folio = $folio;
-        $solicitud->solicitante = $request->solicitante;
+        $solicitud->solicitante = Auth::user()->username;
         $solicitud->status = 'SOLICITADO';
         $solicitud->created_at = Carbon::now()->subHours(1);
         $solicitud->updated_at = Carbon::now()->subHours(1);
-
 
         $solicitud->save();
 
 
         for($i = 0; $i < $request->counter; $i++) {
-
 
             $num_parte = 'num_parte'.$i;
             $cantidad_requerida = 'cantidad_requerida'.$i;
@@ -118,7 +117,8 @@ class RequerimientoManualController extends Controller
                     'kit_nombre',
                     'kit_descripcion',
                     'nivel',
-                    'num_parte'
+                    'num_parte',
+                    'ubicacion',
                 )
                 ->where('num_parte', $request->$num_parte)
                 ->first();
@@ -127,15 +127,15 @@ class RequerimientoManualController extends Controller
                 $requerimiento = new RequerimientosModel();
 
                 $requerimiento->folio = $folio;
+                $requerimiento->kit_nombre = $model->kit_nombre;
                 $requerimiento->num_parte = $request->$num_parte;
-                // $requerimiento->descripcion = consulta bom
                 $requerimiento->descripcion = $model->kit_descripcion ?? '';
                 $requerimiento->cantidad_requerida = $request->$cantidad_requerida;
-                // $requerimiento->cantidad_ubicacion = consulta inventario
                 $requerimiento->cantidad_ubicacion = 1000;
-                $requerimiento->solicitante = $request->solicitante;
+                $requerimiento->solicitante = Auth::user()->username;
                 $requerimiento->comentario = '';
                 $requerimiento->status = 'SOLICITADO';
+                $requerimiento->ubicacion = $model->ubicacion;
                 $requerimiento->created_at = Carbon::now()->subHours(1);
                 $requerimiento->updated_at = Carbon::now()->subHours(1);
 
