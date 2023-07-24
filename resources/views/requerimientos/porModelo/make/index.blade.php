@@ -43,12 +43,18 @@
                                             Solicitar Make
                                         </button>
 
-                                        <button type="submit" class="btn btn-primary" onclick="generatePDF({{ $kit }})">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
-                                                <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
-                                                <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
-                                              </svg>
-                                        </button>
+                                        {{-- <form action="{{ route('requerimientos.generate-pdf') }}" id="pdf-form" method="POST" class="d-inline">
+                                            @csrf
+                                            <input type="hidden" name="kit" value="{{ $kit }}">
+                                            <input type="hidden" name="padre_id" value="{{ $padre_id }}">
+                                            <button type="submit" class="btn btn-sm btn-primary" onclick="generatePDF({{ $kit }}, {{ $padre_id }})">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                                                    <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                                                    <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                                                </svg>
+                                            </button>
+
+                                        </form> --}}
                                     </div>
                                 </div>
                             </div>
@@ -187,11 +193,15 @@
                             const descField = document.createElement('td');
                             descField.innerText = element.kit_descripcion;
 
+                            const kitField = document.createElement('td');
+                            kitField.innerText = element.kit_nombre;
+
                             const countField = document.createElement('td');
                             countField.innerText = Math.round(element.cantidad);
 
                             row.appendChild(partField);
                             row.appendChild(descField);
+                            row.appendChild(kitField);
                             row.appendChild(countField);
 
                             const obj = {
@@ -256,24 +266,28 @@
 
             }
 
-            function generatePDF(kit) {
+            function generatePDF(kit, padre_id) {
                 console.log('Generate PDF');
                 console.log(kit);
-                $.ajax({
-                    type: 'POST',
-                    url: `/requerimientos/getInfo`,
-                    headers: {
-                        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    data: {
-                        "kit_nombre": kit.kit_nombre,
-                        "kit_status": kit.status,
-                        "padre_id": padre_id,
-                    },
-                    success: function(data) {
+                console.log(padre_id);
+                // document.getElementById
+                // $.ajax({
+                //     type: 'POST',
+                //     url: `/requerimientos/getInfo`,
+                //     headers: {
+                //         "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+                //     },
+                //     data: {
+                //         "kit_nombre": kit.kit_nombre,
+                //         "kit_status": kit.status,
+                //         "padre_id": padre_id,
+                //     },
+                //     success: function({data}) {
+                //         console.log(data)
+                //         // requerimientos/generate-pdf
 
-                    }
-                });
+                //     }
+                // });
             }
         </script>
     @endsection

@@ -48,6 +48,18 @@
                                             <button class="btn btn-sm" style="background-color: #347aeb; color: #fff" onclick="showKits('{{ $kit->id }}')" data-bs-toggle="modal" data-bs-target="#solicitarKit{{ $kit->id }}">
                                                 Solicitar KIT
                                             </button>
+                                            {{-- <form action="{{ route('requerimientos.kits.generate-pdf') }}" id="pdf-form" method="POST" class="d-inline">
+                                                @csrf
+                                                <input type="hidden" id="kit-input" name="kit" >
+
+                                            </form>
+                                            <button type="button" class="btn btn-sm btn-primary" onclick="generatePDF('{{ $kit->id }}')">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
+                                                    <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                                                    <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                                                </svg>
+                                                Kit
+                                            </button> --}}
                                         </div>
                                     </div>
                             </div>
@@ -117,7 +129,16 @@
                         table.appendChild(tbody);
                         parts.appendChild(table);
 
-                        data.forEach(({kit_descripcion, num_parte, cantidad}) => {
+                        const datos = [];
+
+                        data.forEach(({kit_descripcion, num_parte, cantidad, kit_nombre}) => {
+                            let data = {
+                                "num_parte": num_parte,
+                                "kit_descripcion": kit_descripcion,
+                                "cantidad": cantidad,
+                                "kit_nombre": kit_nombre,
+                            };
+                            datos.push(data);
 
                             const row = document.createElement('tr');
 
@@ -127,11 +148,15 @@
                             const descField = document.createElement('td');
                             descField.innerText = kit_descripcion;
 
+                            const kitField = document.createElement('td');
+                            kitField.innerText = kit_nombre;
+
                             const countField = document.createElement('td');
                             countField.innerText = Math.round(cantidad);
 
                             row.appendChild(partField);
                             row.appendChild(descField);
+                            row.appendChild(kitField);
                             row.appendChild(countField);
 
                             tbody.appendChild(row);
@@ -142,9 +167,17 @@
 
                             // parts.appendChild(span);
                         });
+                        document.getElementById('kit-input').value = 'datos';
+
                     },
 
                 });
+            }
+
+            const generatePDF = (id) => {
+                showKits(id);
+
+                document.getElementById('pdf-form').submit();
             }
 
             const confirmar = (id) => {

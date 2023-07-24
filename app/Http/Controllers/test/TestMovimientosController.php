@@ -4,14 +4,17 @@ namespace App\Http\Controllers\test;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\test\MovimientosModel;
-use App\Models\test\PartesModel;
-use App\Models\UbicacionesModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+
 use App\Exports\MovimientosExport;
 use Maatwebsite\Excel\Facades\Excel;
+
+use App\Models\test\MovimientosModel;
+use App\Models\test\PartesModel;
+use App\Models\UbicacionesModel;
+use App\Models\InventarioModel;
 
 class TestMovimientosController extends Controller
 {
@@ -109,6 +112,66 @@ class TestMovimientosController extends Controller
                 DB::raw('(SELECT TOP 1 c.id_parte FROM NPI_movimientos_test as c WHERE a.id_parte=c.id_parte ) as id_parte'),
 
             )->get();
+
+    }
+
+    // Test nuevo inventario
+    public function testInventario(Request $request) {
+        $inventario = InventarioModel::select(
+            'id',
+            'numero_de_parte',
+            'cantidad',
+            'ubicacion',
+            'palet',
+        )
+        ->where('numero_de_parte', $request->numero_de_parte)
+        ->where('ubicacion', $request->ubicacion)
+        ->where('palet', $request->palet)
+        ->first();
+
+        if( !$inventario ) {
+            InventarioModel::create([
+                'numero_de_parte' => $request->numero_de_parte,
+                'cantidad' => $request->cantidad,
+                'ubicacion' => $request->ubicacion,
+                'palet' => $request->palet,
+            ]);
+
+            return response([
+                'msg' => 'Movimiento insertado correctamente'
+            ]);
+        }
+
+        if( $request->tipo == 'entrada' ) {
+            InventarioModel::where( 'id', $inventario->id )
+                ->update([ 'cantidad' => $inventario->cantidad += $request->cantidad ]);
+
+            return response([
+                'msg' => 'Registro de entrada actualizado exitosamente'
+            ]);
+        } else {
+            if( $request->cantidad > $inventario->cantidad ) {
+                return response([
+                    'msg' => 'La cantidad solicitada excede el inventario'
+                ]);
+            } else {
+                InventarioModel::where( 'id', $inventario->id )
+                    ->update([ 'cantidad' => $inventario->cantidad -= $request->cantidad ]);
+
+                return response([
+                    'msg' => 'Registro de salida actualizado exitosamente'
+                ]);
+            }
+        }
+
+        return response([
+            'msg' => 'Hay inventario en esta ubicación',
+            'data' => $inventario
+        ]);
+
+
+
+
 
     }
 }

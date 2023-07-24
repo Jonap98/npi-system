@@ -27,7 +27,6 @@ class RequerimientoManualController extends Controller
         ->get();
 
 
-        // $modelosSeleccionados = DB::connection('mysql')->table('npi_boms')->paginate();
         $modelosSeleccionados = BomsModel::select(
             'id',
             'kit_nombre',
@@ -123,19 +122,29 @@ class RequerimientoManualController extends Controller
                 ->where('num_parte', $request->$num_parte)
                 ->first();
 
+                $part_info = $model;
+
+                if( !$model ) {
+                    $part_info = PartesModel::select(
+                        'numero_de_parte',
+                        'descripcion as kit_descripcion',
+                    )
+                    ->where('numero_de_parte', $request->$num_parte)
+                    ->first();
+                }
 
                 $requerimiento = new RequerimientosModel();
 
                 $requerimiento->folio = $folio;
-                $requerimiento->kit_nombre = $model->kit_nombre;
+                $requerimiento->kit_nombre = $model->kit_nombre ?? '';
                 $requerimiento->num_parte = $request->$num_parte;
-                $requerimiento->descripcion = $model->kit_descripcion ?? '';
+                $requerimiento->descripcion = $part_info->kit_descripcion ?? '';
                 $requerimiento->cantidad_requerida = $request->$cantidad_requerida;
                 $requerimiento->cantidad_ubicacion = 1000;
                 $requerimiento->solicitante = Auth::user()->username;
                 $requerimiento->comentario = '';
                 $requerimiento->status = 'SOLICITADO';
-                $requerimiento->ubicacion = $model->ubicacion;
+                $requerimiento->ubicacion = $model->ubicacion ?? '';
                 $requerimiento->created_at = Carbon::now()->subHours(1);
                 $requerimiento->updated_at = Carbon::now()->subHours(1);
 

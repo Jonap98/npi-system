@@ -28,6 +28,7 @@ class MakeController extends Controller
             'num_parte',
             'status',
             'team',
+            'padre',
         )
         ->where('team', $team->team)
         ->where('kit_nombre', $team->kit_nombre)
@@ -49,7 +50,7 @@ class MakeController extends Controller
                 'num_parte',
                 'kit_descripcion',
                 'cantidad',
-                'status'
+                'status',
             )
             ->where('team', $make->team)
             ->where('kit_nombre', $detailsMake->status)
@@ -195,76 +196,18 @@ class MakeController extends Controller
 
     }
 
-    public function storeOLD(Request $request) {
-        $solicitante = $request->solicitante;
-        $cantidad = $request->cantidad;
-        $id = $request->id;
-        $team = $request->team;
-        $num_parte = $request->num_parte;
+    public function generatePDF(Request $request) {
 
-        unset($request['_token']);
-        unset($request['id']);
-        unset($request['kit_nombre']);
-        unset($request['solicitante']);
-        unset($request['cantidad']);
-        unset($request['team']);
-        unset($request['num_parte']);
+        $arr = json_decode($request->kit, true);
 
-        $ultimoFolio = SolicitudesModel::select(
-            'id',
-            'folio'
-        )
-        ->orderBy('id', 'desc')
-        ->first();
+        $fileName = "Vista previa.pdf";
 
-        if(!$ultimoFolio) {
-            $folio = 0;
-        } else {
-            $folio = $ultimoFolio->folio + 1;
-        }
+        // Descargar archivo
+        $pdf = \PDF::loadView('requerimientos.porModelo.make.pdf', array('requerimientos' => $arr['details']));
 
-        // 2 - Se crea la solicitud con nuevo folio
-        $solicitud = new SolicitudesModel();
+        return $pdf->download($fileName);
 
-        $solicitud->folio = $folio;
-        $solicitud->solicitante = $solicitante;
-        $solicitud->status = 'SOLICITADO';
-
-        $solicitud->save();
-
-        for ($index = 0; $index < count($request->all()); $index++) {
-            $parte = 'num_parte'.$index;
-
-            $make = BomsModel::select(
-                'kit_nombre',
-                'kit_descripcion',
-                'ubicacion',
-                'cantidad',
-                'num_parte',
-            )
-            ->where('num_parte', $request->$parte)
-            ->first();
-
-            $requerimiento = new RequerimientosModel();
-
-            $requerimiento->folio = $folio;
-            $requerimiento->num_parte = $make->num_parte;
-            $requerimiento->kit_nombre = $make->kit_nombre;
-            $requerimiento->kit_num_parte = $num_parte;
-            $requerimiento->descripcion = $make->kit_descripcion;
-            $requerimiento->cantidad_requerida = ($cantidad * $make->cantidad);
-            // Validar si seguirá siendo necesario este campo en la BD
-            $requerimiento->cantidad_ubicacion = 1000;
-            $requerimiento->solicitante = $solicitante;
-            $requerimiento->comentario = '';
-            $requerimiento->status = 'SOLICITADO';
-            $requerimiento->ubicacion = $make->ubicacion;
-            $requerimiento->team = $team;
-
-            $requerimiento->save();
-        }
-
-        return back()->with('success', 'El requerimiento fue creado exitosamente');
     }
+
 }
 

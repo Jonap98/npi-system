@@ -22,6 +22,9 @@ use App\Http\Controllers\test\TestInventarioController;
 
 use App\Http\Controllers\InventarioExportController;
 
+// Nuevo inventario
+use App\Http\Controllers\inventario\InventarioController;
+
 
 // Externals
 // e-kanban
@@ -112,6 +115,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('requerimientos/{kit}/modelo', [KitsController::class, 'index'])->name('requerimientos.kit.modelo');
     Route::post('requerimientos/solicitarKits', [KitsController::class, 'store'])->name('requerimientos.kit.solicitarKits');
     Route::get('requerimientos/{id}/showKits', [KitsController::class, 'show'])->name('requerimientos.kit.showKits');
+    Route::post('requerimientos/kits/generate-pdf', [KitsController::class, 'generatePDF'])->name('requerimientos.kits.generate-pdf');
+
 
     // Makes
     Route::get('requerimientos/{make}/make', [MakeController::class, 'index'])->name('requerimientos.kit.make');
@@ -120,6 +125,7 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::post('requerimientos/getInfo', [MakeController::class, 'getInfo'])->name('requerimientos.getInfo');
 
+    Route::post('requerimientos/generate-pdf', [MakeController::class, 'generatePDF'])->name('requerimientos.generate-pdf');
 
 
 
@@ -186,6 +192,8 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
+
+Route::get('inventario/new', [InventarioController::class, 'index'])->name('index');
 
 
 // =========================================================================

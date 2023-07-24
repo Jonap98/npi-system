@@ -12,6 +12,7 @@ use App\Models\MovimientosModel;
 use App\Models\SolicitudesModel;
 use App\Models\test\PartesModel;
 use App\Models\CantidadUbicacionesModel;
+use App\Models\InventarioModel;
 use Carbon\Carbon;
 
 class SolicitudRequerimientosController extends Controller
@@ -198,63 +199,6 @@ class SolicitudRequerimientosController extends Controller
         ]);
     }
 
-    // Ya no se utilizará
-    public function prepararIndividual(Request $request) {
-        $proyecto = PartesModel::select(
-            'proyecto'
-        )
-        ->where('numero_de_parte', $request->num_parte)
-        ->first();
-
-        // PTE ubicación, nombre, validar de dónde se tomará, es decir, de qué ubicación
-        // $bomInfo = BomsModel::select(
-
-        // )
-
-        $cantidad_ubicacion = new CantidadUbicacionesModel();
-
-        $cantidad_ubicacion->folio_solicitud = $request->folio;
-        $cantidad_ubicacion->num_parte = $request->num_parte;
-        $cantidad_ubicacion->cantidad = $request->cantidad;
-        $cantidad_ubicacion->ubicacion = $request->ubicacion;
-        $cantidad_ubicacion->palet = $request->palet;
-        $cantidad_ubicacion->status = 'PREPARADO';
-        $cantidad_ubicacion->id_requerimiento = $request->id_requerimiento;
-        $cantidad_ubicacion->created_at = Carbon::now()->subHours(1);
-        $cantidad_ubicacion->updated_at = Carbon::now()->subHours(1);
-
-
-        $cantidad_ubicacion->save();
-
-        $movimiento = new MovimientosModel();
-
-        $movimiento->proyecto = $proyecto->proyecto;
-        $movimiento->cantidad = $request->cantidad;
-        $movimiento->tipo = 'Salida';
-        $movimiento->comentario = 'Requerimiento de material con folio: '.$request->folio;
-        $movimiento->fecha_registro = Carbon::now()->subHours(1);
-        $movimiento->id_parte = '0';
-        $movimiento->numero_de_parte = $request->num_parte;
-        $movimiento->ubicacion = $request->ubicacion;
-        $movimiento->palet = $request->palet;
-        $movimiento->created_at = Carbon::now()->subHours(1);
-        $movimiento->updated_at = Carbon::now()->subHours(1);
-
-        $movimiento->save();
-
-        if(!$cantidad_ubicacion) {
-            return response([
-                'msg' => 'No se pudo registrar la cantidad',
-            ]);
-        }
-        return response([
-            'msg' => 'Cantidad registrada exitosamente',
-            'data' => $cantidad_ubicacion,
-            'movimiento' => $movimiento->id
-        ]);
-
-    }
-
     public function preparar(Request $request) {
 
         // $ubicacionesTst = [];
@@ -302,6 +246,23 @@ class SolicitudRequerimientosController extends Controller
                 // array_push($movimientosTst, $movimiento);
 
                 $movimiento->save();
+
+                // Obtiene el inventario de esa ubicación
+                $inventario = InventarioModel::select(
+                    'id',
+                    'numero_de_parte',
+                    'cantidad',
+                    'ubicacion',
+                    'palet',
+                )
+                ->where('numero_de_parte', $cantidad['num_parte'])
+                ->where('ubicacion', $cantidad['ubicacion'])
+                ->where('palet', $cantidad['palet'])
+                ->first();
+
+                // Resta la cantidad al inventario
+                InventarioModel::where( 'id', $inventario->id )
+                    ->update([ 'cantidad' => $inventario->cantidad -= $cantidad['cantidad'] ]);
             }
 
         }
@@ -317,107 +278,6 @@ class SolicitudRequerimientosController extends Controller
         return response([
             'msg' => 'Wait'
         ]);
-    }
-
-    // Se utilizará, cambio de lógica
-    public function prepararOLD(Request $request) {
-
-        $requerimientos = $request->all();
-        $requerimientosList = [];
-
-        // Elimina del request los datos que no se necesitan
-        unset($requerimientos['_token']);
-        unset($requerimientos['requerimientos_length']);
-        unset($requerimientos['folio']);
-
-        $inputs = array();
-        foreach ($requerimientos as $req) {
-            return response([
-                'data' => $req
-            ]);
-            if(str_starts_with($req, 'cantidad')) {
-                array_push($inputs, $req);
-            }
-        }
-
-        return response([
-            'data' => $inputs
-        ]);
-
-        return response([
-            'data' => 'wait'
-        ]);
-
-        // Agrega los datos a una lista para poder iterarla de manera más sencilla
-        foreach ($requerimientos as $requerimiento) {
-            array_push($requerimientosList, $requerimiento);
-        }
-
-        $counter = count($requerimientosList);
-
-        for($i = 0; $i < count($requerimientosList); $i ++) {
-
-            $part = PartesModel::select(
-                'id',
-                'proyecto'
-            )
-            ->where('numero_de_parte', $requerimientosList[$i])
-            ->first();
-
-            $proyecto = $part->proyecto ?? '';
-            $id = $part->id ?? '';
-
-            // Ingresa el registro de la cantidad que se requiere, a la tabla de Cantidad_ubicaciones
-            // De manera que permite una mejor visualización y uso, ya que esa cantidad se registrará posteriormente
-            // en la tabla de movimientos como una salida
-            $movimiento = new CantidadUbicacionesModel();
-
-            $movimiento->folio_solicitud = $request->folio;
-            $movimiento->num_parte = $requerimientosList[$i];
-            $movimiento->cantidad = $requerimientosList[$i+3] ?? 0;
-            $movimiento->ubicacion = $requerimientosList[$i+1];
-            $movimiento->palet = $requerimientosList[$i+2];
-            $movimiento->status = 'PREPARADO';
-            $movimiento->id_requerimiento = $requerimientosList[$i+4];
-            $movimiento->created_at = Carbon::now()->subHours(1);
-            $movimiento->updated_at = Carbon::now()->subHours(1);
-
-
-            $movimiento->save();
-
-            // Realiza el descuento de ese material, del inventario, solo si se hay requerimiento de ese material, es decir,
-            // si la cantidad solicitada en esa ubicación es mayor a cero
-
-            // Actualización, crear el movimiento con valor de cero para poder editarlo después en caso de ser necesario
-            // Validar eso
-            if($requerimientosList[$i+3]) {
-                $movimiento = new MovimientosModel();
-
-                $movimiento->proyecto = $proyecto;
-                $movimiento->cantidad = $requerimientosList[$i+3] ?? 0;
-                $movimiento->tipo = 'Salida';
-                $movimiento->comentario = 'Requerimiento de material con folio: '.$request->folio;
-                $movimiento->fecha_registro = Carbon::now()->subHours(1);
-                $movimiento->id_parte = $id;
-                $movimiento->numero_de_parte = $requerimientosList[$i];
-                $movimiento->ubicacion = $requerimientosList[$i+1];
-                $movimiento->palet = $requerimientosList[$i+2];
-                $movimiento->created_at = Carbon::now()->subHours(1);
-                $movimiento->updated_at = Carbon::now()->subHours(1);
-
-                $movimiento->save();
-            }
-
-            // Se itera de 3 en 3 debido a las propiedades del request, de manera que cada 4° valor, es la cantidad
-            $i += 4;
-
-        }
-
-        // Se actualiza el status en la tabla de solicitudes y su requerimiento correspondiente
-        $solicitud = RequerimientosModel::where('folio', $request->folio)->update(['status' => 'PREPARADO', 'updated_at' => Carbon::now()->subHours(1)]);
-        $solicitud = SolicitudesModel::where('folio', $request->folio)->update(['status' => 'PREPARADO', 'updated_at' => Carbon::now()->subHours(1)]);
-
-        return back()->with('success', 'La solicitud fue actualizada exitosamente');
     }
 
     // Validar funcionamiento
@@ -470,71 +330,6 @@ class SolicitudRequerimientosController extends Controller
         $solicitud = SolicitudesModel::where('id', $request->id_solicitud)->update(['status' => 'PREPARADO', 'updated_at' => Carbon::now()->subHours(1)]);
 
         return back()->with('success', 'La solicitud fue actualizada exitosamente');
-    }
-
-    // Tal vez ya no se utilizará
-    public function updateDynamicQty(Request $request) {
-
-
-        CantidadUbicacionesModel::where(
-            'id', $request->cantidad_id
-        )
-        ->update([
-            'cantidad' => $request->cantidad
-        ]);
-
-        $cantidad_ubicacion = CantidadUbicacionesModel::select(
-            'folio_solicitud',
-            'num_parte',
-            'cantidad',
-            'ubicacion',
-            'palet',
-            'status' ,
-            'id_requerimiento',
-        )
-        ->where('id', $request->cantidad_id)
-        ->first();
-
-        MovimientosModel::where(
-            'id', $request->movimiento_id
-        )
-        ->update([
-            'cantidad' => $request->cantidad
-        ]);
-
-        return response([
-            'msg' => 'Cantidad actualizada exitosamente',
-            'data' => $cantidad_ubicacion,
-            'movimiento' => $request->movimiento_id
-        ]);
-
-
-    }
-
-    // Tal vez ya no se utilizará
-    public function calcularAcumulado(Request $request) {
-        // return response([
-        //     'data' => $request->all()
-        // ]);
-        $cantidades = CantidadUbicacionesModel::select(
-            'cantidad'
-        )
-        ->where('folio_solicitud', $request->folio)
-        ->where('num_parte', $request->num_parte)
-        ->where('ubicacion', $request->ubicacion)
-        ->where('palet', $request->palet)
-        ->get();
-
-        $acumulado = 0;
-        foreach ($cantidades as $cantidad) {
-            $acumulado += $cantidad->cantidad;
-        }
-
-        return response([
-            // 'data' => $cantidades,
-            'acumulado' => $acumulado
-        ]);
-
     }
 
     public function updateQty(Request $request) {

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSeccionesTable extends Migration
+class CreateNpiInventarioTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreateSeccionesTable extends Migration
      */
     public function up()
     {
-        Schema::create('Manifests_secciones', function (Blueprint $table) {
+        Schema::create('NPI_inventario', function (Blueprint $table) {
             $table->id();
-            $table->integer('seccion')->nullable();
-            $table->string('brazo', 1);
-            $table->string('nombre');
+            $table->string('numero_de_parte');
+            $table->float('cantidad');
+            $table->string('ubicacion');
+            $table->string('palet');
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ class CreateSeccionesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('secciones');
+        Schema::dropIfExists('npi_inventario');
     }
 }

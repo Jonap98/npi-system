@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\test\TestMovimientosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +25,5 @@ Route::post('movimientos/create', 'App\Http\Controllers\MovimientosController@st
 
 
 Route::get('users', 'App\Http\Controllers\Auth\LoginController@index')->name('users');
+
+Route::post('movimientos/test', [TestMovimientosController::class, 'testInventario'])->name('movimientos.test');

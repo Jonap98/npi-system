@@ -144,7 +144,7 @@ class KitsController extends Controller
         ->get()
         ->where('kit_nombre', $team->kit_nombre)
         ->where('team', $team->team);
-        
+
 
         // $kit_padre = BomsModel::select(
         //     'id',
@@ -160,7 +160,7 @@ class KitsController extends Controller
         // ->first();
 
         // $requerimiento = new RequerimientosModel();
-                
+
         // $requerimiento->folio = $folio;
         // $requerimiento->num_parte = $request->num_parte;
         // $requerimiento->kit_nombre = $kit_padre->kit_nombre;
@@ -172,9 +172,9 @@ class KitsController extends Controller
         // $requerimiento->comentario = '';
         // $requerimiento->status = 'SOLICITADO';
         // $requerimiento->ubicacion = $kit_padre->ubicacion ?? '';
-    
+
         // $requerimiento->save();
-        
+
         // Para cada uno de los registros obtenidos, se crea un requerimiento
         foreach ($kits as $kit) {
             $ubicacion = BomsModel::select(
@@ -185,7 +185,7 @@ class KitsController extends Controller
             ->first();
 
             $requerimiento = new RequerimientosModel();
-                
+
             $requerimiento->folio = $folio;
             $requerimiento->num_parte = $kit->num_parte;
             $requerimiento->kit_nombre = $kit->kit_nombre;
@@ -203,6 +203,22 @@ class KitsController extends Controller
         }
 
         return back()->with('success', 'El requerimiento fue creado exitosamente');
-        
+
+    }
+
+    public function generatePDF(Request $request) {
+        return response([
+            'data' => $request->all()
+        ]);
+
+        $arr = json_decode($request->kit, true);
+
+        $fileName = "Vista previa.pdf";
+
+        // Descargar archivo
+        $pdf = \PDF::loadView('requerimientos.porModelo.make.pdf', array('requerimientos' => $arr['details']));
+
+        return $pdf->download($fileName);
+
     }
 }

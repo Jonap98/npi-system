@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Exports\MovimientosExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\InventarioModel;
 
 class MovimientosController extends Controller
 {
@@ -72,6 +73,47 @@ class MovimientosController extends Controller
             $numero_guia = 'numero_guia'.$i;
 
             if($request->$proyecto) {
+
+                // Valida si hay inventario en esa ubicación
+                $inventario = InventarioModel::select(
+                    'id',
+                    'numero_de_parte',
+                    'cantidad',
+                    'ubicacion',
+                    'palet',
+                )
+                ->where('numero_de_parte', $request->$numero_de_parte)
+                ->where('ubicacion', $request->$ubicacion)
+                ->where('palet', $request->$palet)
+                ->first();
+
+                // Si no hay inventario, ingresa la cantidad tal cual como viene
+                if( !$inventario ) {
+                    InventarioModel::create([
+                        'numero_de_parte' => $request->$numero_de_parte,
+                        'cantidad' => $request->$cantidad,
+                        'ubicacion' => $request->$ubicacion,
+                        'palet' => $request->$palet,
+                        'created_at' => Carbon::now()->subHours(1),
+                        'updated_at' => Carbon::now()->subHours(1),
+                    ]);
+                } else {
+                    // Si hay inventario, valida si es una entrada o salida
+                    if( $request->tipo == 'Entrada' ) {
+                        // Si es una entrada, se la suma a la cantidad del inventario
+                        InventarioModel::where( 'id', $inventario->id )
+                            ->update([ 'cantidad' => $inventario->cantidad += $request->$cantidad ]);
+
+                    } else {
+                        // Si es una entrada, se la suma a la cantidad del inventario
+                        if( $request->$cantidad > $inventario->cantidad ) {
+                        } else {
+                            InventarioModel::where( 'id', $inventario->id )
+                                ->update([ 'cantidad' => $inventario->cantidad -= $request->$cantidad ]);
+                        }
+                    }
+                }
+
 
                 $movimiento->proyecto = $request->$proyecto;
                 $movimiento->cantidad = $request->$cantidad;
