@@ -115,10 +115,10 @@ class MovimientosController extends Controller
                 }
 
 
-                $movimiento->proyecto = $request->$proyecto;
+                $movimiento->proyecto = $request->$proyecto ?? '';
                 $movimiento->cantidad = $request->$cantidad;
                 $movimiento->tipo = $request->tipo;
-                $movimiento->comentario = $request->$comentario;
+                $movimiento->comentario = $request->$comentario ?? '';
                 $movimiento->fecha_registro = Carbon::now()->subHours(1);
                 $movimiento->id_parte = $request->$id_parte;
                 $movimiento->numero_de_parte = $request->$numero_de_parte;

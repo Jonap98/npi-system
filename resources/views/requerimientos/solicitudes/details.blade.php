@@ -68,7 +68,7 @@
                                                     <td>{{ round($requerimiento->cantidad_requerida, 0) }}</td>
                                                     <td id="requerimiento{{ $requerimiento->id }}">
                                                         <b>
-                                                            @forelse ($requerimiento->solicitudes as $ubicaciones)
+                                                            @forelse ($requerimiento->cantidad_solicitada as $ubicaciones)
                                                                 <div class="mb-2 d-flex justify-content-between">
                                                                     <b>{{ $ubicaciones->ubicacion }} {{ $ubicaciones->palet }}: {{ round($ubicaciones->cantidad, 0) }}</b>
 
@@ -91,9 +91,28 @@
 
                                                     </td>
                                                     <td>
-                                                        @forelse ($requerimiento->ubicaciones as $ubicacion)
+                                                        @forelse ($requerimiento->cantidad_ubicacion as $ubicacion)
                                                             <div id="ubicacion{{ $ubicacion->id }}{{ $requerimiento->id }}">
-                                                                <b class="ubicacion{{ $ubicacion->id }}"> {{ $ubicacion->ubicacion }} {{ $ubicacion->palet }}: {{ $ubicacion->cantidad }} </b>
+                                                                {{-- <b class="ubicacion{{ $ubicacion->id }}{{ $requerimiento->id }}"> --}}
+                                                                <b class="ubicacion{{ $ubicacion->id }}"> {{ $ubicacion->ubicacion }} {{ $ubicacion->palet }}: {{ round($ubicacion->cantidad, 0) }} </b>
+                                                                    @if ($requerimiento->status   == 'SOLICITADO')
+                                                                        @if (Auth::user()->role == 'NPI-admin')
+                                                                            <input
+                                                                                id="input{{ $ubicacion->id }}"
+                                                                                type="number"
+                                                                                class="form-control"
+                                                                                name="cantidad"
+                                                                                onblur="addQty( {{ $ubicacion->cantidad }}, {{ $ubicacion->element_index }}, value)">
+                                                                        @endif
+                                                                    @endif
+                                                                </b>
+                                                            </div>
+                                                        @empty
+
+                                                        @endforelse
+                                                        {{-- @forelse ($requerimiento->ubicaciones as $ubicacion)
+                                                            <div id="ubicacion{{ $ubicacion->id }}{{ $requerimiento->id }}">
+                                                                <b class="ubicacion{{ $ubicacion->id }}"> {{ $ubicacion->ubicacion }} {{ $ubicacion->palet }}: {{ round($ubicacion->cantidad, 0) }} </b>
                                                                 @if ($requerimiento->status   == 'SOLICITADO')
                                                                     @if (Auth::user()->role == 'NPI-admin')
                                                                         <input
@@ -102,32 +121,12 @@
                                                                             class="form-control"
                                                                             name="cantidad"
                                                                             onblur="addQty( {{ $ubicacion->cantidad }}, {{ $ubicacion->element_index }}, value)">
-                                                                            {{-- onblur="addQty(
-                                                                                '{{ $requerimiento->num_parte }}',
-                                                                                '{{ $requerimiento->folio }}',
-                                                                                '{{ $ubicacion->ubicacion }}',
-                                                                                '{{ $ubicacion->palet }}',
-                                                                                '{{ $requerimiento->id }}',
-                                                                                value,
-                                                                                '{{ $ubicacion->id }}',
-                                                                                {{ $ubicacion->cantidad }}
-                                                                            )" --}}
-                                                                            {{-- onblur="registrarCantidad(
-                                                                                '{{ $requerimiento->num_parte }}',
-                                                                                '{{ $requerimiento->folio }}',
-                                                                                '{{ $ubicacion->ubicacion }}',
-                                                                                '{{ $ubicacion->palet }}',
-                                                                                '{{ $requerimiento->id }}',
-                                                                                value,
-                                                                                '{{ $ubicacion->id }}',
-                                                                                {{ $ubicacion->cantidad }}
-                                                                            )"> --}}
                                                                     @endif
                                                                 @endif
                                                             </div>
                                                         @empty
 
-                                                        @endforelse
+                                                        @endforelse --}}
 
                                                         @include('requerimientos.solicitudes.edit')
                                                     </td>
@@ -191,10 +190,11 @@
 
             let index = 0;
             ubicacionesList.forEach(requerimiento => {
-                if(requerimiento.ubicaciones.length > 0) {
+                console.log(requerimiento)
+                if(requerimiento.cantidad_ubicacion.length > 0) {
 
                     // se asigna cada una de las propiedades
-                    requerimiento.ubicaciones.forEach(ubicacion => {
+                    requerimiento.cantidad_ubicacion.forEach(ubicacion => {
                         inputList.push({
                             index: index,
                             folio: requerimiento.folio,
@@ -213,6 +213,9 @@
         });
 
         const addQty = (disponible, index, value) => {
+            console.log(disponible);
+            console.log(index);
+            console.log(value);
 
             if( value > disponible ) {
                 value = 0;
@@ -279,6 +282,7 @@
 
             // Inputs
             const cantidadInput = document.getElementById(`cantidad${id}`);
+            const cantidadActualInput = document.getElementById(`cantidad_actual${id}`);
             const cantidadIdInput = document.getElementById(`cantidad_id${id}`);
             const numParteInput = document.getElementById(`num_parte${id}`);
             const ubicacionInput = document.getElementById(`ubicacion${id}`);
@@ -287,6 +291,7 @@
 
             form.appendChild(token);
             form.appendChild(cantidadInput.cloneNode(true));
+            form.appendChild(cantidadActualInput.cloneNode(true));
             form.appendChild(cantidadIdInput.cloneNode(true));
             form.appendChild(numParteInput.cloneNode(true));
             form.appendChild(ubicacionInput.cloneNode(true));

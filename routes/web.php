@@ -178,7 +178,7 @@ Route::group(['middleware' => ['auth']], function() {
 Route::get('/', 'App\Http\Controllers\MovimientosController@index')->name('movimientos');
 
 // Inventario
-Route::get('inventario', 'App\Http\Controllers\InventarioController@index')->name('inventario');
+Route::get('inventario', [InventarioController::class, 'index'])->name('inventario');
 
 //Excel
 Route::get('/exportar', 'App\Http\Controllers\MovimientosController@export')->name('exportar');

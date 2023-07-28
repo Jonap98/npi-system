@@ -60,8 +60,71 @@ class SolicitudRequerimientosController extends Controller
         return view('requerimientos.solicitudes.index', array('requerimientos' => $requerimientos));
     }
 
-
     public function details($folio) {
+        // 1- Obtener todos los requerimientos de ese folio
+        $requerimientos = RequerimientosModel::select(
+            'id',
+            'folio',
+            'num_parte',
+            'kit_nombre',
+            'descripcion',
+            'cantidad_requerida',
+            'cantidad_ubicacion',
+            'solicitante',
+            'comentario',
+            'status',
+            'ubicacion'
+        )
+        ->where('folio', $folio)
+        ->get();
+
+        $status = SolicitudesModel::select('status')->where('folio', $folio)->first();
+
+        $indice = 0;
+
+        // Iterar en cada requerimiento para obtener todos los detalles
+        foreach ($requerimientos as $req) {
+            $ubicaciones = InventarioModel::select(
+                'id',
+                'numero_de_parte',
+                'ubicacion',
+                'cantidad',
+                'palet',
+            )
+            ->where('numero_de_parte', $req->num_parte)
+            ->where('cantidad', '>', 0)
+            ->orderBy('ubicacion', 'asc')
+            ->get();
+
+            $req->cantidad_ubicacion = $ubicaciones;
+
+            foreach ($req->cantidad_ubicacion as $ubicacion) {
+                $ubicacion->element_index = $indice;
+                $indice++;
+            }
+
+            // 3- Obtener las cantidades solicitadas (las que ya fueron surtidas)
+            $cantidad_ubicaciones = CantidadUbicacionesModel::select(
+                'id',
+                'folio_solicitud',
+                'num_parte',
+                'cantidad',
+                'ubicacion',
+                'palet',
+                'status'
+            )
+            ->where('folio_solicitud', $req->folio)
+            ->where('num_parte', $req->num_parte)
+            ->where('id_requerimiento', $req->id)
+            ->get();
+
+            $req->cantidad_solicitada = $cantidad_ubicaciones;
+        }
+
+        return view('requerimientos.solicitudes.details', array('requerimientos' => $requerimientos, 'status' => $status->status, 'folio' => $folio));
+    }
+
+    public function detailsOLD($folio) {
         // 1- Obtener todos los requerimientos de ese folio
         $requerimientos = RequerimientosModel::select(
             'id',
@@ -344,81 +407,77 @@ class SolicitudRequerimientosController extends Controller
         ->where('id', $request->cantidad_id)
         ->first();
 
-        // 1.2 - Obtiene todos los movimientos de ese número de parte, en esa ubicación y palet
-        $cantidadInventario = MovimientosModel::select(
-            'proyecto',
+        // 1.2 - Obtiene el inventario de ese ubicación y palet
+        $cantidadInventario = InventarioModel::select(
+            'id',
             'cantidad',
-            'tipo',
-            'id_parte'
+            'ubicacion',
+            'palet',
         )
         ->where('numero_de_parte', $request->num_parte)
         ->where('ubicacion', $request->ubicacion)
         ->where('palet', $request->palet)
-        ->get();
-
-        // 1.3 - Calcula el inventario existente
-        $enInventario = 0;
-        foreach ($cantidadInventario as $inventario) {
-            if($inventario->tipo == 'Entrada') {
-                $enInventario += $inventario->cantidad;
-            }
-
-            if($inventario->tipo == 'Salida') {
-                $enInventario -= $inventario->cantidad;
-            }
-        }
+        ->first();
 
 
-        // 2 - Realiza el ajuste de inventario
-        $inventarioResultante = ($enInventario + $cantidadRegistrada->cantidad) - $request->cantidad;
-
-        if( $inventarioResultante < 0 ) {
+        // Valida que la cantidad ingresada sea mayor a cero y que halla stock en la ubicación, es decir,
+        // que sea mayor a la cantid ingresada que en la ubicación
+        if( $cantidadInventario->cantidad < 0 || $cantidadInventario->cantidad < $request->cantidad ) {
             return back()->with('error', 'No se puede ajustar la cantidad, no tiene suficiente inventario');
         }
 
-        // 2.1 - Entrada de material con cantidad anterior, solo si se tomó material de esa ubicación
-        // es decir, si la cantidad es mayor a 0
-        if($cantidadRegistrada->cantidad > 0) {
-            $movimiento = new MovimientosModel();
+        $cantidadTemporal = $cantidadInventario->cantidad + $request->cantidad_actual;
 
-            $movimiento->proyecto = $cantidadInventario->first->proyecto->proyecto;
-            $movimiento->cantidad = round($cantidadRegistrada->cantidad, 0);
-            $movimiento->tipo = 'Entrada';
-            $movimiento->comentario = 'Ajuste de requerimiento con folio: '.$cantidadRegistrada->folio_solicitud;
-            $movimiento->fecha_registro = Carbon::now()->subHours(1);
-            $movimiento->id_parte = $cantidadInventario->first->proyecto->id_parte;
-            $movimiento->numero_de_parte = $request->num_parte;
-            $movimiento->ubicacion = $request->ubicacion;
-            $movimiento->palet = $request->palet;
-            $movimiento->created_at = Carbon::now()->subHours(1);
-            $movimiento->updated_at = Carbon::now()->subHours(1);
-            $movimiento->usuario = $currentUser;
+        $nueva = $cantidadTemporal - $request->cantidad;
 
-            $movimiento->save();
-        }
+        // InventarioModel::where('id', $cantidadInventario->id)->update(['cantidad' => $cantidadTemporal + $request->cantidad]);
 
-        // 2.2 - Salida de material con nueva cantidad
-        if($request->cantidad > 0) {
-            $movimiento = new MovimientosModel();
-
-            $movimiento->proyecto = $cantidadInventario->first->proyecto->proyecto;
-            $movimiento->cantidad = $request->cantidad;
-            $movimiento->tipo = 'Salida';
-            $movimiento->comentario = 'Ajuste de requerimiento con folio: '.$cantidadRegistrada->folio_solicitud;
-            $movimiento->fecha_registro = Carbon::now()->subHours(1);
-            $movimiento->id_parte = $cantidadInventario->first->proyecto->id_parte;
-            $movimiento->numero_de_parte = $request->num_parte;
-            $movimiento->ubicacion = $request->ubicacion;
-            $movimiento->palet = $request->palet;
-            $movimiento->created_at = Carbon::now()->subHours(1);
-            $movimiento->updated_at = Carbon::now()->subHours(1);
-            $movimiento->usuario = $currentUser;
-
-            $movimiento->save();
-        }
-
-        // 2.3 - Ajuste de cantidad en ubicación
+        // 2.3- Ajuste de cantidad en ubicación
         CantidadUbicacionesModel::where('id', $request->cantidad_id)->update(['cantidad' => $request->cantidad, 'updated_at' => Carbon::now()->subHours(1)]);
+        // $cantidad_ubicaciones = CantidadUbicacionesModel::where('id', $request->cantidad_id)->get();
+
+        $info = PartesModel::select(
+            'proyecto'
+        )
+        ->where('numero_de_parte', $request->num_parte)
+        ->first();
+
+        // 2.4- Ajuste de cantidad en movimiento
+        $ajuste_salida = new MovimientosModel();
+
+        $ajuste_salida->proyecto = $info->proyecto;
+        $ajuste_salida->cantidad = $request->cantidad_actual;
+        $ajuste_salida->tipo = 'Entrada';
+        $ajuste_salida->comentario = 'Ajuste de requerimiento con folio: '.$cantidadRegistrada->folio_solicitud;
+        $ajuste_salida->fecha_registro = Carbon::now()->subHours(1);
+        $ajuste_salida->id_parte = $cantidadInventario->id_parte ?? 0;
+        $ajuste_salida->numero_de_parte = $request->num_parte;
+        $ajuste_salida->ubicacion = $request->ubicacion;
+        $ajuste_salida->palet = $request->palet;
+        $ajuste_salida->created_at = Carbon::now()->subHours(1);
+        $ajuste_salida->updated_at = Carbon::now()->subHours(1);
+        $ajuste_salida->usuario = $currentUser;
+
+        $ajuste_salida->save();
+
+        $ajuste_entrada = new MovimientosModel();
+
+        $ajuste_entrada->proyecto = $info->proyecto;
+        $ajuste_entrada->cantidad = $request->cantidad;
+        $ajuste_entrada->tipo = 'Salida';
+        $ajuste_entrada->comentario = 'Ajuste de requerimiento con folio: '.$cantidadRegistrada->folio_solicitud;
+        $ajuste_entrada->fecha_registro = Carbon::now()->subHours(1);
+        $ajuste_entrada->id_parte = $cantidadInventario->id_parte ?? 0;
+        $ajuste_entrada->numero_de_parte = $request->num_parte;
+        $ajuste_entrada->ubicacion = $request->ubicacion;
+        $ajuste_entrada->palet = $request->palet;
+        $ajuste_entrada->created_at = Carbon::now()->subHours(1);
+        $ajuste_entrada->updated_at = Carbon::now()->subHours(1);
+        $ajuste_entrada->usuario = $currentUser;
+
+        $ajuste_entrada->save();
+        // 2.4- Ajuste de cantidad en inventario
+        InventarioModel::where('id', $cantidadInventario->id)->update(['cantidad' => $nueva, 'updated_at' => Carbon::now()->subHours(1)]);
 
         return back()->with('success', 'La cantidad fue ajustada exitosamente');
     }

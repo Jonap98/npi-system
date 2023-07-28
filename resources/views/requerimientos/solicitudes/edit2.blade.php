@@ -13,6 +13,7 @@
 
                         <div class="m-2">
                             <label>Cantidad</label>
+                            <input type="hidden" id="cantidad_actual{{ $ubicaciones->id }}" name="cantidad_actual" class="form-control" value="{{ round($ubicaciones->cantidad, 0) }}">
                             <input type="text" id="cantidad{{ $ubicaciones->id }}" name="cantidad" class="form-control" value="{{ round($ubicaciones->cantidad, 0) }}">
                             <input type="hidden" id="cantidad_id{{ $ubicaciones->id }}" name="cantidad_id" class="form-control" value="{{ round($ubicaciones->id, 0) }}">
 
@@ -37,7 +38,7 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-primary" onclick="sendFormEdit('{{ $ubicaciones->id }}')">Guardar</button>
                     </div>
-                
+
             </div>
         </div>
     </div>

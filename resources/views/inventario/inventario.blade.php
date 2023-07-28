@@ -1,4 +1,4 @@
-@extends('layouts.app')
+ @extends('layouts.app')
 
 @section('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
@@ -14,7 +14,7 @@
             <div class="container">
                 <div class="row">
                     <div class="card col-md-12">
-                        
+
                         <div class="mt-2 table-responsive">
                             <table id="consulta" class="table table-striped">
                                 <thead>
@@ -37,18 +37,22 @@
                                             <td>{{ $inventario->numero_de_parte }}</td>
                                             <td>{{ $inventario->descripcion ?? '' }}</td>
                                             <td>{{ $inventario->um ?? '' }}</td>
-                                            <td>{{ $inventario->cantidad_inventario }}</td>
+                                            <td>
+                                                {{-- Validar bien, este muestra cantidades equivocadas, eliminar cuando se halla validado --}}
+                                                {{-- {{ $inventario->cantidad }}  --}}
+                                                {{ $inventario->cantidad_total }}
+                                            </td>
                                             <td>
                                                 @foreach($inventario->ubicaciones_registradas as $ubicaciones)
                                                     <div>
-                                                        {{ $ubicaciones->ubicacion }}: 
+                                                        {{ $ubicaciones->ubicacion }}: {{ $ubicaciones->palet }} <b>{{ round($ubicaciones->cantidad, 0) }}</b>
                                                         <b>
-                                                            @foreach ($ubicaciones->palets_registrados as $palets)
+                                                            {{-- @foreach ($ubicaciones->palets_registrados as $palets)
                                                                 {{ $palets->palet }},
-                                                            @endforeach
+                                                            @endforeach --}}
                                                         </b>
                                                     </div>
-                                                @endforeach 
+                                                @endforeach
                                             </td>
                                             <td>
                                                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#inventarioModal{{ $inventario->id }}">
@@ -66,7 +70,7 @@
                             </table>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <div class="container">
                         </div>

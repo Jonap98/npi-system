@@ -8,97 +8,65 @@ use App\Exports\InventarioExport;
 use Illuminate\Support\Facades\DB;
 use App\Models\MovimientosModel;
 use App\Models\PartesModel;
+use App\Models\InventarioModel;
 
 class InventarioExportController extends Controller
 {
     public function crearExcel() {
-        // 1- Obtiene todos los numeros de parte que tienen movimientos
-        $inventarios = MovimientosModel::get()
-            ->unique('numero_de_parte');
+        $inventario = DB::table('NPI_movimientos')
+        ->get()
+        ->unique('numero_de_parte');
 
-        foreach ($inventarios as $inventario) {
-            // 2- Para cada número, se obtiene su ubicacion y palet sin repetir
-            $ubicaciones = MovimientosModel::select('ubicacion')
-            ->where('numero_de_parte', $inventario->numero_de_parte)
-            ->get()
-            ->unique('ubicacion');
+        $ubicaciones_con_inventario = [];
 
-            $ubicaciones_array = array();
-            foreach ($ubicaciones as $ubicacion) {
-                $palets = MovimientosModel::select('palet')
-                ->where('numero_de_parte', $inventario->numero_de_parte)
-                ->where('ubicacion', $ubicacion->ubicacion)
-                ->get()
-                ->unique('palet');
-
-
-                $palets_array = array();
-                foreach ($palets as $palet) {
-                    array_push($palets_array, $palet);
-                }
-                $ubicacion->palets_registrados = $palets_array;
-
-                array_push($ubicaciones_array, $ubicacion);
-
-            }
-            $inventario->ubicaciones_registradas = $ubicaciones_array;
-        }
-
-        $inventarioFinal = [];
-        foreach ($inventarios as $inventario) {
-            // Para este número de parte se obtienen todos sus movimientos
-            $cantidades = MovimientosModel::select(
-                'numero_de_parte',
-                'cantidad',
-                'tipo',
-                'ubicacion',
-                'palet'
-            )
-            ->where('numero_de_parte', $inventario->numero_de_parte)
-            ->get();
-
-            // Se obtiene la descripción y unidad de medida
-            $datos = PartesModel::select(
+        foreach ($inventario as $num_parte) {
+            $info = PartesModel::select(
                 'descripcion',
-                'um'
+                'proyecto',
+                'um',
             )
-            ->where('numero_de_parte', $inventario->numero_de_parte)
+            ->where('numero_de_parte', $num_parte->numero_de_parte)
             ->first();
 
-            $inventario->descripcion = $datos->descripcion ?? '';
-            $inventario->um = $datos->um ?? '';
+            // Obtiene las cantidades por ubicación
+            $cantidad_ubicaciones = InventarioModel::select(
+                'cantidad',
+                'ubicacion',
+                'palet',
+            )
+            ->where('numero_de_parte', $num_parte->numero_de_parte)
+            ->get();
 
-            // Calculo de inventario
-            $cantidad_inventario = 0;
-            $ubicaciones_list = array();
+            $ubicaciones = [];
+            $suma_ubicaciones = 0;
+            foreach ($cantidad_ubicaciones as $cantidad) {
+                $suma_ubicaciones += $cantidad->cantidad;
 
-            foreach ($cantidades as $cantidad) {
-                // Se realiza la sumatoria validando si son entradas o salidas
-                if(strtoupper($cantidad->tipo) == 'ENTRADA') {
-                    $cantidad_inventario += $cantidad->cantidad;
-                }
-                if(strtoupper($cantidad->tipo) == 'SALIDA'){
-                    $cantidad_inventario -= $cantidad->cantidad;
+                // Ingresa a la lista de ubicaciones, solo aquellas que tienen stock
+                if($cantidad->cantidad > 0) {
+                    array_push($ubicaciones, $cantidad);
                 }
             }
 
-            $inventario->ubicaciones = $ubicaciones_list;
-            $inventario->cantidad_inventario = $cantidad_inventario;
-            $inventario->cantidades = $cantidades;
+            $num_parte->cantidad_total = $suma_ubicaciones;
+            $num_parte->ubicaciones_registradas = $ubicaciones;
+            $num_parte->descripcion = $info->descripcion ?? '';
+            $num_parte->proyecto = $info->proyecto ?? '';
+            $num_parte->um = $info->um ?? '';
 
-            if( $cantidad_inventario > 0 )
-                array_push($inventarioFinal, $inventario);
+            if($num_parte->cantidad_total > 0) {
+                array_push($ubicaciones_con_inventario, $num_parte);
+            }
         }
 
-
         $listaOrdenada = [];
-        foreach ($inventarioFinal as $inventario) {
+        foreach ($ubicaciones_con_inventario as $inventario) {
             $ubicaciones = '';
             foreach ($inventario->ubicaciones_registradas as $ubicacion) {
-                $ubicaciones = $ubicaciones.' '.$ubicacion->ubicacion;
-                foreach ($ubicacion->palets_registrados as $palets) {
-                    $ubicaciones = $ubicaciones.' '.$palets->palet;
-                }
+                $ubicaciones = $ubicaciones.' '.$ubicacion->ubicacion.' '.$ubicacion->palet;
+                // foreach ($ubicacion->palets_registrados as $palets) {
+                //     $ubicaciones = $ubicaciones.' '.$palets->palet;
+                // }
             }
             $obj = ([
                 'Folio' => $inventario->id,
@@ -106,7 +74,7 @@ class InventarioExportController extends Controller
                 'Número  de parte'=> $inventario->numero_de_parte,
                 'Descripción' => $inventario->descripcion,
                 'Unidad  de medida'=> $inventario->um,
-                'Inventario' => $inventario->cantidad_inventario,
+                'Inventario' => $inventario->cantidad_total,
                 'Ubicación' => $ubicaciones,
             ]);
 
