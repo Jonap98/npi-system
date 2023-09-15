@@ -293,7 +293,7 @@ class SolicitudRequerimientosController extends Controller
 
                 $movimiento = new MovimientosModel();
 
-                $movimiento->proyecto = $proyecto->proyecto;
+                $movimiento->proyecto = $proyecto->proyecto ?? '';
                 $movimiento->cantidad = $cantidad['cantidad'];
                 $movimiento->tipo = 'Salida';
                 $movimiento->comentario = 'Requerimiento de material con folio: '.$cantidad['folio'];
@@ -372,7 +372,7 @@ class SolicitudRequerimientosController extends Controller
 
             $movimiento = new MovimientosModel();
 
-            $movimiento->proyecto = $proyecto;
+            $movimiento->proyecto = $proyecto ?? '';
             $movimiento->cantidad = $requerimientosList[$i+1] ?? 0;
             $movimiento->tipo = 'Salida';
             $movimiento->comentario = '';
@@ -445,7 +445,7 @@ class SolicitudRequerimientosController extends Controller
         // 2.4- Ajuste de cantidad en movimiento
         $ajuste_salida = new MovimientosModel();
 
-        $ajuste_salida->proyecto = $info->proyecto;
+        $ajuste_salida->proyecto = $info->proyecto ?? '';
         $ajuste_salida->cantidad = $request->cantidad_actual;
         $ajuste_salida->tipo = 'Entrada';
         $ajuste_salida->comentario = 'Ajuste de requerimiento con folio: '.$cantidadRegistrada->folio_solicitud;
@@ -462,7 +462,7 @@ class SolicitudRequerimientosController extends Controller
 
         $ajuste_entrada = new MovimientosModel();
 
-        $ajuste_entrada->proyecto = $info->proyecto;
+        $ajuste_entrada->proyecto = $info->proyecto ?? '';
         $ajuste_entrada->cantidad = $request->cantidad;
         $ajuste_entrada->tipo = 'Salida';
         $ajuste_entrada->comentario = 'Ajuste de requerimiento con folio: '.$cantidadRegistrada->folio_solicitud;

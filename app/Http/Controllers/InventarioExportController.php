@@ -63,7 +63,7 @@ class InventarioExportController extends Controller
         foreach ($ubicaciones_con_inventario as $inventario) {
             $ubicaciones = '';
             foreach ($inventario->ubicaciones_registradas as $ubicacion) {
-                $ubicaciones = $ubicaciones.' '.$ubicacion->ubicacion.' '.$ubicacion->palet;
+                $ubicaciones = $ubicaciones.' '.$ubicacion->ubicacion.' '.$ubicacion->palet.': '.round($ubicacion->cantidad, 0).',';
                 // foreach ($ubicacion->palets_registrados as $palets) {
                 //     $ubicaciones = $ubicaciones.' '.$palets->palet;
                 // }

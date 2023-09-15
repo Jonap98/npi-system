@@ -15,7 +15,7 @@ class InventarioController extends Controller
 {
     public function index() {
 
-        $inventario = DB::table('NPI_movimientos')
+        $inventario = DB::table('NPI_inventario')
         ->get()
         ->unique('numero_de_parte');
 

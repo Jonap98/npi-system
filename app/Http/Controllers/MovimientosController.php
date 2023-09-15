@@ -41,7 +41,7 @@ class MovimientosController extends Controller
     public function create() {
         $movimiento = new MovimientosModel();
 
-        $partes = PartesModel::get();
+        $partes = PartesModel::where('active', 1)->get();
         $ubicaciones = UbicacionesModel::where('tipo', 'NPI')->get();
 
         foreach ($partes as $parte) {
