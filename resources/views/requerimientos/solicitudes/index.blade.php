@@ -10,6 +10,47 @@
         <div class="col-md-12">
             <span>Solicitudes de requerimientos</span>
             <hr>
+
+            <form method="POST" action="{{ route('solicitud.requerimientos.filter') }}">
+                @csrf
+                <div class="d-flex align-items-center">
+                    <div class="col-md-3 m-3">
+                        <span>Status</span>
+                        <select name="status" id="filtro-status" class="form-select">
+                            <option value="">Seleccionar status</option>
+                            <option value="RECIBIDO">Recibido</option>
+                            <option value="SOLICITADO">Solicitado</option>
+                            <option value="PREPARADO">Preparado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 m-3">
+                        <span>Cantidad a mostrar</span>
+                        <select name="cantidad" id="filtro-cantidad" class="form-select">
+                            <option value="">Seleccionar cantidad</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                            <option value="1500">1500</option>
+                            <option value="{{ $qty }}">Todos</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 m-3">
+                        <button type="submit" class="btn btn-primary">
+                            Buscar
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+
+            <div class="d-flex justify-content-end">
+                <div class="col-md-3 m-3">
+                    <button type="submit" class="btn btn-danger">
+                        Limpiar filtros
+                    </button>
+                </div>
+            </div>
+
             <div class="container">
                 <div class="row">
                     @if(session('success'))
@@ -17,32 +58,6 @@
                             {{ session('success') }}
                         </div>
                     @endif
-
-                    <div class="d-flex justify-content-between">
-                        <div class="col-md-2 mb-4">
-                            <form method="POST" action="{{ route('solicitud.requerimientos.filter') }}" class="" >
-                                @csrf
-                                <label for="">Status</label>
-                                <select name="status" id="status" class="form-select">
-                                    <option value="RECIBIDO">Recibido</option>
-                                    <option value="SOLICITADO">Solicitado</option>
-                                    <option value="PREPARADO">Preparado</option>
-                                </select>
-                                <button type="submit" class="mt-2 btn btn-primary">
-                                    Buscar
-                                </button>
-                            </form>
-                        </div>
-
-                        <div class="mb-4 align-self-end">
-                            <a href="{{ route('solicitud.requerimientos') }}" class="btn" style="background-color: #dc6534; color: #fff">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#fff" class="bi bi-funnel-fill" viewBox="0 0 16 16">
-                                    <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
-                                </svg>
-                                Limpiar filtros
-                            </a>
-                        </div>
-                    </div>
 
                     <div class="card col-md-12">
 

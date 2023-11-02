@@ -6,7 +6,12 @@ use App\Exports\MovimientosExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\auth\RegistroController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UsuariosController;
+use App\Http\Controllers\MovimientosController;
+use App\Http\Controllers\PartesController;
+use App\Http\Controllers\UbicacionesController;
+
 use App\Http\Controllers\SolicitudRequerimientosController;
 use App\Http\Controllers\RequerimientoManualController;
 use App\Http\Controllers\RequerimientosController;
@@ -19,6 +24,7 @@ use App\Http\Controllers\requerimientos\MakeController;
 // Test
 use App\Http\Controllers\test\TestMovimientosController;
 use App\Http\Controllers\test\TestInventarioController;
+use App\Http\Controllers\test\TestPartesController;
 
 use App\Http\Controllers\InventarioExportController;
 
@@ -47,35 +53,32 @@ Route::group(['middleware' => ['auth']], function() {
     // =======================================================
     // Movimientos
     // =======================================================
-    Route::get('movimientos', 'App\Http\Controllers\MovimientosController@create')->name('movimientos.create');
-    Route::post('movimientos/store', 'App\Http\Controllers\MovimientosController@store')->name('store');
+    Route::get('movimientos', [MovimientosController::class, 'create'])->name('movimientos.create');
+    Route::post('movimientos/store', [MovimientosController::class, 'store'])->name('store');
 
     // =======================================================
     // Partes
     // =======================================================
-    Route::get('partes', 'App\Http\Controllers\PartesController@index')->name('partes');
-    Route::get('partes/create', 'App\Http\Controllers\PartesController@create')->name('partes.create');
-    Route::get('partes/{id}/edit', 'App\Http\Controllers\PartesController@edit')->name('partes.edit');
-    // Route::post('partes/{id}/update', 'App\Http\Controllers\PartesController@update')->name('partes.update');
-    Route::post('partes/update', 'App\Http\Controllers\PartesController@update')->name('partes.update');
-    Route::post('partes/store', 'App\Http\Controllers\PartesController@store')->name('partes.store');
-    // Route::get('partes/{id}/delete', 'App\Http\Controllers\PartesController@destroy')->name('partes.delete');
-    Route::post('partes/delete', 'App\Http\Controllers\PartesController@destroy')->name('partes.delete');
+    Route::get('partes', [PartesController::class, 'index'])->name('partes');
+    Route::get('partes/create', [PartesController::class, 'create'])->name('partes.create');
+    Route::post('partes/update', [PartesController::class, 'update'])->name('partes.update');
+    Route::post('partes/store', [PartesController::class, 'store'])->name('partes.store');
+    Route::post('partes/delete', [PartesController::class, 'destroy'])->name('partes.delete');
 
     // =======================================================
     // Ubicaciones
     // =======================================================
-    Route::get('ubicaciones', 'App\Http\Controllers\UbicacionesController@index')->name('ubicaciones');
-    Route::post('ubicaciones/store', 'App\Http\Controllers\UbicacionesController@store')->name('ubicaciones.store');
-    Route::get('ubicaciones/{id}/delete', 'App\Http\Controllers\UbicacionesController@destroy')->name('ubicaciones.delete');
+    Route::get('ubicaciones', [UbicacionesController::class, 'index'])->name('ubicaciones');
+    Route::post('ubicaciones/store', [UbicacionesController::class, 'store'])->name('ubicaciones.store');
+    Route::get('ubicaciones/{id}/delete', [UbicacionesController::class, 'destroy'])->name('ubicaciones.delete');
 
     // =======================================================
     // Inventario
     // =======================================================
-    Route::get('inventario/{id}/image', 'App\Http\Controllers\InventarioController@image')->name('inventario.image');
+    Route::get('inventario/{id}/image', [InventarioController::class, 'image'])->name('inventario.image');
 
     // =======================================================
-    // Requerimientos
+    // Solicitudes
     // =======================================================
 
     // Solicitudes
@@ -86,9 +89,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('solicitudes/requerimientos/export', [SolicitudRequerimientosController::class, 'exportPDF'])->name('solicitud.requerimientos.export');
     Route::post('solicitudes/requerimientos/update-individual', [SolicitudRequerimientosController::class, 'prepararIndividual'])->name('solicitud.requerimientos.update-individual');
     Route::post('solicitudes/requerimientos/calcular-acumulado', [SolicitudRequerimientosController::class, 'calcularAcumulado'])->name('solicitud.requerimientos.calcular-acumulado');
-
-
-
     Route::post('solicitudes/requerimientos/preparar', [SolicitudRequerimientosController::class, 'preparar'])->name('solicitud.requerimientos.preparar');
     // Editar cantidad
     Route::post('solicitudes/requerimientos/edit', [SolicitudRequerimientosController::class, 'updateQty'])->name('solicitud.requerimientos.edit');
@@ -98,6 +98,10 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('solicitudes/requerimientos/delete', [SolicitudRequerimientosController::class, 'delete'])->name('solicitud.requerimientos.delete');
 
 
+
+    // =======================================================
+    // Requerimientos
+    // =======================================================
     // Manual
     Route::get('requerimientos/manual', [RequerimientoManualController::class, 'index'])->name('requerimientos.manual');
     Route::get('requerimientos/{kit}/manual', [RequerimientoManualController::class, 'kit'])->name('requerimientos.kit.manual');
@@ -117,23 +121,13 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('requerimientos/{id}/showKits', [KitsController::class, 'show'])->name('requerimientos.kit.showKits');
     Route::post('requerimientos/kits/generate-pdf', [KitsController::class, 'generatePDF'])->name('requerimientos.kits.generate-pdf');
 
-
     // Makes
     Route::get('requerimientos/{make}/make', [MakeController::class, 'index'])->name('requerimientos.kit.make');
     Route::post('requerimientos/solicitar', [MakeController::class, 'store'])->name('requerimientos.solicitar');
 
-
     Route::post('requerimientos/getInfo', [MakeController::class, 'getInfo'])->name('requerimientos.getInfo');
 
     Route::post('requerimientos/generate-pdf', [MakeController::class, 'generatePDF'])->name('requerimientos.generate-pdf');
-
-
-
-
-
-
-
-
 
     // Boms
     Route::get('boms', [BomsController::class, 'index'])->name('boms');
@@ -141,10 +135,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('boms/update', [BomsController::class, 'update'])->name('boms.update');
     Route::post('boms', [BomsController::class, 'edit'])->name('boms.edit');
 
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
     Route::get('requerimientos/getkit/{kit}/', [RequerimientosController::class, 'getKit'])->name('requerimientos.getkit.detalles');
-
 
 
 
@@ -156,7 +149,7 @@ Route::group(['middleware' => ['auth']], function() {
     // Movimientos
 
     // Route::get('test', [TestMovimientosController::class, 'index'])->name('test.movimientos');
-    Route::get('test', 'App\Http\Controllers\test\TestMovimientosController@index' )->name('test.movimientos');
+    Route::get('test', [TestMovimientosController::class, 'index'])->name('test.movimientos');
 
     Route::get('test/movimientos', [TestMovimientosController::class, 'create'])->name('test.movimientos.create');
     Route::post('test/movimientos/store', [TestMovimientosController::class, 'store'])->name('test.movimientos.store');
@@ -166,34 +159,32 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('test/inventario/{id}/image', [TestInventarioController::class, 'image'])->name('test.inventario.image');
 
     // Partes
-    Route::get('test/partes', 'App\Http\Controllers\test\TestPartesController@index')->name('test.partes');
-    Route::get('test/partes/create', 'App\Http\Controllers\test\TestPartesController@create')->name('test.partes.create');
-    Route::get('test/partes/{id}/edit', 'App\Http\Controllers\test\TestPartesController@edit')->name('test.partes.edit');
-    Route::post('test/partes/{id}/update', 'App\Http\Controllers\test\TestPartesController@update')->name('test.partes.update');
-    Route::post('test/partes/store', 'App\Http\Controllers\test\TestPartesController@store')->name('test.partes.store');
-    Route::get('test/partes/{id}/delete', 'App\Http\Controllers\test\TestPartesController@destroy')->name('test.partes.delete');
+    Route::get('test/partes', [TestPartesController::class, 'index'])->name('test.partes');
+    Route::get('test/partes/create', [TestPartesController::class, 'create'])->name('test.partes.create');
+    Route::get('test/partes/{id}/edit', [TestPartesController::class, 'edit'])->name('test.partes.edit');
+    Route::post('test/partes/{id}/update', [TestPartesController::class, 'update'])->name('test.partes.update');
+    Route::post('test/partes/store', [TestPartesController::class, 'store'])->name('test.partes.store');
+    Route::get('test/partes/{id}/delete', [TestPartesController::class, 'destroy'])->name('test.partes.delete');
 
 });
 
-Route::get('/', 'App\Http\Controllers\MovimientosController@index')->name('movimientos');
+Route::get('/', [MovimientosController::class, 'index'])->name('movimientos');
+Route::get('/movimientos/filters/{cantidad?}', [MovimientosController::class, 'filters'])->name('movimientos.filters');
 
 // Inventario
-Route::get('inventario', [InventarioController::class, 'index'])->name('inventario');
+Route::get('/inventario/inventario', [InventarioController::class, 'index'])->name('inventario');
 
 //Excel
-Route::get('/exportar', 'App\Http\Controllers\MovimientosController@export')->name('exportar');
-// OLD
-// Route::get('/exportar/inventario', 'App\Http\Controllers\InventarioController@export')->name('exportar.inventario');
+Route::get('/exportar', [MovimientosController::class, 'export'])->name('exportar');
 // NEW
 Route::get('/exportar/inventario', [InventarioExportController::class, 'crearExcel'])->name('exportar.inventario');
 
 // Auth
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 
-Route::get('inventario/new', [InventarioController::class, 'index'])->name('index');
 
 
 // =========================================================================

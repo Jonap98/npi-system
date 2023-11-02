@@ -180,7 +180,7 @@ class MakeController extends Controller
             $requerimiento->cantidad_requerida = ($request->cantidad * $valor['cantidad']);
             // Validar si seguirá siendo necesario este campo en la BD
             $requerimiento->cantidad_ubicacion = 1000;
-            $requerimiento->solicitante = Auth::user()->name;
+            $requerimiento->solicitante = Auth::user()->username;
             $requerimiento->comentario = '';
             $requerimiento->status = 'SOLICITADO';
             $requerimiento->ubicacion = $valor['ubicacion'];

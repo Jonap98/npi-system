@@ -9,10 +9,19 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <span>Movimientos</span>
-            <a href="{{ route('partes.create') }}" class="btn btn-primary btn-sm ms-5">Crear parte</a>
             <a href="{{ route('movimientos.create') }}" class="btn btn-primary btn-sm ms-5">Crear movimiento</a>
             <a href="{{ route('exportar') }}" class="btn btn-success btn-sm ms-5">Exportar excel</a>
             <hr>
+            <div class="col-md-3 m-3">
+                <span>Cantidad a mostrar</span>
+                <select name="cantidad" id="filtro-cantidad" class="form-select" onchange="filterFunction()">
+                    <option value="">Seleccionar cantidad</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                    <option value="1500">1500</option>
+                    <option value="all">Todos</option>
+                </select>
+            </div>
             <div class="container">
                 <div class="row">
                     <div class="card col-md-12">
@@ -81,6 +90,13 @@
                 order: [0, 'desc']
             });
         });
+    </script>
+
+    <script>
+        function filterFunction() {
+            const cantidad = document.getElementById('filtro-cantidad');
+            location.href = `/movimientos/filters/${cantidad.value}`
+        }
     </script>
 
 @endsection

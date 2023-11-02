@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\BomsModel;
 use App\Models\SolicitudesModel;
 use App\Models\RequerimientosModel;
+use Illuminate\Support\Facades\Auth;
 
 class KitsController extends Controller
 {
@@ -193,7 +194,7 @@ class KitsController extends Controller
             $requerimiento->cantidad_requerida = ($request->cantidad * $kit->cantidad);
             // Validar si seguirá siendo necesario este campo en la BD
             $requerimiento->cantidad_ubicacion = 1000;
-            $requerimiento->solicitante = $request->solicitante;
+            $requerimiento->solicitante = Auth::user()->username;
             $requerimiento->comentario = '';
             $requerimiento->status = 'SOLICITADO';
             $requerimiento->ubicacion = $ubicacion->ubicacion;

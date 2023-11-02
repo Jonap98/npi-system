@@ -22,26 +22,23 @@ class PartesController extends Controller
         ->where('active', 1)
         ->orderBy('id', 'desc')
         ->get();
-    
+
         $ubicaciones = UbicacionesModel::select(
             'ubicacion',
         )
         ->get();
-    
+
         return view('partes.partes', array('partes' => $partes, 'ubicaciones' => $ubicaciones));
     }
 
     public function create() {
-        $partes = PartesModel::get();
-        
-        $ubicaciones = UbicacionesModel::get();
 
-        return view('partes.create', array('partes' => $partes, 'ubicaciones' => $ubicaciones));
+        return view('partes.create');
     }
-    
+
     public function store(Request $request) {
         $partes = new PartesModel();
-        
+
         $validatedData = $request->validate([
             'proyecto' => 'required|max:255',
             'numero_de_parte' => 'required|max:255',
@@ -56,7 +53,7 @@ class PartesController extends Controller
         $partes->active = 1;
 
         $partes->save();
-        
+
         return redirect('partes')->with('success', 'Registro creado existosamente');
     }
 
@@ -66,24 +63,8 @@ class PartesController extends Controller
             'numero_de_parte' => $request->numero_de_parte,
             'descripcion' => $request->descripcion,
         ]);
-        
+
         return back()->with('success', 'Registro actualizado exitosamente');
-    }
-
-    public function edit($id) {
-        $parte = PartesModel::findOrFail($id);
-
-        $ubicaciones = UbicacionesModel::get();
-
-        return view('partes.edit', array(
-            'proyecto',
-            'numero_parte',
-            'descripcion',
-            'um',
-            'ubicacion',
-            'ubicaciones' => $ubicaciones,
-            'action' => action('App\Http\Controllers\PartesController@update', $id),
-        ));
     }
 
     public function destroy(Request $request) {

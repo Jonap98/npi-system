@@ -18,6 +18,8 @@ use Carbon\Carbon;
 class SolicitudRequerimientosController extends Controller
 {
     public function index() {
+        $qty = SolicitudesModel::select('id')->get()->count();
+
         $requerimientos = SolicitudesModel::select(
             'id',
             'folio',
@@ -25,6 +27,7 @@ class SolicitudRequerimientosController extends Controller
             'status',
             'created_at as fecha'
         )
+        ->take(300)
         ->where('status', '!=', 'RECIBIDO')
         ->where('status', '!=', 'ELIMINADO')
         ->orderBy('id', 'desc')
@@ -42,10 +45,12 @@ class SolicitudRequerimientosController extends Controller
             $requerimiento->team = $kit->team ?? '';
         }
 
-        return view('requerimientos.solicitudes.index', array('requerimientos' => $requerimientos));
+        return view('requerimientos.solicitudes.index', array('qty' => $qty, 'requerimientos' => $requerimientos));
     }
 
     public function filter(Request $request) {
+        $qty = SolicitudesModel::select('id')->get()->count();
+
         $requerimientos = SolicitudesModel::select(
             'id',
             'folio',
@@ -53,11 +58,24 @@ class SolicitudRequerimientosController extends Controller
             'status',
             'created_at as fecha'
         )
-        ->where('status', $request->status)
+        ->where('status', $request->status ?? 'SOLICITADO')
+        ->take($request->cantidad ?? 300)
         ->orderBy('id', 'desc')
         ->get();
 
-        return view('requerimientos.solicitudes.index', array('requerimientos' => $requerimientos));
+        foreach ($requerimientos as $requerimiento) {
+            $kit = RequerimientosModel::select(
+                'kit_nombre',
+                'team'
+            )
+            ->where('folio', $requerimiento->folio)
+            ->first();
+
+            $requerimiento->kit_nombre = $kit->kit_nombre ?? '';
+            $requerimiento->team = $kit->team ?? '';
+        }
+
+        return view('requerimientos.solicitudes.index', array('qty' => $qty, 'requerimientos' => $requerimientos));
     }
 
     public function details($folio) {

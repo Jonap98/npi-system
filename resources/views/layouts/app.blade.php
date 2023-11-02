@@ -56,8 +56,8 @@
 
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{{ route('solicitud.requerimientos') }}">Requerimientos</a>
+                        {{-- <a class="nav-link active" aria-current="page" href="solicitudes/requerimientos">Requerimientos</a> --}}
                     </li>
-
 
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

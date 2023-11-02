@@ -76,7 +76,7 @@
                                                 <td>{{ $bom->kit_descripcion }}</td>
                                                 <td>{{ $bom->nivel }}</td>
                                                 <td>{{ $bom->status }}</td>
-                                                <td>{{ round($bom->cantidad, 0) }}</td>
+                                                <td>{{ round($bom->cantidad, 2) }}</td>
                                                 <td>{{ $bom->ubicacion }}</td>
                                                 <td>{{ $bom->team }}</td>
                                                 <td>
@@ -90,6 +90,7 @@
                                                             '{{ $bom->kit_nombre }}',
                                                             '{{ $bom->kit_descripcion }}',
                                                             '{{ $bom->status }}',
+                                                            '{{ round($bom->cantidad, 2) }}',
                                                             '{{ $bom->ubicacion }}',
                                                             '{{ $bom->team }}',
                                                         )">
@@ -180,6 +181,7 @@
                 kit_nombre,
                 descripcion,
                 status,
+                cantidad,
                 ubicacion,
                 team,
             ) {
@@ -197,6 +199,9 @@
 
                 const statusInput = document.getElementById('status');
                 statusInput.value = status;
+
+                const cantidadInput = document.getElementById('cantidad');
+                cantidadInput.value = cantidad;
 
                 const ubicacionInput = document.getElementById('ubicacion');
                 ubicacionInput.value = ubicacion;

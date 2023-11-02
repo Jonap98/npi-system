@@ -48,53 +48,6 @@
                                 @enderror
                             </div>
 
-                            <!-- <div class="m-2">
-                                <label>Ubicación</label>
-                                <select class="form-select" id="ubicacion" name="ubicacion">
-                                    <option selected >Ubicacion</option>
-                                    @foreach ($ubicaciones as $ubicacion)
-                                        <option value="{{$ubicacion->ubicacion}}"> {{ $ubicacion->ubicacion }} </option>
-                                    @endforeach
-                                </select>
-                                @error('ubicacion')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div> -->
-
-                            <!-- <div class="m-2">
-                                <label>Palet</label>
-                                <select class="form-select" name="palet">
-                                    <option selected>Palet</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="3">4</option>
-                                    <option value="3">5</option>
-                                    <option value="3">6</option>
-                                    <option value="3">7</option>
-                                  </select>
-                                  @error('palet')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div> -->
-
-                            <!-- <div class="m-2">
-                                <label>Fila</label>
-                                <select class="form-select" name="fila">
-                                    <option selected>Fila</option>
-                                    <option value="1">1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="3">4</option>
-                                    <option value="3">5</option>
-                                    <option value="3">6</option>
-                                    <option value="3">7</option>
-                                  </select>
-                                  @error('fila')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div> -->
-
                             <button type="submit" class="btn btn-primary btn-sm m-2">Guardar</button>
 
                         </tr>

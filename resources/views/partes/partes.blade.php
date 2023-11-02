@@ -4,7 +4,6 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
 @endsection
 
-
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
@@ -41,18 +40,16 @@
                                             <td>{{ $parte->um }}</td>
                                             <td>
                                                 <button type="button" class="btn btn-success btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#editModal" onclick="editPart('{{ $parte->id }}', '{{ $parte->numero_de_parte }}', '{{ $parte->descripcion }}')">
-                                                {{-- <button type="button" class="btn btn-success btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#editModal{{ $parte->id }}"> --}}
                                                     Editar
                                                 </button>
                                                 <button type="button" class="btn btn-danger btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="deletePart('{{ $parte->id }}')">
-                                                {{-- <button type="button" class="btn btn-danger btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $parte->id }}"> --}}
                                                     Eliminar
                                                 </button>
                                             </td>
                                         </tr>
 
                                     @endforeach
-                                    
+
                                     {{-- Modal editar --}}
                                     @include('partes.edit')
                                     {{-- Modal eliminar --}}
@@ -61,7 +58,7 @@
                             </table>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <div class="container">
                         </div>
@@ -95,7 +92,7 @@
             const inputId = document.getElementById('id_parte');
             const inputNumParte = document.getElementById('num_parte_id');
             const inputDescripcion = document.getElementById('descripcion_id');
-            
+
             inputId.value = id;
             inputNumParte.value = num_parte;
             inputDescripcion.value = descripcion;
@@ -103,7 +100,7 @@
 
         const deletePart = (id) => {
             const deleteInputId = document.getElementById('delete_id');
-            
+
             deleteInputId.value = id;
         }
     </script>

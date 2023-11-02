@@ -34,6 +34,11 @@
                     </div>
 
                     <div class="m-2">
+                        <label for="">Cantidad</label>
+                        <input type="text" name="cantidad" id="cantidad" class="form-control">
+                    </div>
+
+                    <div class="m-2">
                         <label for="">Ubicación</label>
                         <input type="text" name="ubicacion" id="ubicacion" class="form-control">
                     </div>

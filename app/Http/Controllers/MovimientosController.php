@@ -16,6 +16,8 @@ use App\Models\InventarioModel;
 class MovimientosController extends Controller
 {
     public function index() {
+        $qty = MovimientosModel::select('id')->get()->count();
+
         $movimientos = DB::table('NPI_movimientos as movimiento')
             ->join('NPI_partes', 'NPI_partes.numero_de_parte', '=', 'movimiento.numero_de_parte')
             ->select(
@@ -33,14 +35,44 @@ class MovimientosController extends Controller
                 'movimiento.fecha_registro',
                 'movimiento.numero_guia',
                 'movimiento.usuario'
-            )->get();
+            )
+            ->take(500)
+            ->get();
 
-        return view('movimientos.consulta', array('movimientos' => $movimientos));
+        return view('movimientos.consulta', array('qty' => $qty, 'movimientos' => $movimientos));
+    }
+
+    public function filters( $cantidad ) {
+        $qty = MovimientosModel::select('id')->get()->count();
+
+        $movimientos = DB::table('NPI_movimientos as movimiento')
+            ->join('NPI_partes', 'NPI_partes.numero_de_parte', '=', 'movimiento.numero_de_parte')
+            ->select(
+                'movimiento.id',
+                'movimiento.proyecto',
+                'NPI_partes.numero_de_parte as numero_parte',
+                'NPI_partes.descripcion',
+                'movimiento.ubicacion',
+                'movimiento.palet',
+                'movimiento.fila',
+                'NPI_partes.um as unidad_de_medida',
+                'movimiento.tipo',
+                'movimiento.cantidad',
+                'movimiento.comentario',
+                'movimiento.fecha_registro',
+                'movimiento.numero_guia',
+                'movimiento.usuario'
+            );
+
+        if( $cantidad != 'all' ) {
+            $movimientos = $movimientos->take($cantidad);
+        }
+        $movimientos = $movimientos->get();
+
+        return view('movimientos.consulta', array('qty' => $qty, 'movimientos' => $movimientos));
     }
 
     public function create() {
-        $movimiento = new MovimientosModel();
-
         $partes = PartesModel::where('active', 1)->get();
         $ubicaciones = UbicacionesModel::where('tipo', 'NPI')->get();
 
@@ -48,7 +80,7 @@ class MovimientosController extends Controller
             $parte->descripcion = str_replace('"', "''", $parte->descripcion);
         }
 
-        return view('movimientos.movimientos', array('movimiento' => $movimiento, 'partes' => $partes, 'ubicaciones' => $ubicaciones));
+        return view('movimientos.movimientos', array('partes' => $partes, 'ubicaciones' => $ubicaciones));
     }
 
     public function store(Request $request) {

@@ -57,6 +57,7 @@ class BomsController extends Controller
             'kit_nombre' => $request->kit_nombre,
             'kit_descripcion' => $request->kit_descripcion,
             'status' => $request->status,
+            'cantidad' => $request->cantidad,
             'ubicacion' => $request->ubicacion,
             'team' => $request->team,
         ]);
