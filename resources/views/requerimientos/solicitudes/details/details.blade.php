@@ -18,7 +18,6 @@
                     <div class="d-flex justify-content-end">
                         @if ($status == 'SOLICITADO')
                             @if (Auth::user()->role == 'NPI-admin')
-                                {{-- <button type="submit" class="btn btn-primary" onclick="saveInfo()"> --}}
                                 <button type="submit" class="btn btn-primary" onclick="guardarInfo()">
                                     Guardar
                                 </button>
@@ -40,11 +39,21 @@
                             </div>
                         @endif
                         <span id="counter"></span>
+                        <div id="cantidad-a-eliminar-indicador" style="display: none">
+                            <span>Cantidad de registros a eliminar: <b id="cantidad-a-eliminar"></b> </span>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="enviarDatosEliminar()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+                                </svg>
+                                Eliminar
+                            </button>
+                        </div>
                             <div class="card col-md-12 mt-4">
                                 <div class="mt-2 table-responsive">
                                     <table id="requerimientos" class="table table-striped">
                                         <thead>
                                             <tr>
+                                                <th scope="col">Eliminar</th>
                                                 <th scope="col">Folio</th>
                                                 <th scope="col">Número de parte</th>
                                                 <th scope="col">Kit nombre</th>
@@ -61,6 +70,11 @@
                                         <tbody>
                                             @foreach ($requerimientos as $requerimiento)
                                                 <tr>
+                                                    <td class="text-center">
+                                                        @if ( $requerimiento->status == 'SOLICITADO' )
+                                                            <input type="checkbox" style="top: 1.2rem; scale: 2; margin-right: 0.8rem;" name="" id="" onchange="addDeleteIndex('{{ $requerimiento->id }}')">
+                                                        @endif
+                                                    </td>
                                                     <td>{{ $requerimiento->folio }}</td>
                                                     <td>{{ $requerimiento->num_parte }}</td>
                                                     <td>{{ $requerimiento->kit_nombre }}</td>
@@ -83,7 +97,7 @@
                                                                         @endif
                                                                     @endif
                                                                 </div>
-                                                                @include('requerimientos.solicitudes.edit2')
+                                                                @include('requerimientos.solicitudes.details.edit2')
                                                             @empty
                                                                 <b>0</b>
                                                             @endforelse
@@ -93,7 +107,6 @@
                                                     <td>
                                                         @forelse ($requerimiento->cantidad_ubicacion as $ubicacion)
                                                             <div id="ubicacion{{ $ubicacion->id }}{{ $requerimiento->id }}">
-                                                                {{-- <b class="ubicacion{{ $ubicacion->id }}{{ $requerimiento->id }}"> --}}
                                                                 <b class="ubicacion{{ $ubicacion->id }}"> {{ $ubicacion->ubicacion }} {{ $ubicacion->palet }}: {{ round($ubicacion->cantidad, 0) }} </b>
                                                                     @if ($requerimiento->status   == 'SOLICITADO')
                                                                         @if (Auth::user()->role == 'NPI-admin')
@@ -110,45 +123,9 @@
                                                         @empty
 
                                                         @endforelse
-                                                        {{-- @forelse ($requerimiento->ubicaciones as $ubicacion)
-                                                            <div id="ubicacion{{ $ubicacion->id }}{{ $requerimiento->id }}">
-                                                                <b class="ubicacion{{ $ubicacion->id }}"> {{ $ubicacion->ubicacion }} {{ $ubicacion->palet }}: {{ round($ubicacion->cantidad, 0) }} </b>
-                                                                @if ($requerimiento->status   == 'SOLICITADO')
-                                                                    @if (Auth::user()->role == 'NPI-admin')
-                                                                        <input
-                                                                            id="input{{ $ubicacion->id }}"
-                                                                            type="number"
-                                                                            class="form-control"
-                                                                            name="cantidad"
-                                                                            onblur="addQty( {{ $ubicacion->cantidad }}, {{ $ubicacion->element_index }}, value)">
-                                                                    @endif
-                                                                @endif
-                                                            </div>
-                                                        @empty
 
-                                                        @endforelse --}}
-
-                                                        @include('requerimientos.solicitudes.edit')
+                                                        @include('requerimientos.solicitudes.details.edit')
                                                     </td>
-                                                    {{-- <td>
-                                                        <input type="hidden" name="folio" value="{{ $requerimiento->folio }}">
-
-                                                        @forelse ($requerimiento->ubicaciones as $ubicacion)
-                                                            <div>
-                                                                <b>{{ $ubicacion->ubicacion }} {{ $ubicacion->palet }}: {{ $ubicacion->cantidad }}</b>
-                                                                @if ($status == 'SOLICITADO')
-                                                                    @if (Auth::user()->role == 'NPI-admin')
-                                                                        <input type="hidden" id="{{ $ubicacion->id }}" class="form-control" name="num_parte{{ $requerimiento->num_parte }}_{{ $ubicacion->id }}" value="{{ $requerimiento->num_parte }}">
-                                                                        <input type="hidden" id="{{ $ubicacion->id }}" class="form-control" name="ubicacion{{ $requerimiento->num_parte }}_{{ $ubicacion->id }}" value="{{ $ubicacion->ubicacion }}">
-                                                                        <input type="hidden" id="{{ $ubicacion->id }}" class="form-control" name="palet{{ $requerimiento->num_parte }}_{{ $ubicacion->id }}" value="{{ $ubicacion->palet }}">
-                                                                        <input type="number" id="{{ $ubicacion->id }}" class="form-control" name="cantidad{{ $requerimiento->num_parte }}_{{ $ubicacion->id }}_{{ $requerimiento->id }}" >
-                                                                    @endif
-                                                                @endif
-                                                            </div>
-                                                        @empty
-                                                            <b>0</b>
-                                                        @endforelse
-                                                    </td> --}}
                                                     <td>{{ $requerimiento->solicitante }}</td>
                                                     <td>{{ $requerimiento->ubicacion }}</td>
                                                     <td>{{ $requerimiento->status }}</td>
@@ -156,6 +133,7 @@
                                                 </tr>
 
                                             @endforeach
+                                            @include('requerimientos.solicitudes.details.delete')
                                         </tbody>
                                     </table>
                                 </div>
@@ -190,7 +168,6 @@
 
             let index = 0;
             ubicacionesList.forEach(requerimiento => {
-                console.log(requerimiento)
                 if(requerimiento.cantidad_ubicacion.length > 0) {
 
                     // se asigna cada una de las propiedades
@@ -213,9 +190,6 @@
         });
 
         const addQty = (disponible, index, value) => {
-            console.log(disponible);
-            console.log(index);
-            console.log(value);
 
             if( value > disponible ) {
                 value = 0;
@@ -255,9 +229,6 @@
                     snack.innerText = 'No se pudo surtir el requerimiento, intente de nuevo';
                     snack.removeAttribute('hidden');
 
-                    // setTimeout(() => {
-                    //     window.location.reload()
-                    // }, 2000);
                 }
             });
         }
@@ -300,6 +271,38 @@
 
             form.submit();
 
+        }
+
+    </script>
+
+    <script>
+
+        let listaParaEliminar = [];
+
+        const addDeleteIndex = ( id ) => {
+            if(listaParaEliminar.includes(id)) {
+                listaParaEliminar.splice(listaParaEliminar.indexOf(id), 1);
+            } else {
+                listaParaEliminar.push(id);
+            }
+
+            const cantidadIndicador = document.getElementById('cantidad-a-eliminar-indicador');
+
+            if(listaParaEliminar.length > 0) {
+                cantidadIndicador.style.display = 'block';
+
+                const cantidad = document.getElementById('cantidad-a-eliminar');
+                cantidad.innerText = listaParaEliminar.length;
+            } else {
+                cantidadIndicador.style.display = 'none';
+
+            }
+
+        }
+
+        function enviarDatosEliminar() {
+            const inputRegistros = document.getElementById('registros');
+            inputRegistros.value = listaParaEliminar;
         }
 
     </script>
@@ -368,14 +371,12 @@
                                 dataType: "json",
                                 success: function({acumulado}) {
                                     if( acumulado ) {
-                                        console.log(acumulado)
                                         cantidadUbicacion[index].innerText = `${ubicacion} ${palet}: ${cantidad_actual - acumulado}`;
 
                                     }
 
                                 },
                                 error: function(error) {
-                                    // console.log({error})
                                 }
                             });
                             // cantidadUbicacion[index].innerText = `${ubicacion} ${palet}: ${cantidad_actual - acumulado}`;
@@ -404,7 +405,6 @@
 
                 },
                 error: function(error) {
-                    // console.log({error})
                 }
             });
         }
@@ -430,7 +430,6 @@
                     window.location.reload();
                 },
                 error: function(error) {
-                    // console.log({error})
                 }
             });
 

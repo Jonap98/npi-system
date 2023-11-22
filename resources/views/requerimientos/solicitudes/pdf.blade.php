@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-    {{-- <link rel="stylesheet" href="{{ asset('css/pdf-styles.css') }}"> --}}
     <style>
         body, th, td{
             font-family: Arial, Helvetica, sans-serif;
@@ -18,16 +17,11 @@
         th {
             border: 1px solid;
             text-align: center;
-            /* max-width: 200px; */
         }
         td {
             text-align: center;
-            /* max-width: 200px; */
         }
         .header {
-            /* margin: auto;
-            width: 75%;
-            padding-top: 10px; */
             display: flex;
             justify-content: center;
         }
@@ -75,8 +69,6 @@
         <div class="flx-container">
             <div class="inline">
                 <span class="title">Solicitud de material NPI: {{ $kit }} - SKU {{ $team }}</span>
-                {{-- <img src="{{ asset('assets/whirlpool-logo.png') }}" alt="" width="50px"> --}}
-                {{-- <img src="https://m.media-amazon.com/images/I/71H-vvz0PXL._AC_SY879_.jpg" height="200" alt="" class="m-2"> --}}
             </div>
             <div class="block">
                 <div class="col">
@@ -97,14 +89,11 @@
                 <th class="ubicacion">Ubicación</th>
                 <th>Cantidad requerida</th>
                 <th>Ubicación almacén</th>
-                {{-- <th>Solicitante</th>
-                <th>Fecha</th> --}}
             </thead>
 
             <tbody>
                 @foreach ($requerimientos as $requerimiento)
                     <tr>
-                        {{-- <td class=""><span>{{ $requerimiento->folio }}</span></td> --}}
                         <td class=""><span>{{ $requerimiento->status_bom }}</span></td>
                         <td class=""><span>{{ $requerimiento->num_parte }}</span></td>
                         <td class=""><span>{{ $requerimiento->descripcion }}</span></td>
@@ -124,9 +113,6 @@
                                 </div>
                             @endforeach
                         </td>
-                        {{-- <td class=""><span>{{ $requerimiento->solicitante }}</span></td> --}}
-                        {{-- <td class=""><span>{{ $requerimiento->created_at->format('d-m-Y H:i') }}</span></td> --}}
-                        {{-- <td class=""><span>{{ substr($requerimiento->created_at, 0, 10) }}</span></td> --}}
                     </tr>
                 @endforeach
             </tbody>

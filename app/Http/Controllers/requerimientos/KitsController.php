@@ -199,6 +199,7 @@ class KitsController extends Controller
             $requerimiento->status = 'SOLICITADO';
             $requerimiento->ubicacion = $ubicacion->ubicacion;
             $requerimiento->team = $request->team;
+            $requerimiento->active = 1;
 
             $requerimiento->save();
         }

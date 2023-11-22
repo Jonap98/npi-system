@@ -94,6 +94,7 @@ class SolicitudRequerimientosController extends Controller
             'ubicacion'
         )
         ->where('folio', $folio)
+        ->where('active', 1)
         ->get();
 
         $status = SolicitudesModel::select('status')->where('folio', $folio)->first();
@@ -139,136 +140,7 @@ class SolicitudRequerimientosController extends Controller
             $req->cantidad_solicitada = $cantidad_ubicaciones;
         }
 
-        return view('requerimientos.solicitudes.details', array('requerimientos' => $requerimientos, 'status' => $status->status, 'folio' => $folio));
-    }
-
-    public function detailsOLD($folio) {
-        // 1- Obtener todos los requerimientos de ese folio
-        $requerimientos = RequerimientosModel::select(
-            'id',
-            'folio',
-            'num_parte',
-            'kit_nombre',
-            'descripcion',
-            'cantidad_requerida',
-            'cantidad_ubicacion',
-            'solicitante',
-            'comentario',
-            'status',
-            'ubicacion'
-        )
-        ->where('folio', $folio)
-        ->get();
-
-        $status = SolicitudesModel::select('status')->where('folio', $folio)->first();
-
-        $indice = 0;
-
-        // Iterar en cada requerimiento para obtener los detalles
-        for($i = 0; $i < count($requerimientos); $i++) {
-
-            $inventarioIndividual = 0;
-
-            // 2- Obtener las cantidades solicitadas
-            // Consulta de material por ubicación de la tabla de movimientos
-            // para ver de donde se tomará el material, según su disponibilidad
-            $solicitadas = MovimientosModel::select(
-                'id',
-                'numero_de_parte',
-                'ubicacion',
-                'cantidad',
-                'tipo',
-                'palet',
-            )
-            ->where('numero_de_parte', $requerimientos[$i]->num_parte)
-            ->orderBy('ubicacion', 'asc')
-            ->get();
-
-            // Agrupar las cantidades solicitadas
-            $ubicaciones_temp = [];
-            if(count($solicitadas) > 0) {
-                array_push($ubicaciones_temp, $solicitadas[0]);
-            }
-
-            for($j = 1; $j < count($solicitadas); $j++) {
-                $repetida = false;
-                for($k = 0; $k < count($ubicaciones_temp); $k++) {
-                    if($solicitadas[$j]->numero_de_parte == $ubicaciones_temp[$k]->numero_de_parte && $solicitadas[$j]->ubicacion == $ubicaciones_temp[$k]->ubicacion && $solicitadas[$j]->palet == $ubicaciones_temp[$k]->palet) {
-                        $repetida = true;
-                        if($solicitadas[$j]->tipo == 'Entrada') {
-                            $ubicaciones_temp[$k]->cantidad += $solicitadas[$j]->cantidad;
-                        }
-
-                        if($solicitadas[$j]->tipo == 'Salida') {
-                            $ubicaciones_temp[$k]->cantidad -= $solicitadas[$j]->cantidad;
-                        }
-
-                        if($ubicaciones_temp[$k]->cantidad < 0) {
-                            $ubicaciones_temp[$k]->cantidad = 0;
-                        }
-                    }
-                }
-                if(!$repetida) {
-                    array_push($ubicaciones_temp, $solicitadas[$j]);
-                }
-            }
-
-            $requerimientos[$i]->ubicaciones = $ubicaciones_temp;
-
-
-            // 3- Obtener las cantidades por ubicacion de cada número  de parte
-            $solicitudes = CantidadUbicacionesModel::select(
-                'id',
-                'folio_solicitud',
-                'num_parte',
-                'cantidad',
-                'ubicacion',
-                'palet',
-                'status'
-            )
-            ->where('folio_solicitud', $requerimientos[$i]->folio)
-            ->where('num_parte', $requerimientos[$i]->num_parte)
-            ->where('id_requerimiento', $requerimientos[$i]->id)
-            ->get();
-
-
-
-            $solicitudes_list = [];
-            if(count($solicitudes) > 0) {
-                array_push($solicitudes_list, $solicitudes[0]);
-            }
-
-            // Sumar las cantidades agrupandolas por ubicacion y palet
-            for($l = 1; $l < count($solicitudes); $l++) {
-                $seRepitio = false;
-                for($m = 0; $m < count($solicitudes_list); $m++) {
-                    if($solicitudes[$l]->ubicacion == $solicitudes_list[$m]->ubicacion && $solicitudes[$l]->palet == $solicitudes_list[$m]->palet) {
-                        $seRepitio = true;
-                        // $suma = $solicitudes_list[$m]->cantidad += $solicitudes[$l]->cantidad;
-                    }
-                }
-                if(!$seRepitio) {
-                    array_push($solicitudes_list, $solicitudes[$l]);
-                }
-            }
-
-
-            $requerimientos[$i]->solicitudes = $solicitudes_list;
-
-
-            foreach ($requerimientos[$i]->ubicaciones as $ubicacion) {
-                $ubicacion->element_index = $indice;
-                $indice++;
-
-                foreach ($requerimientos[$i]->solicitudes as $solicitud) {
-                    if($ubicacion->ubicacion == $solicitud->ubicacion && $ubicacion->palet == $solicitud->palet) {
-                        // $ubicacion->cantidad -= $solicitud->cantidad;
-                    }
-                }
-            }
-        }
-
-        return view('requerimientos.solicitudes.details', array('requerimientos' => $requerimientos, 'status' => $status->status, 'folio' => $folio));
+        return view('requerimientos.solicitudes.details.details', array('requerimientos' => $requerimientos, 'status' => $status->status, 'folio' => $folio));
     }
 
     public function updateStatus(Request $request) {
@@ -282,8 +154,6 @@ class SolicitudRequerimientosController extends Controller
 
     public function preparar(Request $request) {
 
-        // $ubicacionesTst = [];
-        // $movimientosTst = [];
         $currentUser = Auth::user()->username;
         foreach ($request->cantidades as $cantidad) {
             if( $cantidad['cantidad'] > 0 ) {
@@ -305,8 +175,6 @@ class SolicitudRequerimientosController extends Controller
                 $cantidad_ubicacion->created_at = Carbon::now()->subHours(1);
                 $cantidad_ubicacion->updated_at = Carbon::now()->subHours(1);
 
-                // array_push($ubicacionesTst, $cantidad_ubicacion);
-
                 $cantidad_ubicacion->save();
 
                 $movimiento = new MovimientosModel();
@@ -323,8 +191,6 @@ class SolicitudRequerimientosController extends Controller
                 $movimiento->created_at = Carbon::now()->subHours(1);
                 $movimiento->updated_at = Carbon::now()->subHours(1);
                 $movimiento->usuario = $currentUser;
-
-                // array_push($movimientosTst, $movimiento);
 
                 $movimiento->save();
 
@@ -520,6 +386,7 @@ class SolicitudRequerimientosController extends Controller
             'ubicacion'
         )
         ->where('folio', $request->folio)
+        ->where('active', 1)
         ->get();
 
         $solicitud = RequerimientosModel::select(

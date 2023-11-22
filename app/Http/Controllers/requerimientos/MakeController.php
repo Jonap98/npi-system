@@ -185,6 +185,7 @@ class MakeController extends Controller
             $requerimiento->status = 'SOLICITADO';
             $requerimiento->ubicacion = $valor['ubicacion'];
             $requerimiento->team = $valor['team'];
+            $requerimiento->active = 1;
 
             $requerimiento->save();
         }

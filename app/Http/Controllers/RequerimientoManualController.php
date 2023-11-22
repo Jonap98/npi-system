@@ -147,6 +147,7 @@ class RequerimientoManualController extends Controller
                 $requerimiento->ubicacion = $model->ubicacion ?? '';
                 $requerimiento->created_at = Carbon::now()->subHours(1);
                 $requerimiento->updated_at = Carbon::now()->subHours(1);
+                $requerimiento->active = 1;
 
                 $requerimiento->save();
             }

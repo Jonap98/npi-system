@@ -16,6 +16,7 @@ use App\Http\Controllers\SolicitudRequerimientosController;
 use App\Http\Controllers\RequerimientoManualController;
 use App\Http\Controllers\RequerimientosController;
 use App\Http\Controllers\BomsController;
+use App\Http\Controllers\solicitudes\SolicitudDetallesController;
 
 use App\Http\Controllers\requerimientos\ModelosController;
 use App\Http\Controllers\requerimientos\KitsController;
@@ -97,6 +98,7 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::post('solicitudes/requerimientos/delete', [SolicitudRequerimientosController::class, 'delete'])->name('solicitud.requerimientos.delete');
 
+    Route::post('solicitud/requerimientos/delete-details', [SolicitudDetallesController::class, 'delete'])->name('solicitud.requerimientos.delete-details');
 
 
     // =======================================================
