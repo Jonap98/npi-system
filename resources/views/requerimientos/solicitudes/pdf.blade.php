@@ -103,12 +103,13 @@
                             @foreach ($requerimiento->ubicaciones_registradas as $ubicaciones)
                                 <div>
                                     <span>
-                                        {{ $ubicaciones->ubicacion }}:
+                                        {{ $ubicaciones->ubicacion }}
+                                    </span>
+                                    <span>
+                                        {{ $ubicaciones->palet }}
                                     </span>
                                     <b>
-                                        @foreach ($ubicaciones->palets_registrados as $palets)
-                                            {{ $palets->palet }},
-                                        @endforeach
+                                        {{ $ubicaciones->cantidad }}
                                     </b>
                                 </div>
                             @endforeach

@@ -210,6 +210,8 @@
         }
 
         function confirm() {
+            document.getElementById('confirmButton').setAttribute('disabled', 'true');
+
             document.getElementById("counter").value = rows + 1;
 
             const formulario = document.getElementById('requerimientos-form').submit();

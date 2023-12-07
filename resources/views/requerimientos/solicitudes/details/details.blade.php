@@ -18,7 +18,7 @@
                     <div class="d-flex justify-content-end">
                         @if ($status == 'SOLICITADO')
                             @if (Auth::user()->role == 'NPI-admin')
-                                <button type="submit" class="btn btn-primary" onclick="guardarInfo()">
+                                <button type="submit" class="btn btn-primary" id="confirmButton" onclick="guardarInfo()">
                                     Guardar
                                 </button>
                             @endif
@@ -202,6 +202,8 @@
         }
 
         const guardarInfo = () => {
+
+            document.getElementById('confirmButton').setAttribute('disabled', 'true');
 
             $.ajax({
                 type: "POST",

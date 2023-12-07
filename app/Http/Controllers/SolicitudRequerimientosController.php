@@ -412,33 +412,17 @@ class SolicitudRequerimientosController extends Controller
 
             $req->status_bom = substr($status->status ?? '', 0, 8);
 
-            // Proceso para obtener ubicacion y palet sin repetir
-            $ubicaciones = DB::table('NPI_movimientos')
-            ->select('ubicacion')
+            $ubicaciones = InventarioModel::select(
+                'ubicacion',
+                'cantidad',
+                'palet',
+            )
             ->where('numero_de_parte', $req->num_parte)
-            ->get()
-            ->unique('ubicacion');
+            ->where('cantidad', '>', 0)
+            ->get();
 
-            $ubicaciones_array = array();
-            foreach ($ubicaciones as $ubicacion) {
-                $palets = DB::table('NPI_movimientos')
-                ->select('palet')
-                ->where('numero_de_parte', $req->num_parte)
-                ->where('ubicacion', $ubicacion->ubicacion)
-                ->get()
-                ->unique('palet');
+            $req->ubicaciones_registradas = $ubicaciones;
 
-
-                $palets_array = array();
-                foreach ($palets as $palet) {
-                    array_push($palets_array, $palet);
-                }
-                $ubicacion->palets_registrados = $palets_array;
-
-                array_push($ubicaciones_array, $ubicacion);
-
-            }
-            $req->ubicaciones_registradas = $ubicaciones_array;
         }
 
         // Se debe decodificar la respuesta para hacerla compatible con el PDF

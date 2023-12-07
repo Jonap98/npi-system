@@ -17,7 +17,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="confirm()">Solicitar</button>
+                <button type="button" id="confirmButton" class="btn btn-primary" onclick="confirm()">Solicitar</button>
             </div>
 
         </div>
