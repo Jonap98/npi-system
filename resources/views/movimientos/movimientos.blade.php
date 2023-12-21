@@ -323,6 +323,9 @@
             getRowsCount();
 
             document.getElementById('movimientos-form').submit();
+
+            document.getElementById('confirmar-movimiento').setAttribute('disabled', 'true');
+
         }
 
         function getRowsCount() {

@@ -28,10 +28,10 @@
 </head>
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+        <nav class="navbar navbar-expand-md navbar-dark bg-dark shadow-sm">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ route('movimientos') }}">
-                    <img src="{{ asset('assets/whirlpool-logo.png') }}" alt="" width="100px">
+                    <img src="{{ asset('assets/logo_blanco.png') }}" alt="" width="100px">
                 </a>
                 <div class="navbar-link">
                     <b>Inventario de nuevas partes</b>
@@ -59,24 +59,26 @@
                         {{-- <a class="nav-link active" aria-current="page" href="solicitudes/requerimientos">Requerimientos</a> --}}
                     </li>
 
-                    <li class="nav-item dropdown">
-                        <a href="#" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                            Solicitar
-                        </a>
-                        <ul class="dropdown-menu dropdown-bar-content" aria-labelledby="navbarDropdown">
-                            <li>
-                                <a href="{{ route('requerimientos.manual') }}" class="nav-link active">Requerimientos por número</a>
-                            </li>
+                    @if(Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Solicitar
+                            </a>
+                            <ul class="dropdown-menu dropdown-bar-content bg-dark" aria-labelledby="navbarDropdown">
+                                <li>
+                                    <a href="{{ route('requerimientos.manual') }}" class="nav-link active">Requerimientos por número</a>
+                                </li>
 
-                            <li>
-                                <a href="{{ route('requerimientos.modelo') }}" class="nav-link active">Requerimientos por modelo</a>
-                            </li>
-                        </ul>
-                    </li>
+                                <li>
+                                    <a href="{{ route('requerimientos.modelo') }}" class="nav-link active">Requerimientos por modelo</a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endif
 
                     @auth
 
-                        @if(Auth::user()->role == 'NPI-admin')
+                        @if(Auth::user() && (Auth::user()->role == 'NPI-adm'))
 
                             <li class="nav-item dropdown">
                                 <a href="#" id="navbarDropdow" class="nav-link active dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
@@ -108,7 +110,7 @@
                 @auth
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="btn">Logout</button>
+                        <button type="submit" class="btn btn-outlined-success text-white">Logout</button>
                     </form>
                 @endauth
                 <a class="btn" href="../">Regresar al portal</a>

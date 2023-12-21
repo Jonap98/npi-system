@@ -14,7 +14,9 @@
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
                         <button class="btn btn-success" onclick="addRow()">Agregar parte</button>
-                        <button class="btn btn-primary m-4 col-md-2" data-bs-toggle="modal" data-bs-target="#confirm">Guardar</button>
+                        @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                            <button class="btn btn-primary m-4 col-md-2" data-bs-toggle="modal" data-bs-target="#confirm">Guardar</button>
+                        @endif
                     </div>
                     @if(session('success'))
                         <div class="alert alert-success mt-2" role="alert">

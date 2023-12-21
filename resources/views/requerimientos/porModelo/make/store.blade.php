@@ -30,10 +30,12 @@
 
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="solicitarRequerimiento()" data-bs-dismiss="modal">Solicitar</button>
-            </div>
+            @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="solicitarRequerimiento()" data-bs-dismiss="modal">Solicitar</button>
+                </div>
+            @endif
 
         </div>
     </div>

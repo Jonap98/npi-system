@@ -9,7 +9,9 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <span>Partes</span>
-            <a href="{{ route('partes.create') }}" class="btn btn-primary btn-sm ms-5">Crear parte</a>
+            @if(Auth::user()->role == 'NPI-adm')
+                <a href="{{ route('partes.create') }}" class="btn btn-primary btn-sm ms-5">Crear parte</a>
+            @endif
             <hr>
             @if(session('success'))
                 <div class="alert alert-success mt-2" role="alert">
@@ -28,7 +30,9 @@
                                         <th scope="col">Número de parte</th>
                                         <th scope="col">Descripcion</th>
                                         <th scope="col">UM</th>
-                                        <th scope="col">Acción</th>
+                                        @if (Auth::user() && (Auth::user()->role == 'NPI-adm'))
+                                            <th scope="col">Acción</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,22 +42,26 @@
                                             <td>{{ $parte->numero_de_parte }}</td>
                                             <td>{{ $parte->descripcion }}</td>
                                             <td>{{ $parte->um }}</td>
-                                            <td>
-                                                <button type="button" class="btn btn-success btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#editModal" onclick="editPart('{{ $parte->id }}', '{{ $parte->numero_de_parte }}', '{{ $parte->descripcion }}')">
-                                                    Editar
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="deletePart('{{ $parte->id }}')">
-                                                    Eliminar
-                                                </button>
-                                            </td>
+                                            @if (Auth::user() && (Auth::user()->role == 'NPI-adm'))
+                                                <td>
+                                                    <button type="button" class="btn btn-success btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#editModal" onclick="editPart('{{ $parte->id }}', '{{ $parte->numero_de_parte }}', '{{ $parte->descripcion }}')">
+                                                        Editar
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#deleteModal" onclick="deletePart('{{ $parte->id }}')">
+                                                        Eliminar
+                                                    </button>
+                                                </td>
+                                            @endif
                                         </tr>
 
                                     @endforeach
 
-                                    {{-- Modal editar --}}
-                                    @include('partes.edit')
-                                    {{-- Modal eliminar --}}
-                                    @include('partes.delete')
+                                    @if (Auth::user() && (Auth::user()->role == 'NPI-adm'))
+                                        {{-- Modal editar --}}
+                                        @include('partes.edit')
+                                        {{-- Modal eliminar --}}
+                                        @include('partes.delete')
+                                    @endif
                                 </tbody>
                             </table>
                         </div>

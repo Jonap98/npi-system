@@ -10,9 +10,11 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <span>Ubicaciones</span>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#storeUbicacion">
-                Crear ubicación
-            </button>
+            @if (Auth::user() && (Auth::user()->role == 'NPI-adm'))
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#storeUbicacion">
+                    Crear ubicación
+                </button>
+            @endif
             @if(session('success'))
                 <div class="alert alert-success mt-2" role="alert">
                     {{ session('success') }}
@@ -29,7 +31,9 @@
                                     <tr>
                                         <th scope="col">Ubicación</th>
                                         <th scope="col">Tipo</th>
-                                        <th scope="col">Acción</th>
+                                        @if (Auth::user() && (Auth::user()->role == 'NPI-adm'))
+                                            <th scope="col">Acción</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -37,17 +41,21 @@
                                         <tr>
                                             <td>{{ $ubicacion->ubicacion }}</td>
                                             <td>{{ $ubicacion->tipo }}</td>
-                                            <td>
-                                                <button type="button" class="btn btn-danger btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $ubicacion->id }}">
-                                                    Eliminar
-                                                </button>
-                                            </td>
+                                            @if (Auth::user() && (Auth::user()->role == 'NPI-adm'))
+                                                <td>
+                                                    <button type="button" class="btn btn-danger btn-sm mx-auto" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $ubicacion->id }}">
+                                                        Eliminar
+                                                    </button>
+                                                </td>
+                                            @endif
                                         </tr>
 
-                                        {{-- Modal editar --}}
-                                        @include('ubicaciones.store')
-                                        {{-- Modal eliminar --}}
-                                        @include('ubicaciones.delete')
+                                        @if (Auth::user() && (Auth::user()->role == 'NPI-adm'))
+                                            {{-- Modal editar --}}
+                                            @include('ubicaciones.store')
+                                            {{-- Modal eliminar --}}
+                                            @include('ubicaciones.delete')
+                                        @endif
 
                                     @endforeach
                                 </tbody>

@@ -42,11 +42,13 @@ class MovimientosController extends Controller
         return view('movimientos.consulta', array('qty' => $qty, 'movimientos' => $movimientos));
     }
 
-    public function filters( $cantidad ) {
+    public function filters( Request $request ) {
+        $splited = explode(",", $request->materiales2);
+
         $qty = MovimientosModel::select('id')->get()->count();
 
         $movimientos = DB::table('NPI_movimientos as movimiento')
-            ->join('NPI_partes', 'NPI_partes.numero_de_parte', '=', 'movimiento.numero_de_parte')
+            ->leftjoin('NPI_partes', 'NPI_partes.numero_de_parte', '=', 'movimiento.numero_de_parte')
             ->select(
                 'movimiento.id',
                 'movimiento.proyecto',
@@ -64,8 +66,14 @@ class MovimientosController extends Controller
                 'movimiento.usuario'
             );
 
-        if( $cantidad != 'all' ) {
-            $movimientos = $movimientos->take($cantidad);
+        if( $request->materiales2 ) {
+            $movimientos = $movimientos->whereIn('NPI_partes.numero_de_parte', $splited);
+        }
+
+        if( $request->cantidad ) {
+            if( $request->cantidad != 'all' ) {
+                $movimientos = $movimientos->take($request->cantidad);
+            }
         }
         $movimientos = $movimientos->get();
 
@@ -74,7 +82,7 @@ class MovimientosController extends Controller
 
     public function create() {
         $partes = PartesModel::where('active', 1)->get();
-        $ubicaciones = UbicacionesModel::where('tipo', 'NPI')->get();
+        $ubicaciones = UbicacionesModel::where('tipo', 'NPI')->orderBy('ubicacion', 'asc')->get();
 
         foreach ($partes as $parte) {
             $parte->descripcion = str_replace('"', "''", $parte->descripcion);

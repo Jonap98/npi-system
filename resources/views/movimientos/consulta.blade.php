@@ -9,18 +9,28 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <span>Movimientos</span>
-            <a href="{{ route('movimientos.create') }}" class="btn btn-primary btn-sm ms-5">Crear movimiento</a>
+            @if(Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-whs'))
+                <a href="{{ route('movimientos.create') }}" class="btn btn-primary btn-sm ms-5">Crear movimiento</a>
+            @endif
             <a href="{{ route('exportar') }}" class="btn btn-success btn-sm ms-5">Exportar excel</a>
             <hr>
-            <div class="col-md-3 m-3">
-                <span>Cantidad a mostrar</span>
-                <select name="cantidad" id="filtro-cantidad" class="form-select" onchange="filterFunction()">
-                    <option value="">Seleccionar cantidad</option>
-                    <option value="500">500</option>
-                    <option value="1000">1000</option>
-                    <option value="1500">1500</option>
-                    <option value="all">Todos</option>
-                </select>
+            <div class="row">
+                <div class="col-md-3 m-3">
+                    <form id="qty-form" action="{{ route('movimientos.filters') }}" method="POST">
+                        @csrf
+                        <span>Cantidad a mostrar</span>
+                        <select name="cantidad" id="filtro-cantidad" class="form-select" onchange="filterFunction()">
+                            <option value="">Seleccionar cantidad</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                            <option value="1500">1500</option>
+                            <option value="all">Todos</option>
+                        </select>
+                    </form>
+                </div>
+                <div class="col align-self-center">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filtrar-numeros">Por número</button>
+                </div>
             </div>
             <div class="container">
                 <div class="row">
@@ -68,6 +78,8 @@
                         </div>
                     </div>
 
+                    @include('movimientos.filters.numeros')
+
                     <div class="col-md-4">
                         <div class="container">
                         </div>
@@ -95,7 +107,25 @@
     <script>
         function filterFunction() {
             const cantidad = document.getElementById('filtro-cantidad');
-            location.href = `/movimientos/filters/${cantidad.value}`
+
+            document.getElementById('qty-form').submit();
+
+        }
+
+        function buscar() {
+            let materialsList = [];
+            let lines = document.getElementById('materiales');
+            let lines2 = document.getElementById('materiales2');
+
+            document.getElementById('materials-button').setAttribute('disabled', '');
+
+            materialsList = lines.value.split('\n');
+
+            lines2.value = materialsList;
+
+            console.log(materialsList)
+
+            document.getElementById('numeros-id').submit();
         }
     </script>
 

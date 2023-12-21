@@ -15,7 +15,7 @@ class RegistroController extends Controller
     }
 
     public function store(Request $request) {
-        
+
 
         $validatedData = $validatedData = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -28,7 +28,7 @@ class RegistroController extends Controller
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
-            'role' =>  $request->admin ? 'NPI-admin' : 'NPI',
+            'role' =>  $request->role,
             'password' => Hash::make($request->password),
             'active' => 'Y'
         ]);

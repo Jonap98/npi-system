@@ -22,23 +22,16 @@
                 @endif
                 <div class="d-flex justify-content-between">
 
-                    <form method="POST"  action="{{ route('boms.import') }}" enctype="multipart/form-data" style="display: inline-flex">
-                        @csrf
-                        <div class="">
-                            <label for="">Cargar BOM</label>
-                            <input type="file" name="import" class="form-control mt-2 mb-2" id="import" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" >
-                            <button class="btn btn-success" type="submit">Cargar</button>
-                        </div>
-                    </form>
-
-                    {{-- @if (Auth::user()->role == 'NPI-admin')
-                        <div class="mt-2 mb-2">
-                            <button type="button" class="btn btn-primary mx-auto mb-4" data-bs-toggle="modal" data-bs-target="#modal">
-                                Seleccionar números
-                            </button>
-                            @include('boms.modal')
-                        </div>
-                    @endif --}}
+                    @if(Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng'))
+                        <form method="POST"  action="{{ route('boms.import') }}" enctype="multipart/form-data" style="display: inline-flex">
+                            @csrf
+                            <div class="">
+                                <label for="">Cargar BOM</label>
+                                <input type="file" name="import" class="form-control mt-2 mb-2" id="import" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" >
+                                <button class="btn btn-success" type="submit">Cargar</button>
+                            </div>
+                        </form>
+                    @endif
 
                 </div>
 
@@ -60,11 +53,12 @@
                                             <th scope="col">Descripción</th>
                                             <th scope="col">Nivel</th>
                                             <th scope="col">Status</th>
-                                            {{-- <th scope="col">Requerido</th> --}}
                                             <th scope="col">Cantidad</th>
                                             <th scope="col">Ubicación</th>
                                             <th scope="col">Temp</th>
-                                            <th scope="col">Editar</th>
+                                            @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng'))
+                                                <th scope="col">Editar</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -79,24 +73,26 @@
                                                 <td>{{ round($bom->cantidad, 2) }}</td>
                                                 <td>{{ $bom->ubicacion }}</td>
                                                 <td>{{ $bom->team }}</td>
-                                                <td>
-                                                    <button
-                                                        class="btn btn-primary"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#edit"
-                                                        onclick="loadData(
-                                                            {{ $bom->id }},
-                                                            '{{ $bom->num_parte }}',
-                                                            '{{ $bom->kit_nombre }}',
-                                                            '{{ $bom->kit_descripcion }}',
-                                                            '{{ $bom->status }}',
-                                                            '{{ round($bom->cantidad, 2) }}',
-                                                            '{{ $bom->ubicacion }}',
-                                                            '{{ $bom->team }}',
-                                                        )">
-                                                        Editar
-                                                    </button>
-                                                </td>
+                                                @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng'))
+                                                    <td>
+                                                        <button
+                                                            class="btn btn-primary"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#edit"
+                                                            onclick="loadData(
+                                                                {{ $bom->id }},
+                                                                '{{ $bom->num_parte }}',
+                                                                '{{ $bom->kit_nombre }}',
+                                                                '{{ $bom->kit_descripcion }}',
+                                                                '{{ $bom->status }}',
+                                                                '{{ round($bom->cantidad, 2) }}',
+                                                                '{{ $bom->ubicacion }}',
+                                                                '{{ $bom->team }}',
+                                                            )">
+                                                            Editar
+                                                        </button>
+                                                    </td>
+                                                @endif
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -104,8 +100,10 @@
 
                             </div>
                         </div>
-                    {{-- @include('boms.modal') --}}
-                    @include('boms.edit')
+                    @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng'))
+                        {{-- @include('boms.modal') --}}
+                        @include('boms.edit')
+                    @endif
                 </div>
             </div>
         </div>

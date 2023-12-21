@@ -17,7 +17,7 @@
                 <div id="location"></div>
                     <div class="d-flex justify-content-end">
                         @if ($status == 'SOLICITADO')
-                            @if (Auth::user()->role == 'NPI-admin')
+                            @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-whs'))
                                 <button type="submit" class="btn btn-primary" id="confirmButton" onclick="guardarInfo()">
                                     Guardar
                                 </button>
@@ -53,7 +53,9 @@
                                     <table id="requerimientos" class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th scope="col">Eliminar</th>
+                                                @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                                                    <th scope="col">Eliminar</th>
+                                                @endif
                                                 <th scope="col">Folio</th>
                                                 <th scope="col">Número de parte</th>
                                                 <th scope="col">Kit nombre</th>
@@ -70,11 +72,13 @@
                                         <tbody>
                                             @foreach ($requerimientos as $requerimiento)
                                                 <tr>
-                                                    <td class="text-center">
-                                                        @if ( $requerimiento->status == 'SOLICITADO' )
-                                                            <input type="checkbox" style="top: 1.2rem; scale: 2; margin-right: 0.8rem;" name="" id="" onchange="addDeleteIndex('{{ $requerimiento->id }}')">
-                                                        @endif
-                                                    </td>
+                                                    @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                                                        <td class="text-center">
+                                                            @if ( $requerimiento->status == 'SOLICITADO' )
+                                                                <input type="checkbox" style="top: 1.2rem; scale: 2; margin-right: 0.8rem;" name="" id="" onchange="addDeleteIndex('{{ $requerimiento->id }}')">
+                                                            @endif
+                                                        </td>
+                                                    @endif
                                                     <td>{{ $requerimiento->folio }}</td>
                                                     <td>{{ $requerimiento->num_parte }}</td>
                                                     <td>{{ $requerimiento->kit_nombre }}</td>
@@ -86,7 +90,7 @@
                                                                 <div class="mb-2 d-flex justify-content-between">
                                                                     <b>{{ $ubicaciones->ubicacion }} {{ $ubicaciones->palet }}: {{ round($ubicaciones->cantidad, 0) }}</b>
 
-                                                                    @if (Auth::user()->role == 'NPI-admin')
+                                                                    @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-whs'))
                                                                         @if ($status != 'RECIBIDO')
                                                                             <button type="button" class="btn btn-sm" style="background-color: #de7e35; color: #fff" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $ubicaciones->id }}">
                                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -97,7 +101,10 @@
                                                                         @endif
                                                                     @endif
                                                                 </div>
-                                                                @include('requerimientos.solicitudes.details.edit2')
+
+                                                                @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-whs'))
+                                                                    @include('requerimientos.solicitudes.details.edit2')
+                                                                @endif
                                                             @empty
                                                                 <b>0</b>
                                                             @endforelse
@@ -109,7 +116,7 @@
                                                             <div id="ubicacion{{ $ubicacion->id }}{{ $requerimiento->id }}">
                                                                 <b class="ubicacion{{ $ubicacion->id }}"> {{ $ubicacion->ubicacion }} {{ $ubicacion->palet }}: {{ round($ubicacion->cantidad, 0) }} </b>
                                                                     @if ($requerimiento->status   == 'SOLICITADO')
-                                                                        @if (Auth::user()->role == 'NPI-admin')
+                                                                        @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-whs'))
                                                                             <input
                                                                                 id="input{{ $ubicacion->id }}"
                                                                                 type="number"
@@ -133,7 +140,9 @@
                                                 </tr>
 
                                             @endforeach
-                                            @include('requerimientos.solicitudes.details.delete')
+                                            @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                                                @include('requerimientos.solicitudes.details.delete')
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>

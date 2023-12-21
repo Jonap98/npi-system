@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
 @section('css')
-    {{-- <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous"> --}}
 @endsection
 
 @section('content')
@@ -12,11 +10,6 @@
                 <div class="d-flex justify-content-between">
                     <div class="md-3">
                         <span>kits - <b>{{ $modelo }}</b> </span>
-                    </div>
-
-                    <div class="md-3">
-                        <button class="btn btn-primary">Cargar BOM</button>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#solicitudMaterial">Solicitud de material</button>
                     </div>
                 </div>
 
@@ -35,8 +28,6 @@
                             <div class="col-auto mb-3">
                                     <div class="card" style="width: 18rem;">
                                         <div class="card-body col-xs-1 text-center">
-                                            {{-- <img src="not-found.png" /> --}}
-                                            {{-- <img id="img{{ $kit->id }}" src="/tkav/storage/{{$kit->num_parte}}.jpg" alt="" height="200" class="m-2"> --}}
                                             <img id="img{{ $kit->id }}" src="" height="200" alt="" class="m-2 rounded">
                                             <h5 class="card-title text-card" style="text-decoration: none">{{ $kit->kit_nombre }}</h5>
                                             <h6 class="card-subtitle mb-2 text-muted text-card">{{ $kit->num_parte }}</h6>
@@ -48,18 +39,6 @@
                                             <button class="btn btn-sm" style="background-color: #347aeb; color: #fff" onclick="showKits('{{ $kit->id }}')" data-bs-toggle="modal" data-bs-target="#solicitarKit{{ $kit->id }}">
                                                 Solicitar KIT
                                             </button>
-                                            {{-- <form action="{{ route('requerimientos.kits.generate-pdf') }}" id="pdf-form" method="POST" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" id="kit-input" name="kit" >
-
-                                            </form>
-                                            <button type="button" class="btn btn-sm btn-primary" onclick="generatePDF('{{ $kit->id }}')">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer-fill" viewBox="0 0 16 16">
-                                                    <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
-                                                    <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
-                                                </svg>
-                                                Kit
-                                            </button> --}}
                                         </div>
                                     </div>
                             </div>
@@ -99,11 +78,6 @@
                     } else {
                         imagen.src = noPartImage;
                     }
-                    // response.blob().then((myBlob) => {
-
-                    //     // const objectURL = URL.createObjectURL(myBlob);
-                    //     // myImage.src = objectURL;
-                    // });
                 });
 
             });
@@ -161,11 +135,6 @@
 
                             tbody.appendChild(row);
 
-                            // const span = document.createElement('span');
-                            // span.innerText = `${kit_descripcion}\n${num_parte}: ${Math.round(cantidad)}`;
-                            // span.className = 'm-2 btn btn-secondary btn-sm m-1';
-
-                            // parts.appendChild(span);
                         });
                         document.getElementById('kit-input').value = 'datos';
 

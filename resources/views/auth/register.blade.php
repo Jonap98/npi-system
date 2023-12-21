@@ -59,10 +59,15 @@
                         </div>
 
                         <div class="row mb-3">
-                            <label for="admin" class="col-md-4 col-form-label text-md-end">Administrador</label>
+                            <label for="role" class="col-md-4 col-form-label text-md-end">Rol</label>
 
                             <div class="col-md-6 position-relative top-50">
-                                <input type="checkbox" class="form-check-input" name="admin">
+                                <select name="role" id="" class="form-select">
+                                    <option value="NPI-adm">Administrador</option>
+                                    <option value="NPI-whs">Almacén</option>
+                                    <option value="NPI-usr">Usuario ingeniería</option>
+                                    <option value="NPI-eng">Admin Ingeniería</option>
+                                </select>
                             </div>
                         </div>
 

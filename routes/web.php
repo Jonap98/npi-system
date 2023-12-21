@@ -171,7 +171,8 @@ Route::group(['middleware' => ['auth']], function() {
 });
 
 Route::get('/', [MovimientosController::class, 'index'])->name('movimientos');
-Route::get('/movimientos/filters/{cantidad?}', [MovimientosController::class, 'filters'])->name('movimientos.filters');
+// Route::get('/movimientos/filters/{cantidad?}', [MovimientosController::class, 'filters'])->name('movimientos.filters');
+Route::post('/movimientos/filters', [MovimientosController::class, 'filters'])->name('movimientos.filters');
 
 // Inventario
 Route::get('/inventario/inventario', [InventarioController::class, 'index'])->name('inventario');

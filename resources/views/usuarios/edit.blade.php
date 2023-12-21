@@ -33,13 +33,15 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
-                    
+
                     <div class="m-2">
                         <label>Rol</label>
-                        <select class="form-select" id="role" name="role">
+                        <select name="role" id="role" class="form-select">
                             <option selected >{{ $usuario->role }}</option>
-                                <option value="NPI-admin"> Administrador NPI </option>
-                                <option value="NPI"> Usuario NPI </option>
+                            <option value="NPI-adm">Administrador</option>
+                            <option value="NPI-whs">Almacén</option>
+                            <option value="NPI-usr">Usuario ingeniería</option>
+                            <option value="NPI-eng">Admin Ingeniería</option>
                         </select>
                         @error('role')
                             <span class="text-danger">{{ $message }}</span>

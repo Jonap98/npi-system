@@ -12,11 +12,6 @@
                     <div class="md-3">
                         <span>Make - <b>{{ $make }} {{ $temp }}</b> </span>
                     </div>
-
-                    <div class="md-3">
-                        <button class="btn btn-primary">Cargar BOM</button>
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#solicitudMaterial">Solicitud de material</button>
-                    </div>
                 </div>
 
                 <hr>

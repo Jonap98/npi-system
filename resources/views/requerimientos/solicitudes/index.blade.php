@@ -65,14 +65,18 @@
                             <table id="requerimientos" class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Eliminar</th>
+                                        @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                                            <th scope="col">Eliminar</th>
+                                        @endif
                                         <th scope="col">Folio</th>
                                         <th scope="col">Solicitante</th>
                                         <th scope="col">Kit</th>
                                         <th scope="col">SKU</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Fecha</th>
-                                        <th scope="col">Recibir</th>
+                                        @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                                            <th scope="col">Recibir</th>
+                                        @endif
                                         <th scope="col">Ver detalles</th>
                                         <th scope="col">Imprimir</th>
                                     </tr>
@@ -80,28 +84,32 @@
                                 <tbody>
                                     @foreach ($requerimientos as $requerimiento)
                                         <tr>
-                                            <td>
-                                                @if ($requerimiento->status == 'SOLICITADO')
-                                                    <button class="btn" style="background-color: #ba3636; color: #fff" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="addFolioToDelete({{ $requerimiento->folio }})">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-                                                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
-                                                        </svg>
-                                                    </button>
-                                                @endif
-                                            </td>
+                                            @if(Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                                                <td>
+                                                    @if ($requerimiento->status == 'SOLICITADO')
+                                                        <button class="btn" style="background-color: #ba3636; color: #fff" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="addFolioToDelete({{ $requerimiento->folio }})">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                                                            </svg>
+                                                        </button>
+                                                    @endif
+                                                </td>
+                                            @endif
                                             <td>{{ $requerimiento->folio }}</td>
                                             <td>{{ $requerimiento->solicitante }}</td>
                                             <td>{{ $requerimiento->kit_nombre }}</td>
                                             <td>{{ $requerimiento->team }}</td>
                                             <td>{{ $requerimiento->status }}</td>
                                             <td>{{ $requerimiento->fecha }}</td>
-                                            <td>
-                                                <button {{ ($requerimiento->status != 'PREPARADO') ? 'disabled' : '' }} class="btn" style="background-color: #4aba36; color: #fff" onclick="sendAction({{ $requerimiento->id }}, '2', {{ $requerimiento->folio }})" data-bs-toggle="modal" data-bs-target="#update{{ $requerimiento->id }}">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-arrow-down-fill" viewBox="0 0 16 16">
-                                                        <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM8 5a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 9.293V5.5A.5.5 0 0 1 8 5z"/>
-                                                    </svg>
-                                                </button>
-                                            </td>
+                                            @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                                                <td>
+                                                    <button {{ ($requerimiento->status != 'PREPARADO') ? 'disabled' : '' }} class="btn" style="background-color: #4aba36; color: #fff" onclick="sendAction({{ $requerimiento->id }}, '2', {{ $requerimiento->folio }})" data-bs-toggle="modal" data-bs-target="#update{{ $requerimiento->id }}">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-arrow-down-fill" viewBox="0 0 16 16">
+                                                            <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM8 5a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 9.293V5.5A.5.5 0 0 1 8 5z"/>
+                                                        </svg>
+                                                    </button>
+                                                </td>
+                                            @endif
                                             <td>
                                                 <a href="{{ route('solicitud.requerimientos.detalles', $requerimiento->folio) }}" class="btn" style="background-color: #f0ac3e; color: #fff">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-text-fill" viewBox="0 0 16 16">
@@ -126,7 +134,9 @@
                                         </tr>
                                         @include('requerimientos.solicitudes.update')
                                     @endforeach
-                                    @include('requerimientos.solicitudes.delete')
+                                    @if (Auth::user() && (Auth::user()->role == 'NPI-adm' || Auth::user()->role == 'NPI-eng' || Auth::user()->role == 'NPI-usr'))
+                                        @include('requerimientos.solicitudes.delete')
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
